@@ -69,6 +69,7 @@ function step_status {
 echo
 GLOBAL_VAR=""
 GLOBAL_CONF=""
+CURENT_FUNC=""
 
 
 color_echo $BBlue "#############################################################################################################################"
@@ -127,7 +128,7 @@ if [ "$testOs" != 'ko' ]; then
 	    #echo "----------------------------------conf_SNMP : " >> ../$HOME/tmp.txt
 	    cd $PathrepoSnmp
 	    Package=$snmp
-	    VIP_SNMP=$(grep 'com2sec readonly  ' $Package | sed "s+com2sec readonly  ++g" | sed "s+public++g")
+	    VIP_SNMP=$(grep 'com2sec readonly  ' $Package | grep -v '#' | sed "s+com2sec readonly  ++g" | sed "s+public++g")
 	    echo "$VIP_SNMP" >> /tmp/tmp.txt
 	    cd ../
 	    echo -e " ; " >> /tmp/tmp.txt
@@ -200,7 +201,7 @@ else
 	    #echo "----------------------------------conf_SNMP : " >> ../$HOME/tmp.txt
 	    cd $PathrepoSnmp
 	    Package=$snmp
-	    VIP_SNMP=$(grep 'com2sec' $Package | sed "s+com2sec readonly  ++g" | sed "s+public++g")
+	    VIP_SNMP=$(grep 'com2sec' $Package | grep -v '#' | sed "s+com2sec readonly  ++g" | sed "s+public++g")
 	    echo "$VIP_SNMP" >> /tmp/tmp.txt
 	    cd ../
 	    echo -e " ; " >> /tmp/tmp.txt
@@ -243,11 +244,12 @@ help()
 {
     cat <<HELP
 
-usage: get_conf_distant {-c -h -r -v  -d [@DNS] -l [@LDAP] -m [@SMTP] -n [@NTP] -p [@NRPE] -s [@SNMP]}
+usage: get_conf_distant {-c -h -r -v  -d [@DNS] -e [SERVER_NAME] -l [@LDAP] -m [@SMTP] -n [@NTP] -p [@NRPE] -s [@SNMP]}
 recupere, test et affiche les configurations des services presents sur l'equipements
 
  -c => delta_conf_puppet
  -d => dns
+ -e => change_puppet_server_path
  -h => Help
  -l => ldap
  -m => smtp
@@ -300,7 +302,7 @@ STEP="CONF DNS $OPTARG"
 init_step
 #color_echo $Yellow "> DNS CONFIGURATION STATE $OPTARG"
 TEST=$( echo $VIP_MID | grep $OPTARG && echo "OK" || echo "NOK")
-
+CURRENT_FUNC="addr_dns"
 test_conf $TEST
 
 }
@@ -310,7 +312,7 @@ STEP="CONF NTP $OPTARG"
 init_step
 #color_echo $Yellow "> NTP CONFIGURATION STATE $OPTARG"
 TEST=$( echo $VIP_NTP | grep $OPTARG && echo "OK" || echo "NOK")
-
+CURRENT_FUNC="addr_ntp"
 test_conf $TEST
 
 }
@@ -320,7 +322,7 @@ STEP="CONF LDAP $OPTARG"
 init_step
 #color_echo $Yellow "> LDAP CONFIGURATION STATE $OPTARG"
 TEST=$( echo $VIP_ADM | grep $OPTARG && echo "OK" || echo "NOK")
-
+CURRENT_FUNC="addr_ldap"
 test_conf $TEST
 }
 
@@ -329,7 +331,7 @@ STEP="CONF SMTP $OPTARG"
 init_step
 #color_echo $Yellow "> SMTP CONFIGURATION STATE $OPTARG"
 TEST=$( echo $VIP_SMTP | grep $OPTARG && echo "OK" || echo "NOK")
-
+CURRENT_FUNC="addr_smtp"
 test_conf $TEST
 
 }
@@ -339,7 +341,7 @@ STEP="CONF SNMP $OPTARG"
 init_step
 #color_echo $Yellow "> SMTP CONFIGURATION STATE $OPTARG"
 TEST=$( echo $VIP_SNMP | grep $OPTARG && echo "OK" || echo "NOK")
-
+CURRENT_FUNC="addr_snmp"
 test_conf $TEST
 
 }
@@ -349,7 +351,7 @@ STEP="CONF NRPE $OPTARG"
 init_step
 #color_echo $Yellow "> SMTP CONFIGURATION STATE $OPTARG"
 TEST=$( echo $VIP_NRPE | grep $OPTARG && echo "OK" || echo "NOK")
-
+CURRENT_FUNC="addr_nrpe"
 test_conf $TEST
 
 }
@@ -361,12 +363,80 @@ if [ "$1" != "NOK" ] ;then
 	color_echo $Green '[OK]'
 	GLOBAL_CONF=${GLOBAL_CONF}"OK"
 else
-	color_echo $Red '[NOK]' 
+	color_echo $Red '[NOK]'
 	GLOBAL_CONF=${GLOBAL_CONF}"NOK"
 fi
 echo
 
 }
+
+function modif_conf_file {
+
+	case $1 in
+		addr_nrpe)	FILES="/etc/nagios/nrpe.cfg";;
+		addr_snmp)	FILES="/etc/snmp/snmpd.conf";;
+		addr_smtp)	FILES="/etc/postfix/main.cf";;
+		addr_ldap)	if [ -f "/etc/libnss-ldap.conf" ];then 
+						FILES="/etc/libnss-ldap.conf" 
+					else FILES="/etc/ldap/ldap.conf" 
+					fi ;;
+		addr_ntp)	FILES="/etc/ntp.conf";;
+		addr_dns)	FILES="/etc/resolv.conf";;
+change_puppet_server_path) FILES="/etc/puppet/puppet.conf";;
+	esac
+	echo "###########################################   CONTENU DE $FILES   ###########################################"
+	cat $FILES | grep -v '#' | grep [0-9]
+	#echo $CAT
+	echo ""
+	echo "Parametre à modifier : "
+	read old_IP
+	echo " "
+	echo "Nouveau parametre à implementer : "
+	read new_IP
+	DT=$(date +%D%T | sed "s/\///g" | sed "s/\://g")
+	FILE2=`echo "$FILES" | awk -F '/' '{ print $NF }'`
+	cp "$FILES" "/tmp/$FILE2-$DT"
+	sed -i "s/$old_IP/$new_IP/g" $FILES
+	echo
+	choice
+				
+}
+
+function choice {
+	
+		echo "Voulez vous modifier un élément de la configuration ? (yes/no) : "
+		read resp
+		if [ "$resp" == "yes" ] || [ "$resp" == "y" ]
+		then
+			echo ""
+			echo "Quel configuration souhaitez vous modifier ?"
+			echo ""	
+			echo "1 - nrpe"
+			echo "2 - snmp"
+			echo "3 - smtp"
+			echo "4 - ldap"
+			echo "5 - ntp"
+			echo "6 - dns"
+			echo "7 - puppet"
+			echo ""
+			echo "Entrez votre choix :"
+			read CHOIX
+			echo ""
+			case $CHOIX in
+				1) FUNC="addr_nrpe";;
+				2) FUNC="addr_snmp";;
+				3) FUNC="addr_smtp";;
+				4) FUNC="addr_ldap";;
+				5) FUNC="addr_ntp";;
+				6) FUNC="addr_dns";;
+				7) FUNC="change_puppet_server_path";;
+				*) exit 0;;
+			esac
+			modif_conf_file $FUNC
+		fi	
+	
+}
+
 
 function delta_conf_puppet {
 #test du delta entre la conf puppet distante et la local
@@ -392,8 +462,23 @@ exit 0
 
 }
 
+function change_puppet_server_path {
+	
+	#old_puppet_server=$(grep 'SERVER' /etc/puppet/puppet.conf | sed "s+SERVER :++g" | sed 's+ ++g')
+	#DT=$(date +%D%T | sed "s/\///g" | sed "s/\://g")
+	#cp "/etc/puppet/puppet.conf" "/tmp/puppet.conf-$DT"
+	#echo $old_puppet_server  $OPTARG
+	#sed -i "s/$old_puppet_server/$OPTARG/g" /etc/puppet/puppet.conf
 
-while getopts ":d:n:l:m:s:p:hvrc" OPTION
+
+	TEST=$( echo $puppet_server | grep $OPTARG && echo "OK" || echo "NOK")
+	CURRENT_FUNC="addr_nrpe"
+	test_conf $TEST
+	
+}
+
+
+while getopts ":d:n:l:m:s:p:e:hvrc" OPTION
 do
     case $OPTION in
     h) help;;
@@ -406,6 +491,7 @@ do
     s) addr_snmp;;
     p) addr_nrpe;;
     c) delta_conf_puppet;;
+    e) change_puppet_server_path;;
     :) error 1 "Option '-$OPTION' needs an argument."
        exit 1;;
     *) error 2 "Unrecognized option '-$OPTION'."
@@ -423,7 +509,8 @@ init_step
 cd /etc/puppet
 puppet_run=$(grep 'rundir' puppet.conf | sed "s+rundir=++g" | sed 's+ ++g')
 puppet_class=$(grep 'classfile' puppet.conf | sed "s+classfile =++g" | sed 's+ ++g')
-puppet_server=$(grep 'server' puppet.conf | sed "s+server=++g" | sed 's+ ++g')
+#puppet_server=$(grep 'server' puppet.conf | sed "s+server=++g" | sed 's+ ++g')
+puppet_server=$(grep 'SERVER' /etc/puppet/puppet.conf | sed "s+SERVER :++g" | sed 's+ ++g')
 
 if [ "$puppet_run" != "" ]
 then
@@ -448,8 +535,13 @@ fi
 
 STEP="GLOBAL CONF STATE"
 init_step
-echo $GLOBAL_CONF | grep -q 'N'  &&  color_echo $Red '[NOK]' || color_echo $Green '[OK]'
-echo 
+echo $GLOBAL_CONF | grep -q 'N'   &&  color_echo $Red '[NOK]' || color_echo $Green '[OK]'
+STAT_GLOBAL_CONF=`echo $GLOBAL_CONF | grep  'N'`
+echo ""
+if [ "$STAT_GLOBAL_CONF" != "" ]
+then
+ choice
+fi	
 echo
 echo
 color_echo $BBlue "#############################################################################################################################"
@@ -702,7 +794,6 @@ else
 fi ##fin de boucle testpresencepuppetd
 echo
 #####################################################  Route #################################################################################
-
 # Liste des routes
 STEP="ROUTES"
 init_step
@@ -717,9 +808,7 @@ then
 ERR_STEP_FLAG=2
 COMMENT="$COMMENT `color_echo $Purple 'PAS DE ROUTES' `"
 fi
-
 ######################################################### GLOBAL SERVICE STATE #####################################################################
-echo 
 echo
 STEP="GLOBAL SERVICE STATE"
 init_step
@@ -734,5 +823,3 @@ echo
 
 rm /tmp/tmp.txt
 exit 0
-
-
