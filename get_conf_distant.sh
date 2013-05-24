@@ -515,12 +515,12 @@ function conf_puppet {
 		if [ "$testPuppet" = "KO" ]; then
 		    init_substep
 		    ERR_STEP_FLAG=1  
-		    step_status "ping fail"
+		    step_status "ping $puppet_server fail"
 		    echo
 		else
 		    init_substep
 		    ERR_STEP_FLAG=0
-		    step_status "ping ok"
+		    step_status "ping $puppet_server ok"
 		    echo
 		fi ##fin de boucle if ping SVCC
 	fi
