@@ -77,186 +77,194 @@ color_echo $BBlue "##############################           TEST CONFIGURATION  
 color_echo $BBlue "#############################################################################################################################"
 
 
-#test la version d'OS
-os=$(cat /etc/issue)
-testOs=$(echo "$os" | grep -iE 'Ubuntu|Debian' && echo ok || echo ko)
-if [ "$testOs" != 'ko' ]; then
 
-    > /tmp/tmp.txt
-    #echo "----------------------------------conf_LDAP : " >> tmp.txt
-    cd /
-    cd $Pathrepo
-    if [ -f "${Pathrepoldap}$ldap" ];
-    then
-	   if [ -f "libnss-ldap.conf" ];
-	   then
-		Package=libnss-ldap.conf
-	   else 
-		cd $Pathrepoldap
-		Package=$ldap
-	   fi
-	   SUB_VIP_ADM=$( grep 'host ' $Package | sed "s+host ++g")
-	   VIP_ADM=$( echo $SUB_VIP_ADM | cut -d "#" -f1)
-	   echo "$VIP_ADM" >> /tmp/tmp.txt
-    fi
-    echo -e " ; " >> /tmp/tmp.txt
-
-
-    cd /etc/
-    if [ -f "$ntp" ];
-    then
-	    #echo "----------------------------------conf_NTP : " >> ../$HOME/tmp.txt
-	    Package=$ntp
-	    VIP_NTP=$( grep 'server ' $Package | sed "s+server ++g" | cut -d "#" -f1 )
-    	    echo "$VIP_NTP" >> /tmp/tmp.txt
-	    echo -e " ; " >> /tmp/tmp.txt
-    fi
-
-
-    if [ -f "$dns" ];
-    then
-	    #echo "----------------------------------conf_DNS : " >> ../$HOME/tmp.txt
-	    Package=$dns
-	    VIP_MID=$( grep nameserver $Package | sed "s+nameserver ++g" | sed "s+ ++g" )
-	    echo "$VIP_MID" >> /tmp/tmp.txt
-	    echo -e " ; " >> /tmp/tmp.txt
-    fi
-
-
-    if [ -d "$PathrepoSnmp" ];
-    then
-	    #echo "----------------------------------conf_SNMP : " >> ../$HOME/tmp.txt
-	    cd $PathrepoSnmp
-	    Package=$snmp
-	    VIP_SNMP=$(grep 'com2sec readonly  ' $Package | grep -v '#' | sed "s+com2sec readonly  ++g" | sed "s+public++g")
-	    echo "$VIP_SNMP" >> /tmp/tmp.txt
-	    cd ../
-	    echo -e " ; " >> /tmp/tmp.txt
-    fi
-
-    if [ -d "$PathrepoSmtp" ];
-    then
-	    #echo "----------------------------------conf_SMTP : " >> ../$HOME/tmp.txt
-	    cd $PathrepoSmtp
-	    Package=$smtp
-	    VIP_SMTP=$(grep 'relayhost = ' $Package | sed "s+relayhost = ++g") 
-	    echo "$VIP_SMTP"	>> /tmp/tmp.txt
-	    cd ../	
-	    echo -e " ; " >> /tmp/tmp.txt
-	    cd $PathrepoSmtp
-	    VIP_SMTP2=$(grep 'fallback_relay' $Package | sed "s+fallback_relay = ++g")
-	    echo "$VIP_SMTP2"	>> /tmp/tmp.txt
-	    cd ../
-	    echo -e " ; " >> /tmp/tmp.txt
-    fi
-
-
-    if [ -d "$Pathnrpe" ];
-    then
-	    #echo "----------------------------------conf_NRPE : " >> ../$HOME/tmp.txt
-	    cd $Pathnrpe
-	    Package=$nrpe
-	    grep 'server_address=' $Package | sed "s+server_address=++g" >> /tmp/tmp.txt
-	    cd ../
-	    echo -e " ; " >> /tmp/tmp.txt
-    fi
-
-else
-
-
-    > /tmp/tmp.txt
-    #echo "----------------------------------conf_LDAP : " >> tmp.txt
-    cd /
-    if [ -d "$Pathrepo" ];
-    then
-	    cd $Pathrepo
-	    Package=ldap.conf
-	    SUB_VIP_ADM=$( grep 'host ' $Package | sed "s+host ++g")
-	    VIP_ADM=$( echo $SUB_VIP_ADM | cut -d "#" -f1)
-	    echo "$VIP_ADM" >> /tmp/tmp.txt
-	    echo -e " ; " >> /tmp/tmp.txt
-    fi
-
-    if [ -f "$ntp" ];
-    then
-    #echo "----------------------------------conf_NTP : " >> ../$HOME/tmp.txt
-    Package=$ntp
-    VIP_NTP=$( grep 'server ' $Package | sed "s+server ++g"| cut -d "#" -f1 )
-    echo "$VIP_NTP" >> /tmp/tmp.txt
-    echo -e " ; " >> /tmp/tmp.txt
-    fi
-
-    if [ -f "$dns" ];
-    then
-	    #echo "----------------------------------conf_DNS : " >> ../$HOME/tmp.txt
-	    Package=$dns
-	    VIP_MID=$( grep nameserver $Package | sed "s+nameserver ++g" )
-	    echo "$VIP_MID" >> /tmp/tmp.txt
-	    echo -e " ; " >> /tmp/tmp.txt
-    fi
-
-
-    if [ -d "$PathrepoSnmp" ];
-    then
-	    #echo "----------------------------------conf_SNMP : " >> ../$HOME/tmp.txt
-	    cd $PathrepoSnmp
-	    Package=$snmp
-	    VIP_SNMP=$(grep 'com2sec' $Package | grep -v '#' | sed "s+com2sec readonly  ++g" | sed "s+public++g")
-	    echo "$VIP_SNMP" >> /tmp/tmp.txt
-	    cd ../
-	    echo -e " ; " >> /tmp/tmp.txt
-    fi
-
-
-
-    if [ -d "$PathrepoSmtp" ];
-    then
-	    #echo "----------------------------------conf_SMTP : " >> ../$HOME/tmp.txt
-	    cd $PathrepoSmtp
-	    Package=$smtp
-	    VIP_SMTP=$(grep 'relayhost = ' $Package | sed "s+relayhost = ++g") 
-	    echo "$VIP_SMTP"	>> /tmp/tmp.txt
-	    cd ../
-	    echo -e " ; " >> /tmp/tmp.txt
-	    cd $PathrepoSmtp
-	    VIP_SMTP2=$(grep 'fallback_relay' $Package | sed "s+fallback_relay = ++g")
-	    echo "$VIP_SMTP2"	>> /tmp/tmp.txt
-	    cd ../
-	    echo -e " ; " >> /tmp/tmp.txt	
-    fi
-
-    if [ -d "$Pathnrpe" ];
-    then
-	    #echo "----------------------------------conf_NRPE : " >> ../$HOME/tmp.txt
-	    cd $Pathnrpe
-	    Package=$nrpe
-	    VIP_NRPE=$(grep 'server_address=' $Package | sed "s+server_address=++g")
-	    echo "$VIP_NRPE" >> /tmp/tmp.txt
-	    echo -e " ; " >> /tmp/tmp.txt
-    fi
-
-fi ##fin de boucle if testOs
 
 ############################################# COMMON FUNCTIONS ###################################################################
+function get_param {
+#test la version d'OS
+	os=$(cat /etc/issue)
+	testOs=$(echo "$os" | grep -iE 'Ubuntu|Debian' && echo ok || echo ko)
+	if [ "$testOs" != 'ko' ]; then
+	
+	    > /tmp/tmp.txt
+	
+	
+		
+	#echo "----------------------------------conf_LDAP : " >> tmp.txt
+	    cd /
+	    cd $Pathrepo
+	    if [ -f "${Pathrepoldap}$ldap" ];
+	    then
+		   if [ -f "libnss-ldap.conf" ];
+		   then
+			Package=libnss-ldap.conf
+		   else 
+			cd $Pathrepoldap
+			Package=$ldap
+		   fi
+		   SUB_VIP_ADM=$( grep 'host ' $Package | sed "s+host ++g")
+		   VIP_ADM=$( echo $SUB_VIP_ADM | cut -d "#" -f1)
+		   echo "$VIP_ADM" >> /tmp/tmp.txt
+	    fi
+	    echo -e " ; " >> /tmp/tmp.txt
+	
+	
+	
+	    cd /etc/
+	    if [ -f "$ntp" ];
+	    then
+		    #echo "----------------------------------conf_NTP : " >> ../$HOME/tmp.txt
+		    Package=$ntp
+		    VIP_NTP=$( grep 'server ' $Package | sed "s+server ++g" | cut -d "#" -f1 )
+	    	    echo "$VIP_NTP" >> /tmp/tmp.txt
+		    echo -e " ; " >> /tmp/tmp.txt
+	    fi
+	
+	
+	    if [ -f "$dns" ];
+	    then
+		    #echo "----------------------------------conf_DNS : " >> ../$HOME/tmp.txt
+		    Package=$dns
+		    VIP_MID=$( grep nameserver $Package | sed "s+nameserver ++g" | sed "s+ ++g" )
+		    echo "$VIP_MID" >> /tmp/tmp.txt
+		    echo -e " ; " >> /tmp/tmp.txt
+	    fi
+	
+	
+	    if [ -d "$PathrepoSnmp" ];
+	    then
+		    #echo "----------------------------------conf_SNMP : " >> ../$HOME/tmp.txt
+		    cd $PathrepoSnmp
+		    Package=$snmp
+		    VIP_SNMP=$(grep 'com2sec readonly  ' $Package | grep -v '#' | sed "s+com2sec readonly  ++g" | sed "s+public++g")
+		    echo "$VIP_SNMP" >> /tmp/tmp.txt
+		    cd ../
+		    echo -e " ; " >> /tmp/tmp.txt
+	    fi
+	
+	    if [ -d "$PathrepoSmtp" ];
+	    then
+		    #echo "----------------------------------conf_SMTP : " >> ../$HOME/tmp.txt
+		    cd $PathrepoSmtp
+		    Package=$smtp
+		    VIP_SMTP=$(grep 'relayhost = ' $Package | sed "s+relayhost = ++g") 
+		    echo "$VIP_SMTP"	>> /tmp/tmp.txt
+		    cd ../	
+		    echo -e " ; " >> /tmp/tmp.txt
+		    cd $PathrepoSmtp
+		    VIP_SMTP2=$(grep 'fallback_relay' $Package | sed "s+fallback_relay = ++g")
+		    echo "$VIP_SMTP2"	>> /tmp/tmp.txt
+		    cd ../
+		    echo -e " ; " >> /tmp/tmp.txt
+	    fi
+	
+	
+	    if [ -d "$Pathnrpe" ];
+	    then
+		    #echo "----------------------------------conf_NRPE : " >> ../$HOME/tmp.txt
+		    cd $Pathnrpe
+		    Package=$nrpe
+		    grep 'server_address=' $Package | sed "s+server_address=++g" >> /tmp/tmp.txt
+		    cd ../
+		    echo -e " ; " >> /tmp/tmp.txt
+	    fi
+	
+	else
+	
+	
+	    > /tmp/tmp.txt
+	    #echo "----------------------------------conf_LDAP : " >> tmp.txt
+	    cd /
+	    if [ -d "$Pathrepo" ];
+	    then
+		    cd $Pathrepo
+		    Package=ldap.conf
+		    SUB_VIP_ADM=$( grep 'host ' $Package | sed "s+host ++g")
+		    VIP_ADM=$( echo $SUB_VIP_ADM | cut -d "#" -f1)
+		    echo "$VIP_ADM" >> /tmp/tmp.txt
+		    echo -e " ; " >> /tmp/tmp.txt
+	    fi
+	
+	    if [ -f "$ntp" ];
+	    then
+	    #echo "----------------------------------conf_NTP : " >> ../$HOME/tmp.txt
+	    Package=$ntp
+	    VIP_NTP=$( grep 'server ' $Package | sed "s+server ++g"| cut -d "#" -f1 )
+	    echo "$VIP_NTP" >> /tmp/tmp.txt
+	    echo -e " ; " >> /tmp/tmp.txt
+	    fi
+	
+	    if [ -f "$dns" ];
+	    then
+		    #echo "----------------------------------conf_DNS : " >> ../$HOME/tmp.txt
+		    Package=$dns
+		    VIP_MID=$( grep nameserver $Package | sed "s+nameserver ++g" )
+		    echo "$VIP_MID" >> /tmp/tmp.txt
+		    echo -e " ; " >> /tmp/tmp.txt
+	    fi
+	
+	
+	    if [ -d "$PathrepoSnmp" ];
+	    then
+		    #echo "----------------------------------conf_SNMP : " >> ../$HOME/tmp.txt
+		    cd $PathrepoSnmp
+		    Package=$snmp
+		    VIP_SNMP=$(grep 'com2sec' $Package | grep -v '#' | sed "s+com2sec readonly  ++g" | sed "s+public++g")
+		    echo "$VIP_SNMP" >> /tmp/tmp.txt
+		    cd ../
+		    echo -e " ; " >> /tmp/tmp.txt
+	    fi
+	
+	
+	
+	    if [ -d "$PathrepoSmtp" ];
+	    then
+		    #echo "----------------------------------conf_SMTP : " >> ../$HOME/tmp.txt
+		    cd $PathrepoSmtp
+		    Package=$smtp
+		    VIP_SMTP=$(grep 'relayhost = ' $Package | sed "s+relayhost = ++g") 
+		    echo "$VIP_SMTP"	>> /tmp/tmp.txt
+		    cd ../
+		    echo -e " ; " >> /tmp/tmp.txt
+		    cd $PathrepoSmtp
+		    VIP_SMTP2=$(grep 'fallback_relay' $Package | sed "s+fallback_relay = ++g")
+		    echo "$VIP_SMTP2"	>> /tmp/tmp.txt
+		    cd ../
+		    echo -e " ; " >> /tmp/tmp.txt	
+	    fi
+	
+	    if [ -d "$Pathnrpe" ];
+	    then
+		    #echo "----------------------------------conf_NRPE : " >> ../$HOME/tmp.txt
+		    cd $Pathnrpe
+		    Package=$nrpe
+		    VIP_NRPE=$(grep 'server_address=' $Package | sed "s+server_address=++g")
+		    echo "$VIP_NRPE" >> /tmp/tmp.txt
+		    echo -e " ; " >> /tmp/tmp.txt
+	    fi
+	
+	fi ##fin de boucle if testOs
+}
+
 
 # some functions
 help()
 {
     cat <<HELP
 
-usage: get_conf_distant {-c -h -r -v  -d [@DNS] -e [SERVER_NAME] -l [@LDAP] -m [@SMTP] -n [@NTP] -p [@NRPE] -s [@SNMP]}
+usage: get_conf_distant {-c -h -r -v  -d [@DNS] -l [@LDAP] -m [@SMTP] -n [@NTP] -p [@NRPE] -s [@SNMP]}
 recupere, test et affiche les configurations des services presents sur l'equipements
 
- -c => delta_conf_puppet
- -d => dns
- -e => change_puppet_server_path
+ -c => delta_Conf_puppet
+ -d => Dns
+ -e => changeE_puppet_server_path
  -h => Help
- -l => ldap
- -m => smtp
- -n => ntp
- -p => nrpe
- -r => print results (like version 1.01)
- -s => snmp
+ -l => Ldap
+ -m => sMtp
+ -n => Ntp
+ -p => nrPe
+ -r => print Results (like version 1.01)
+ -s => Snmp
  -v => Version
 
 
@@ -297,62 +305,91 @@ exit 0
 
 }
 
+###################################################### CHECK PUPPETd ################################################################################ 
+function check_cmd_puppetd {
+#test la precense de la cmd puppetd
+
+	STEP="CMD PUPPETd"
+	init_step
+	
+	cd /tmp/
+	testpresencepuppetd=$(which puppetd | grep -qiE 'puppetd' && echo ok || echo ko )
+	if [ "$testpresencepuppetd" != 'ko' ]; then
+		NEWCOM="`color_echo $Green   'OK'`"
+		NEWCOM="[${NEWCOM}]   - presence de la commande \"puppetd\""
+		echo "$NEWCOM"
+	else 
+		NEWCOM="`color_echo $Red  'NOK'`" 
+		NEWCOM="[${NEWCOM}]   - absence de la commande \"puppetd\""
+		echo "$NEWCOM"
+	fi ##fin de boucle testpresencepuppetd
+
+}
+#######################################################################################################################################################
+
+
 function addr_dns {
-STEP="CONF DNS $OPTARG"
-init_step
+	get_param 
+	STEP="CONF DNS $OPTARG"
+	init_step
 #color_echo $Yellow "> DNS CONFIGURATION STATE $OPTARG"
-TEST=$( echo $VIP_MID | grep $OPTARG && echo "OK" || echo "NOK")
-CURRENT_FUNC="addr_dns"
-test_conf $TEST
+	TEST=$( echo $VIP_MID | grep $OPTARG && echo "OK" || echo "NOK")
+	CURRENT_FUNC="addr_dns"
+	test_conf $TEST
 
 }
 
 function addr_ntp {
-STEP="CONF NTP $OPTARG"
-init_step
+	get_param 
+	STEP="CONF NTP $OPTARG"
+	init_step
 #color_echo $Yellow "> NTP CONFIGURATION STATE $OPTARG"
-TEST=$( echo $VIP_NTP | grep $OPTARG && echo "OK" || echo "NOK")
-CURRENT_FUNC="addr_ntp"
-test_conf $TEST
+	TEST=$( echo $VIP_NTP | grep $OPTARG && echo "OK" || echo "NOK")
+	CURRENT_FUNC="addr_ntp"
+	test_conf $TEST
 
 }
 
 function addr_ldap {
-STEP="CONF LDAP $OPTARG"
-init_step
+	get_param 
+	STEP="CONF LDAP $OPTARG"
+	init_step
 #color_echo $Yellow "> LDAP CONFIGURATION STATE $OPTARG"
-TEST=$( echo $VIP_ADM | grep $OPTARG && echo "OK" || echo "NOK")
-CURRENT_FUNC="addr_ldap"
-test_conf $TEST
+	TEST=$( echo $VIP_ADM |  grep $OPTARG && echo "OK" || echo "NOK")
+	CURRENT_FUNC="addr_ldap"
+	test_conf $TEST
 }
 
 function addr_smtp {
-STEP="CONF SMTP $OPTARG"
-init_step
+	get_param 
+	STEP="CONF SMTP $OPTARG"
+	init_step
 #color_echo $Yellow "> SMTP CONFIGURATION STATE $OPTARG"
-TEST=$( echo $VIP_SMTP | grep $OPTARG && echo "OK" || echo "NOK")
-CURRENT_FUNC="addr_smtp"
-test_conf $TEST
+	TEST=$( echo $VIP_SMTP | grep $OPTARG && echo "OK" || echo "NOK")
+	CURRENT_FUNC="addr_smtp"
+	test_conf $TEST
 
 }
 
 function addr_snmp {
-STEP="CONF SNMP $OPTARG"
-init_step
+	get_param 
+	STEP="CONF SNMP $OPTARG"
+	init_step
 #color_echo $Yellow "> SMTP CONFIGURATION STATE $OPTARG"
-TEST=$( echo $VIP_SNMP | grep $OPTARG && echo "OK" || echo "NOK")
-CURRENT_FUNC="addr_snmp"
-test_conf $TEST
+	TEST=$( echo $VIP_SNMP | grep $OPTARG && echo "OK" || echo "NOK")
+	CURRENT_FUNC="addr_snmp"
+	test_conf $TEST
 
 }
 
 function addr_nrpe {
-STEP="CONF NRPE $OPTARG"
-init_step
+	get_param 
+	STEP="CONF NRPE $OPTARG"
+	init_step
 #color_echo $Yellow "> SMTP CONFIGURATION STATE $OPTARG"
-TEST=$( echo $VIP_NRPE | grep $OPTARG && echo "OK" || echo "NOK")
-CURRENT_FUNC="addr_nrpe"
-test_conf $TEST
+	TEST=$( echo $VIP_NRPE | grep $OPTARG && echo "OK" || echo "NOK")
+	CURRENT_FUNC="addr_nrpe"
+	test_conf $TEST
 
 }
 
@@ -384,26 +421,29 @@ function modif_conf_file {
 		addr_dns)	FILES="/etc/resolv.conf";;
 change_puppet_server_path) FILES="/etc/puppet/puppet.conf";;
 	esac
-	echo "###########################################   CONTENU DE $FILES   ###########################################"
-	cat $FILES | grep -v '#' | grep [0-9]
-	#echo $CAT
-	echo ""
-	echo "Parametre à modifier : "
-	read old_IP
-	echo " "
-	echo "Nouveau parametre à implementer : "
-	read new_IP
-	DT=$(date +%D%T | sed "s/\///g" | sed "s/\://g")
-	FILE2=`echo "$FILES" | awk -F '/' '{ print $NF }'`
-	cp "$FILES" "/tmp/$FILE2-$DT"
-	sed -i "s/$old_IP/$new_IP/g" $FILES
-	echo
+	if [ -e $FILES ];then
+		echo "###########################################   CONTENU DE $FILES   ###########################################"
+		cat $FILES | grep -v '#' | grep [0-9]
+		echo ""
+		echo "Parametre à modifier : "
+		read old_IP
+		echo " "
+		echo "Nouveau parametre à implementer : "
+		read new_IP
+		DT=$(date +%D%T | sed "s/\///g" | sed "s/\://g")
+		FILE2=`echo "$FILES" | awk -F '/' '{ print $NF }'`
+		cp "$FILES" "/tmp/$FILE2-$DT"
+		sed -i "s/$old_IP/$new_IP/g" $FILES
+		echo
+	else 	echo "Le fichier $FILES  n'est pas present sur cet equipement "
+	fi
 	choice
 				
 }
 
 function choice {
-	
+		
+		echo
 		echo "Voulez vous modifier un élément de la configuration ? (yes/no) : "
 		read resp
 		if [ "$resp" == "yes" ] || [ "$resp" == "y" ]
@@ -438,47 +478,102 @@ function choice {
 }
 
 
+###################################################### CONF PUPPET ################################################################################ 
+#recup de la conf puppet
+function conf_puppet {
+	
+	STEP="CONF PUPPET"
+	init_step
+	
+	cd /etc/puppet
+	puppet_run=$(grep 'rundir' puppet.conf | sed "s+rundir=++g" | sed 's+ ++g')
+	puppet_class=$(grep 'classfile' puppet.conf | sed "s+classfile =++g" | sed 's+ ++g')
+	puppet_server=$(grep 'server' puppet.conf | sed "s+server=++g" | sed 's+ ++g')
+	if [ -z $puppet_server ];then
+		puppet_server=$(grep 'SERVER' /etc/puppet/puppet.conf | sed "s+SERVER :++g" | sed 's+ ++g')
+	fi
+	
+	if [ "$puppet_run" != "" ]
+	then
+		color_echo $Yellow "RUNDIR : $puppet_run"
+		echo
+	fi
+	
+	if [ "$puppet_class" != "" ]
+	then
+		color_echo $Yellow "CLASSFILE : $puppet_class"
+		echo
+	fi
+	
+	if [ "$puppet_server" != "" ]
+	then
+		color_echo $Yellow "SERVER : $puppet_server"
+		echo
+		PING=$(ping -W 10 -c 3 $puppet_server)
+		testPuppet=$(echo "$PING" | grep -qiE '0 received, 100% packet loss| Network is unreachable' && echo "KO" || echo "OK")
+		#echo $testDNS
+		if [ "$testPuppet" = "KO" ]; then
+		    init_substep
+		    ERR_STEP_FLAG=1  
+		    step_status "ping fail"
+		    echo
+		else
+		    init_substep
+		    ERR_STEP_FLAG=0
+		    step_status "ping ok"
+		    echo
+		fi ##fin de boucle if ping SVCC
+	fi
+
+}
+
+check_cmd_puppetd
+conf_puppet
+
 function delta_conf_puppet {
 #test du delta entre la conf puppet distante et la local
 STEP="DELTA CONF PUPPET"
 init_step
 
-cd /tmp/
-puppetd -tv --noop |grep "should be" > /dev/null
-testdeltapuppet=$(echo $?)
-if [ "$testdeltapuppet" != 0 ]; then
-	
-	color_echo $Green '[OK] - pas de delta'
+#check_cmd_puppetd
+#conf_puppet
 
-else 
-	color_echo $Red '[NOK] - difference entre la conf puppet distante et la conf puppet local'
-
-fi 
-echo
-echo
-
-rm /tmp/tmp.txt
-exit 0
-
+if [ -e /etc/puppet/puppet.conf ];then
+	if [ ! -e /etc/puppet/puppetd.conf ];then
+		
+		if [ "$puppet_run" == "/var/run/puppet" ] && [ `ls -A "$puppet_run" | wc -c` -eq 0 ];then
+		cd /tmp/
+		puppetd -tv --noop |grep "should be" > /dev/null
+		testdeltapuppet=$(echo $?)
+		if [ "$testdeltapuppet" != 0 ]; then
+			
+			color_echo $Green '[OK] - pas de delta'
+		
+		else 
+			color_echo $Red '[NOK] - difference entre la conf puppet distante et la conf puppet local'
+		
+		fi 
+		echo
+		echo
+		
+		#rm /tmp/tmp.txt
+		#exit 0
+		else echo "/var/run/puppet non existant ou non vide"
+		fi
+	else echo "/etc/puppet/puppetd.conf existant"
+	fi	
+else echo "/etc/puppet/puppet.conf inexistant"
+fi
 }
 
 function change_puppet_server_path {
 	
-	#old_puppet_server=$(grep 'SERVER' /etc/puppet/puppet.conf | sed "s+SERVER :++g" | sed 's+ ++g')
-	#DT=$(date +%D%T | sed "s/\///g" | sed "s/\://g")
-	#cp "/etc/puppet/puppet.conf" "/tmp/puppet.conf-$DT"
-	#echo $old_puppet_server  $OPTARG
-	#sed -i "s/$old_puppet_server/$OPTARG/g" /etc/puppet/puppet.conf
-
-
-	TEST=$( echo $puppet_server | grep $OPTARG && echo "OK" || echo "NOK")
-	CURRENT_FUNC="addr_nrpe"
-	test_conf $TEST
-	
+	conf_puppet
+	choice
 }
 
 
-while getopts ":d:n:l:m:s:p:e:hvrc" OPTION
+while getopts ":d:n:l:m:s:p:ehvrc" OPTION
 do
     case $OPTION in
     h) help;;
@@ -499,39 +594,8 @@ do
     esac
 done
 
-
-###################################################### CONF PUPPET ################################################################################ 
-#recup de la conf puppet
-
-STEP="CONF PUPPET"
-init_step
-
-cd /etc/puppet
-puppet_run=$(grep 'rundir' puppet.conf | sed "s+rundir=++g" | sed 's+ ++g')
-puppet_class=$(grep 'classfile' puppet.conf | sed "s+classfile =++g" | sed 's+ ++g')
-#puppet_server=$(grep 'server' puppet.conf | sed "s+server=++g" | sed 's+ ++g')
-puppet_server=$(grep 'SERVER' /etc/puppet/puppet.conf | sed "s+SERVER :++g" | sed 's+ ++g')
-
-if [ "$puppet_run" != "" ]
-then
-	color_echo $Yellow "RUNDIR : $puppet_run"
-	echo
-fi
-
-if [ "$puppet_class" != "" ]
-then
-	color_echo $Yellow "CLASSFILE : $puppet_class"
-	echo
-fi
-
-if [ "$puppet_server" != "" ]
-then
-	color_echo $Yellow "SERVER : $puppet_server"
-	echo
-fi
-
-
 ######################################################### GLOBAL CONF STATE #####################################################################
+
 
 STEP="GLOBAL CONF STATE"
 init_step
@@ -544,10 +608,11 @@ then
 fi	
 echo
 echo
+
 color_echo $BBlue "#############################################################################################################################"
 color_echo $BBlue "##############################           TEST SERVICE    ####################################################################"
 color_echo $BBlue "#############################################################################################################################"
-
+get_param
 ################################################# SMTP #########################################################################
 # Test du port 25 (SMTP) sur le SVCC
 STEP="CHECK SMTP"
@@ -776,23 +841,7 @@ step_status "$LDAP4 $COMMENT (test port 389 + test du compte \"support_tech\")"
 
 done
 
-###################################################### CHECK PUPPETd ################################################################################ 
-#test la precense de la cmd puppetd
-STEP="CHECK PUPPETd"
-init_step
 
-cd /tmp/
-testpresencepuppetd=$(which puppetd | grep -qiE 'puppetd' && echo ok || echo ko )
-if [ "$testpresencepuppetd" != 'ko' ]; then
-	NEWCOM="`color_echo $Green   'OK'`"
-	NEWCOM="[${NEWCOM}]   - presence de la commande \"puppetd\""
-	echo "$NEWCOM"
-else 
-	NEWCOM="`color_echo $Red  'NOK'`" 
-	NEWCOM="[${NEWCOM}]   - absence de la commande \"puppetd\""
-	echo "$NEWCOM"
-fi ##fin de boucle testpresencepuppetd
-echo
 #####################################################  Route #################################################################################
 # Liste des routes
 STEP="ROUTES"

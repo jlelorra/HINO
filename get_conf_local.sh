@@ -127,7 +127,7 @@ fi
 STEP="PING SVCC ($ip)"
 init_step
 
-ADDR=$(ping -c 3 $ip)
+ADDR=$(ping -W 10 -c 3 $ip)
 testDNS=$(echo "$ADDR" | grep -qiE '0 received, 100% packet loss| Network is unreachable' && echo "KO" || echo "OK")
 #echo $testDNS
 if [ "$testDNS" = "KO" ]; then
