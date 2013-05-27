@@ -125,7 +125,7 @@ function get_param {
 	    then
 		    #echo "----------------------------------conf_DNS : " >> ../$HOME/tmp.txt
 		    Package=$dns
-		    VIP_MID=$( grep nameserver $Package | sed "s+nameserver ++g" | sed "s+ ++g" )
+		    VIP_MID=$( grep nameserver $Package | grep -v '#' | sed "s+nameserver ++g" | sed "s+ ++g" )
 		    echo "$VIP_MID" >> /tmp/tmp.txt
 		    echo -e " ; " >> /tmp/tmp.txt
 	    fi
@@ -198,7 +198,7 @@ function get_param {
 	    then
 		    #echo "----------------------------------conf_DNS : " >> ../$HOME/tmp.txt
 		    Package=$dns
-		    VIP_MID=$( grep nameserver $Package | sed "s+nameserver ++g" )
+		    VIP_MID=$( grep nameserver $Package | grep -v '#' | sed "s+nameserver ++g" )
 		    echo "$VIP_MID" >> /tmp/tmp.txt
 		    echo -e " ; " >> /tmp/tmp.txt
 	    fi
@@ -252,7 +252,7 @@ help()
 {
     cat <<HELP
 
-usage: get_conf_distant {-c -h -r -v  -d [@DNS] -l [@LDAP] -m [@SMTP] -n [@NTP] -p [@NRPE] -s [@SNMP]}
+usage: get_conf_distant {-c -e -h -r -v -d [@DNS] -l [@LDAP] -m [@SMTP] -n [@NTP] -p [@NRPE] -s [@SNMP]}
 recupere, test et affiche les configurations des services presents sur l'equipements
 
  -c => delta_Conf_puppet
@@ -313,13 +313,15 @@ function check_cmd_puppetd {
 	init_step
 	
 	cd /tmp/
-	testpresencepuppetd=$(which puppetd | grep -qiE 'puppetd' && echo ok || echo ko )
+	testpresencepuppetd=$(which puppetd 2> /dev/null | grep -qiE 'puppetd' && echo ok || echo ko)
 	if [ "$testpresencepuppetd" != 'ko' ]; then
 		NEWCOM="`color_echo $Green   'OK'`"
+		GLOBAL_CONF=${GLOBAL_CONF}"OK"
 		NEWCOM="[${NEWCOM}]   - presence de la commande \"puppetd\""
 		echo "$NEWCOM"
 	else 
 		NEWCOM="`color_echo $Red  'NOK'`" 
+		GLOBAL_CONF=${GLOBAL_CONF}"NOK"
 		NEWCOM="[${NEWCOM}]   - absence de la commande \"puppetd\""
 		echo "$NEWCOM"
 	fi ##fin de boucle testpresencepuppetd
@@ -509,20 +511,30 @@ function conf_puppet {
 	then
 		color_echo $Yellow "SERVER : $puppet_server"
 		echo
-		PING=$(ping -W 10 -c 3 $puppet_server)
-		testPuppet=$(echo "$PING" | grep -qiE '0 received, 100% packet loss| Network is unreachable' && echo "KO" || echo "OK")
-		#echo $testDNS
-		if [ "$testPuppet" = "KO" ]; then
-		    init_substep
-		    ERR_STEP_FLAG=1  
-		    step_status "ping $puppet_server fail"
-		    echo
+		PING=$(ping -W 10 -c 3 $puppet_server )  2> /dev/null 
+		if [ `echo $?` -eq 0 ];then
+			testPuppet=$(echo "$PING" | grep -qiE '0 received, 100% packet loss| Network is unreachable' && echo "KO" || echo "OK")
+			#echo $testDNS
+			if [ "$testPuppet" = "KO" ]; then
+			    init_substep
+			    ERR_STEP_FLAG=1  
+			    step_status "ping $puppet_server fail"
+			    GLOBAL_CONF=${GLOBAL_CONF}"NOK"
+			    echo
+			else
+			    init_substep
+			    ERR_STEP_FLAG=0
+			    step_status "ping $puppet_server ok"
+			    GLOBAL_CONF=${GLOBAL_CONF}"OK"
+			    echo
+			fi ##fin de boucle if ping SVCC
 		else
 		    init_substep
-		    ERR_STEP_FLAG=0
-		    step_status "ping $puppet_server ok"
+		    ERR_STEP_FLAG=1
+		    step_status "ping $puppet_server fail"
+		    GLOBAL_CONF=${GLOBAL_CONF}"NOK"
 		    echo
-		fi ##fin de boucle if ping SVCC
+		fi
 	fi
 
 }
@@ -540,10 +552,10 @@ init_step
 
 if [ -e /etc/puppet/puppet.conf ];then
 	if [ ! -e /etc/puppet/puppetd.conf ];then
-		
+	
 		if [ "$puppet_run" == "/var/run/puppet" ] && [ `ls -A "$puppet_run" | wc -c` -eq 0 ];then
 		cd /tmp/
-		puppetd -tv --noop |grep "should be" > /dev/null
+		puppetd -tv --noop |grep "should be" 2> /dev/null
 		testdeltapuppet=$(echo $?)
 		if [ "$testdeltapuppet" != 0 ]; then
 			
@@ -567,8 +579,7 @@ fi
 }
 
 function change_puppet_server_path {
-	
-	conf_puppet
+
 	choice
 }
 
@@ -605,7 +616,7 @@ echo ""
 if [ "$STAT_GLOBAL_CONF" != "" ]
 then
  choice
-fi	
+fi
 echo
 echo
 
@@ -624,13 +635,13 @@ for SMTP4 in ${IP_ADM_SVCC_SMTP2[@]}; do
 
 if [ "$SMTP4" != " " ] && [ "$SMTP4" != ";" ]
 then
-	SMTP=`nc -z -w 1 -q 1  $SMTP4 25; if [ $? = 0 ]; then echo "OK"; else echo "NOK"; fi;`
+	SMTP=`nc -z -w 1 -q 1 $SMTP4 25 2> /dev/null ; if [ $? = 0 ]; then echo "OK"; else echo "NOK"; fi;` 
 	GLOBAL_VAR=${GLOBAL_VAR}${SMTP}
 	if  [ "$SMTP" == "OK" ]
 	then 
 		init_substep
 		RELAY_IP=`cat /etc/postfix/main.cf | grep "relayhost" | awk '{ print $3 }'`
-		nc -w 1 -q 1 -z $RELAY_IP 25
+		nc -w 1 -q 1 -z $RELAY_IP 25 2> /dev/null
 		ERR_STEP_FLAG=$?
 		step_status "$SMTP4 Service SMTP (test port 25 + telnet)"
 	fi
@@ -639,7 +650,7 @@ then
 	then 
 		init_substep
 		RELAY_IP=`cat /etc/postfix/main.cf | grep "relayhost" | awk '{ print $3 }'`
-		nc -w 1 -q 1 -z $RELAY_IP 25
+		nc -w 1 -q 1 -z $RELAY_IP 25 2> /dev/null
 		ERR_STEP_FLAG=$?
 		step_status "$SMTP4 Service SMTP (test port 25 + telnet)"
 	fi
@@ -659,7 +670,7 @@ IP_ADM_SVCC_DNS2=$(echo $IP_ADM_SVCC_DNS | cut -d ";" -f3 )
 
 for DNS4 in ${IP_ADM_SVCC_DNS2[@]}; do
 
-DNS=`nc -z -w 1 -q 1  $DNS4 53; if [ $? = 0 ]; then echo "OK"; else echo "NOK"; fi;`
+DNS=`nc -z -w 1 -q 1 $DNS4 53 2> /dev/null ; if [ $? = 0 ]; then echo "OK"; else echo "NOK"; fi;` 
 #echo $DNS
 
 GLOBAL_VAR=${GLOBAL_VAR}${DNS}
@@ -670,7 +681,7 @@ then
 
 ### Check Configuration
 	for RESOLV in ${DNS_RESOLVERS[@]}; do
-	cat /etc/resolv.conf | egrep "nameserver.*$RESOLV" > /dev/null
+	cat /etc/resolv.conf | egrep "nameserver.*$RESOLV" 2> /dev/null
 	 RETURN_CODE=$?
 	 COMMENT="$COMMENT $RESOLV"
         if [ $RETURN_CODE -ne 0 ]; then
@@ -723,7 +734,7 @@ fi
 done
 
 #test la presence de 'dig'
-testpresencedig=$(which dig | grep -qiE 'dig' && echo ok || echo ko )
+testpresencedig=$(which dig | grep -qiE 'dig' && echo ok || echo ko) 2> /dev/null
 if [ "$testpresencedig" != 'ko' ]; then
 	# test DNS #
 	ADDR=$(dig www.sfr.fr)
@@ -768,7 +779,7 @@ IP_ADM_SVCC_NTP2=$(echo $IP_ADM_SVCC_NTP | cut -d ";" -f2 )
 
 for NTP4 in ${IP_ADM_SVCC_NTP2[@]}; do
 
-NTP=`nc -zu -w 1 -q 1 $NTP4 123; if [ $? = 0 ]; then echo "OK"; else echo "NOK"; fi;`
+NTP=`nc -zu -w 1 -q 1 $NTP4 123 2> /dev/null ; if [ $? = 0 ]; then echo "OK"; else echo "NOK"; fi;` 
 GLOBAL_VAR=${GLOBAL_VAR}${NTP}
 #echo $NTP1
 #echo $NTP
@@ -823,7 +834,7 @@ IP_ADM_SVCC_LDAP2=$(echo $IP_ADM_SVCC_LDAP | cut -d ";" -f1 )
 
 for LDAP4 in ${IP_ADM_SVCC_LDAP2[@]}; do
 
-LDAP=`nc -z -w 1 -q 1  $LDAP4 389 ; if [ $? = 0 ]; then echo "OK"; else echo "NOK"; fi;`
+LDAP=`nc -z -w 1 -q 1 $LDAP4 389 2> /dev/null ; if [ $? = 0 ]; then echo "OK"; else echo "NOK"; fi;` 
 GLOBAL_VAR=${GLOBAL_VAR}${LDAP}
 #echo $LDAP
 init_substep
