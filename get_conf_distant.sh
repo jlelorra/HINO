@@ -487,12 +487,17 @@ function conf_puppet {
 	STEP="CONF PUPPET"
 	init_step
 	
-	cd /etc/puppet
-	puppet_run=$(grep 'rundir' puppet.conf | sed "s+rundir=++g" | sed 's+ ++g')
-	puppet_class=$(grep 'classfile' puppet.conf | sed "s+classfile =++g" | sed 's+ ++g')
-	puppet_server=$(grep 'server' puppet.conf | sed "s+server=++g" | sed 's+ ++g')
-	if [ -z $puppet_server ];then
-		puppet_server=$(grep 'SERVER' /etc/puppet/puppet.conf | sed "s+SERVER :++g" | sed 's+ ++g')
+	if [ -e /etc/puppet/puppet.conf ];then
+		cd /etc/puppet
+		puppet_run=$(grep 'rundir' puppet.conf | sed "s+rundir=++g" | sed 's+ ++g')
+		puppet_class=$(grep 'classfile' puppet.conf | sed "s+classfile =++g" | sed 's+ ++g')
+		puppet_server=$(grep 'server' puppet.conf | sed "s+server=++g" | sed 's+ ++g')
+		if [ -z $puppet_server ];then
+			puppet_server=$(grep 'SERVER' /etc/puppet/puppet.conf | sed "s+SERVER :++g" | sed 's+ ++g')
+		fi
+	else
+		color_echo $Red "[NOK] - /etc/puppet/puppet.conf inexistant"
+		echo
 	fi
 	
 	if [ "$puppet_run" != "" ]
@@ -511,7 +516,7 @@ function conf_puppet {
 	then
 		color_echo $Yellow "SERVER : $puppet_server"
 		echo
-		PING=$(ping -W 10 -c 3 $puppet_server )  2> /dev/null 
+		PING=$(ping -W 10 -c 3 $puppet_server 2> /dev/null)   
 		if [ `echo $?` -eq 0 ];then
 			testPuppet=$(echo "$PING" | grep -qiE '0 received, 100% packet loss| Network is unreachable' && echo "KO" || echo "OK")
 			#echo $testDNS
@@ -570,11 +575,11 @@ if [ -e /etc/puppet/puppet.conf ];then
 		
 		#rm /tmp/tmp.txt
 		#exit 0
-		else echo "/var/run/puppet non existant ou non vide"
+		else color_echo $Red "[NOK] - /var/run/puppet non existant ou non vide"
 		fi
-	else echo "/etc/puppet/puppetd.conf existant"
+	else color_echo $Red "[NOK] - /etc/puppet/puppetd.conf existant"
 	fi	
-else echo "/etc/puppet/puppet.conf inexistant"
+else color_echo $Red "[NOK] - /etc/puppet/puppet.conf inexistant"
 fi
 }
 
@@ -631,31 +636,37 @@ init_step
 IP_ADM_SVCC_SMTP=$(cat -s /tmp/tmp.txt | sed 's/\n//')
 IP_ADM_SVCC_SMTP2=$(echo $IP_ADM_SVCC_SMTP | cut -d ";" -f5,6)
 
-for SMTP4 in ${IP_ADM_SVCC_SMTP2[@]}; do
-
-if [ "$SMTP4" != " " ] && [ "$SMTP4" != ";" ]
-then
-	SMTP=`nc -z -w 1 -q 1 $SMTP4 25 2> /dev/null ; if [ $? = 0 ]; then echo "OK"; else echo "NOK"; fi;` 
-	GLOBAL_VAR=${GLOBAL_VAR}${SMTP}
-	if  [ "$SMTP" == "OK" ]
-	then 
-		init_substep
-		RELAY_IP=`cat /etc/postfix/main.cf | grep "relayhost" | awk '{ print $3 }'`
-		nc -w 1 -q 1 -z $RELAY_IP 25 2> /dev/null
-		ERR_STEP_FLAG=$?
-		step_status "$SMTP4 Service SMTP (test port 25 + telnet)"
-	fi
-
-	if  [ "$SMTP" == "NOK" ]
-	then 
-		init_substep
-		RELAY_IP=`cat /etc/postfix/main.cf | grep "relayhost" | awk '{ print $3 }'`
-		nc -w 1 -q 1 -z $RELAY_IP 25 2> /dev/null
-		ERR_STEP_FLAG=$?
-		step_status "$SMTP4 Service SMTP (test port 25 + telnet)"
-	fi
+if [ "$IP_ADM_SVCC_SMTP2" != "" ]; then
+	for SMTP4 in ${IP_ADM_SVCC_SMTP2[@]}; do
+		if [ "$SMTP4" != " " ] && [ "$SMTP4" != ";" ]
+		then
+			SMTP=`nc -z -w 1 -q 1 $SMTP4 25 2> /dev/null ; if [ $? = 0 ]; then echo "OK"; else echo "NOK"; fi;` 
+			GLOBAL_VAR=${GLOBAL_VAR}${SMTP}
+			if  [ "$SMTP" == "OK" ]
+			then 
+				init_substep
+				RELAY_IP=`cat /etc/postfix/main.cf | grep "relayhost" | awk '{ print $3 }'`
+				nc -w 1 -q 1 -z $RELAY_IP 25 2> /dev/null
+				ERR_STEP_FLAG=$?
+				step_status "$SMTP4 Service SMTP (test port 25 + telnet)"
+			fi
+		
+			if  [ "$SMTP" == "NOK" ]
+			then 
+				init_substep
+				RELAY_IP=`cat /etc/postfix/main.cf | grep "relayhost" | awk '{ print $3 }'`
+				nc -w 1 -q 1 -z $RELAY_IP 25 2> /dev/null
+				ERR_STEP_FLAG=$?
+				step_status "$SMTP4 Service SMTP (test port 25 + telnet)"
+			fi
+		fi
+	done
+else 
+	NEWCOMMENT2="`color_echo $Red   'NOK'`"
+	NEWCOMMENT2="[${NEWCOMMENT2}]  - absence de conf SMTP (etc/postfix/main.cf)"
+	GLOBAL_VAR=${GLOBAL_VAR}."NOK"
+	echo $NEWCOMMENT2
 fi
-done
 
 
 
@@ -689,7 +700,7 @@ then
               COMMENT="$COMMENT `color_echo $Purple '(manquant)'`"
         fi
         COMMENT="$COMMENT,"
-done
+	done
 if [ "$COMMENT" != "" ]; then
         COMMENT="Resolver(s) $COMMENT"
 fi
@@ -716,17 +727,20 @@ if [ "$DNS_IP" == "$DNS4" ] && [ $rep_IP ]; then
 	    if [[ $HOST == *$HOST3* ]]; then
 		      NEWCOMMENT="`color_echo $Green   'OK'`"
 		      NEWCOMMENT="[${NEWCOMMENT}]     CHECK SERVICE DNS - $DNS4 (comparaison NAME/IP puis IP/NAME)"
+		      GLOBAL_VAR=${GLOBAL_VAR}."OK"
 		      echo $NEWCOMMENT
 		      echo
 	    else
 		      NEWCOMMENT="`color_echo $Red  'NOK'`" 
 		      NEWCOMMENT="[${NEWCOMMENT}]     CHECK SERVICE DNS - $DNS4 (comparaison NAME/IP puis IP/NAME)"
+		      GLOBAL_VAR=${GLOBAL_VAR}."NOK"
 		      echo $NEWCOMMENT
 		      echo
 	    fi
 else
 	    NEWCOMMENT="`color_echo $Red  'NOK'`" 
 	    NEWCOMMENT="[${NEWCOMMENT}]     CHECK SERVICE DNS - $DNS4 (comparaison NAME/IP puis IP/NAME)"
+	    GLOBAL_VAR=${GLOBAL_VAR}."NOK"
 	    echo $NEWCOMMENT
 	    echo
 fi
@@ -741,10 +755,12 @@ if [ "$testpresencedig" != 'ko' ]; then
 	testDNS=$(echo "$ADDR" | grep -qiE ';; Query time: 0 msec|;; connection timed out' && echo ko || echo ok)
 	if [ "$testDNS" != 'ko' ]; then
 	    NEWCOMMENT="`color_echo $Green   'OK'`"
+	    GLOBAL_VAR=${GLOBAL_VAR}."OK"
 	    NEWCOMMENT="[${NEWCOMMENT}]     Resolution de \"www.sfr.fr\" (=> dig)"
 	    echo $NEWCOMMENT
 	else
 	    NEWCOMMENT="`color_echo $Red  'NOK'`" 
+	    GLOBAL_VAR=${GLOBAL_VAR}."NOK"
 	    NEWCOMMENT="[${NEWCOMMENT}]     Resolution de \"www.sfr.fr\" (=> dig)"
 	    echo $NEWCOMMENT
 
@@ -755,10 +771,12 @@ else
 	testDNS=$(echo "$ADDR" | grep -qiE 'server can\047t find |;; connection timed out' && echo ko || echo ok)
 	if [ "$testDNS" != 'ko' ]; then
 		    NEWCOMMENT="`color_echo $Green   'OK'`" 
+		    GLOBAL_VAR=${GLOBAL_VAR}."OK"
 		    NEWCOMMENT="[${NEWCOMMENT}]     Resolution de \"www.sfr.fr\" (=> nslookup)"
 		    echo $NEWCOMMENT
 		else
 		    NEWCOMMENT="`color_echo $Red  'NOK'`" 
+		    GLOBAL_VAR=${GLOBAL_VAR}."NOK"
 		    NEWCOMMENT="[${NEWCOMMENT}]     Resolution de \"www.sfr.fr\" (=> nslookup)"
 		    echo $NEWCOMMENT
 
@@ -795,7 +813,7 @@ for NTP in ${NTP_SRV[@]}; do
         COMMENT="$COMMENT $NTP"
         if [ $RETURN_CODE -ne 0 ]; then
         ERR_STEP_FLAG=1
-                COMMENT="$COMMENT `color_echo $Purple '(manquant)'`"
+        COMMENT="$COMMENT `color_echo $Purple '(manquant)'`"
     fi
         COMMENT="$COMMENT,"
 done
@@ -832,26 +850,32 @@ init_step
 IP_ADM_SVCC_LDAP=$(cat -s /tmp/tmp.txt | sed 's/\n//')
 IP_ADM_SVCC_LDAP2=$(echo $IP_ADM_SVCC_LDAP | cut -d ";" -f1 )
 
-for LDAP4 in ${IP_ADM_SVCC_LDAP2[@]}; do
-
-LDAP=`nc -z -w 1 -q 1 $LDAP4 389 2> /dev/null ; if [ $? = 0 ]; then echo "OK"; else echo "NOK"; fi;` 
-GLOBAL_VAR=${GLOBAL_VAR}${LDAP}
+if [ "$IP_ADM_SVCC_LDAP2" != "" ]; then
+	for LDAP4 in ${IP_ADM_SVCC_LDAP2[@]}; do
+	
+	LDAP=`nc -z -w 1 -q 1 $LDAP4 389 2> /dev/null ; if [ $? = 0 ]; then echo "OK"; else echo "NOK"; fi;` 
+	GLOBAL_VAR=${GLOBAL_VAR}${LDAP}
 #echo $LDAP
-init_substep
-getent passwd support_tech > /dev/null
-if [ $? != 0 ]
-then
-ERR_STEP_FLAG=2
-COMMENT="$COMMENT `color_echo $Purple 'USER \"'support_tech'\" NON TROUVE' `"
-COMMENT="$COMMENT `color_echo $Purple 'Verifier la config LDAP' `"
+	init_substep
+	getent passwd support_tech > /dev/null
+	if [ $? != 0 ]
+	then
+	ERR_STEP_FLAG=2
+	COMMENT="$COMMENT `color_echo $Purple 'USER \"'support_tech'\" NON TROUVE' `"
+	COMMENT="$COMMENT `color_echo $Purple 'Verifier la config LDAP' `"
+	fi
+	if [ "$COMMENT" != "" ]; then
+	        COMMENT="$COMMENT"
+	fi
+	step_status "$LDAP4 $COMMENT (test port 389 + test du compte \"support_tech\")"
+	
+	done
+else 
+	NEWCOMMENT3="`color_echo $Red   'NOK'`"
+	NEWCOMMENT3="[${NEWCOMMENT3}]  - absence de conf LDAP (etc/ldap/ldap.conf)"
+	GLOBAL_VAR=${GLOBAL_VAR}."NOK"
+	echo $NEWCOMMENT3
 fi
-if [ "$COMMENT" != "" ]; then
-        COMMENT="$COMMENT"
-fi
-step_status "$LDAP4 $COMMENT (test port 389 + test du compte \"support_tech\")"
-
-done
-
 
 #####################################################  Route #################################################################################
 # Liste des routes
