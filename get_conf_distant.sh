@@ -497,6 +497,7 @@ function conf_puppet {
 		fi
 	else
 		color_echo $Red "[NOK] - /etc/puppet/puppet.conf inexistant"
+		GLOBAL_CONF=${GLOBAL_CONF}"NOK"
 		echo
 	fi
 	
