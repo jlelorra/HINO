@@ -399,10 +399,16 @@ function test_conf {
 
 if [ "$1" != "NOK" ] ;then
 
-	color_echo $Green '[OK]'
+	#color_echo $Green '[OK]'
+	NEWCOMMENT3="`color_echo $Green   'OK'`"
+	NEWCOMMENT3="[${NEWCOMMENT3}]"
+	echo $NEWCOMMENT3
 	GLOBAL_CONF=${GLOBAL_CONF}"OK"
 else
-	color_echo $Red '[NOK]'
+	#color_echo $Red '[NOK]'
+	NEWCOMMENT3="`color_echo $Red   'NOK'`"
+	NEWCOMMENT3="[${NEWCOMMENT3}]"
+	echo $NEWCOMMENT3
 	GLOBAL_CONF=${GLOBAL_CONF}"NOK"
 fi
 echo
