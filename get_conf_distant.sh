@@ -222,12 +222,12 @@ function get_param {
 		    #echo "----------------------------------conf_SMTP : " >> ../$HOME/tmp.txt
 		    cd $PathrepoSmtp
 		    Package=$smtp
-		    VIP_SMTP=$(grep 'relayhost = ' $Package | sed "s+relayhost = ++g") 
+		    VIP_SMTP=$(grep 'relayhost = ' $Package 2> /dev/null | sed "s+relayhost = ++g") 
 		    echo "$VIP_SMTP"	>> /tmp/tmp.txt
 		    cd ../
 		    echo -e " ; " >> /tmp/tmp.txt
 		    cd $PathrepoSmtp
-		    VIP_SMTP2=$(grep 'fallback_relay' $Package | sed "s+fallback_relay = ++g")
+		    VIP_SMTP2=$(grep 'fallback_relay' $Package 2> /dev/null | sed "s+fallback_relay = ++g")
 		    echo "$VIP_SMTP2"	>> /tmp/tmp.txt
 		    cd ../
 		    echo -e " ; " >> /tmp/tmp.txt	
@@ -637,38 +637,44 @@ init_step
 IP_ADM_SVCC_SMTP=$(cat -s /tmp/tmp.txt | sed 's/\n//')
 IP_ADM_SVCC_SMTP2=$(echo $IP_ADM_SVCC_SMTP | cut -d ";" -f5,6)
 
-if [ "$IP_ADM_SVCC_SMTP2" != "" ]; then
-	for SMTP4 in ${IP_ADM_SVCC_SMTP2[@]}; do
-		if [ "$SMTP4" != " " ] && [ "$SMTP4" != ";" ]
-		then
-			SMTP=`nc -z -w 1 -q 1 $SMTP4 25 2> /dev/null ; if [ $? = 0 ]; then echo "OK"; else echo "NOK"; fi;` 
-			GLOBAL_VAR=${GLOBAL_VAR}${SMTP}
-			if  [ "$SMTP" == "OK" ]
-			then 
-				init_substep
-				RELAY_IP=`cat /etc/postfix/main.cf | grep "relayhost" | awk '{ print $3 }'`
-				nc -w 1 -q 1 -z $RELAY_IP 25 2> /dev/null
-				ERR_STEP_FLAG=$?
-				step_status "$SMTP4 Service SMTP (test port 25 + telnet)"
+if [ -e /etc/postfix/main.cf ];then
+	if [ "$IP_ADM_SVCC_SMTP2" != "" ]; then
+		for SMTP4 in ${IP_ADM_SVCC_SMTP2[@]}; do
+			if [ "$SMTP4" != " " ] && [ "$SMTP4" != ";" ]
+			then
+				SMTP=`nc -z -w 1 -q 1 $SMTP4 25 2> /dev/null ; if [ $? = 0 ]; then echo "OK"; else echo "NOK"; fi;` 
+				GLOBAL_VAR=${GLOBAL_VAR}${SMTP}
+				if  [ "$SMTP" == "OK" ]
+				then 
+					init_substep
+					RELAY_IP=`cat /etc/postfix/main.cf | grep "relayhost" | awk '{ print $3 }'`
+					nc -w 1 -q 1 -z $RELAY_IP 25 2> /dev/null
+					ERR_STEP_FLAG=$?
+					step_status "$SMTP4 Service SMTP (test port 25 + telnet)"
+				fi
+			
+				if  [ "$SMTP" == "NOK" ]
+				then 
+					init_substep
+					RELAY_IP=`cat /etc/postfix/main.cf | grep "relayhost" | awk '{ print $3 }'`
+					nc -w 1 -q 1 -z $RELAY_IP 25 2> /dev/null
+					ERR_STEP_FLAG=$?
+					step_status "$SMTP4 Service SMTP (test port 25 + telnet)"
+				fi
 			fi
-		
-			if  [ "$SMTP" == "NOK" ]
-			then 
-				init_substep
-				RELAY_IP=`cat /etc/postfix/main.cf | grep "relayhost" | awk '{ print $3 }'`
-				nc -w 1 -q 1 -z $RELAY_IP 25 2> /dev/null
-				ERR_STEP_FLAG=$?
-				step_status "$SMTP4 Service SMTP (test port 25 + telnet)"
-			fi
-		fi
-	done
+		done
+	else 
+		NEWCOMMENT2="`color_echo $Red   'NOK'`"
+		NEWCOMMENT2="[${NEWCOMMENT2}]  - absence de conf SMTP (/etc/postfix/main.cf)"
+		GLOBAL_VAR=${GLOBAL_VAR}."NOK"
+		echo $NEWCOMMENT2
+	fi
 else 
 	NEWCOMMENT2="`color_echo $Red   'NOK'`"
-	NEWCOMMENT2="[${NEWCOMMENT2}]  - absence de conf SMTP (etc/postfix/main.cf)"
+	NEWCOMMENT2="[${NEWCOMMENT2}]  - absence de conf SMTP (/etc/postfix/main.cf)"
 	GLOBAL_VAR=${GLOBAL_VAR}."NOK"
 	echo $NEWCOMMENT2
 fi
-
 
 
 ####################################### Resolution DNS  #######################################################################
@@ -720,7 +726,7 @@ ADDR=$( nslookup $HOSTNAME $DNS4 )
 rep_IP=$(echo "$ADDR" | grep 'Address:' | grep -v '#' | sed 's+Address:++g' | sed 's+ ++g' | sed 's+\n++g')
 DNS_IP=$(echo "$ADDR" | grep 'Server:' | sed 's+Server:++g' | sed 's+\t++g')
 if [ "$DNS_IP" == "$DNS4" ] && [ $rep_IP ]; then
-	    HOST=$( nslookup "$rep_IP" | grep "name" | cut -d '=' -f2 | sed 's+ ++g')
+	    HOST=$( nslookup "$rep_IP" | grep -i "name" | cut -d '=' -f2 | sed 's+ ++g')
 	    short_HOST1=$(echo $HOSTNAME | cut -d '-' -f1)
 	    short_HOST2=$(echo $HOSTNAME | cut -d '-' -f2)
 	    HOST3="${short_HOST1}-${short_HOST2}"
