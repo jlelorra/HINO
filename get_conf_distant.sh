@@ -152,7 +152,7 @@ function get_param {
 		    cd ../	
 		    echo -e " ; " >> /tmp/tmp.txt
 		    cd $PathrepoSmtp
-		    VIP_SMTP2=$(grep 'fallback_relay' $Package | sed "s+fallback_relay = ++g")
+		    VIP_SMTP2=$(grep 'fallback_relay' $Package | grep -v '#' | sed "s+fallback_relay = ++g")
 		    echo "$VIP_SMTP2"	>> /tmp/tmp.txt
 		    cd ../
 		    echo -e " ; " >> /tmp/tmp.txt
@@ -227,7 +227,7 @@ function get_param {
 		    cd ../
 		    echo -e " ; " >> /tmp/tmp.txt
 		    cd $PathrepoSmtp
-		    VIP_SMTP2=$(grep 'fallback_relay' $Package 2> /dev/null | sed "s+fallback_relay = ++g")
+		    VIP_SMTP2=$(grep 'fallback_relay' $Package 2> /dev/null | grep -v '#' | sed "s+fallback_relay = ++g")
 		    echo "$VIP_SMTP2"	>> /tmp/tmp.txt
 		    cd ../
 		    echo -e " ; " >> /tmp/tmp.txt	
@@ -253,7 +253,7 @@ help()
     cat <<HELP
 
 usage: get_conf_distant {-c -e -h -r -v -d [@DNS] -l [@LDAP] -m [@SMTP] -n [@NTP] -p [@NRPE] -s [@SNMP]}
-recupere, test et affiche les configurations des services presents sur l'equipements
+recupere, test et affiche et modifie au besoin les configurations des services presents sur l'equipements
 
  -c => delta_Conf_puppet
  -d => Dns
@@ -277,8 +277,8 @@ HELP
 function version {
    echo -e  "
 
-$0  version 1.02 - May 6th, 2013
-Copyright (c) 2013 Jason LELORRAIN 
+$0  version 2.00 - May 6th, 2013
+2013 Jason LELORRAIN 
 This program is free software; you can redistribute it and/or modify it under the same terms as shell itself. 
 
 "
@@ -293,7 +293,7 @@ error()
 }
 
 function result {
-
+	
 get_param
 echo '------------------------------------------------------------------------------'
 echo '-----------------------------------RESULT-------------------------------------'

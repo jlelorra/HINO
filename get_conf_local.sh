@@ -75,14 +75,22 @@ usage: get_conf_local {-h  -v } [USER] [@IP_EQUIPEMENT]
  -h => Help
  -v => Version
 
-appel le script d'audit distant sur l'equipement fourni : "get_conf_distant {-h -v -r -d [@DNS] -n [@NTP] -l [@LDAP] -s [@SNMP] -p [@NRPE] -m [@SMTP]}"
+appel le script d'audit distant sur l'equipement fourni : "get_conf_distant {-c -e -h -r -v -d [@DNS] -l [@LDAP] -m [@SMTP] -n [@NTP] -p [@NRPE] -s [@SNMP]}"
 Possible de passer les parametres au script distant, ex :
-get_conf_local [USER] [@IP_EQUIPEMENT] {-h -v -r -d [@DNS] -n [@NTP] -l [@LDAP] -s [@SNMP] -p [@NRPE] -m [@SMTP]}
+usage: get_conf_distant {-c -e -h -r -v -d [@DNS] -l [@LDAP] -m [@SMTP] -n [@NTP] -p [@NRPE] -s [@SNMP]}
+recupere, test et affiche et modifie au besoin les configurations des services presents sur l'equipements
 
- -r => print results
+ -c => delta_Conf_puppet
+ -d => Dns
+ -e => changeE_puppet_server_path
  -h => Help
+ -l => Ldap
+ -m => sMtp
+ -n => Ntp
+ -p => nrPe
+ -r => print Results (like version 1.01)
+ -s => Snmp
  -v => Version
-
 
 HELP
     exit 0
@@ -92,8 +100,8 @@ HELP
 function version {
    echo -e  "
 
-$0  version 1.02 - May 6th, 2013
-Copyright (c) 2013 Jason LELORRAIN
+$0  version 2.00 - May 6th, 2013
+2013 Jason LELORRAIN
 This program is free software; you can redistribute it and/or modify it under the same terms as shell itself. 
 
 "
