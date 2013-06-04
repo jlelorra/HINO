@@ -92,7 +92,7 @@ exit 0
 
 sub print_version {
         print "
-    replace_space.pl  version 1.03 - May 15th, 2013
+    replace_space.pl  version 1.03 - June 5th, 2013
     2013 Jason LELORRAIN
     This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 ";
@@ -128,16 +128,9 @@ sub main {
 	    $final_tab{"$oldlist1"} = $PATH."/".$PATHDIR.$list2;
 	    print $oldlist1." , ".$PATH."/".$PATHDIR.$list2."\n";
 	}
-
-	#print "Appliquer les modifications ci dessus (yes/no) ? : ";
-	#my $resp = <STDIN>;
-	#$resp =~ s/\n//g;
-	#if ( $resp eq 'y' || $resp eq "yes" ) {
-		foreach my $k (reverse sort keys(%final_tab)) {
-		    #print $k." , ".$final_tab{$k}."\n";
-		    rename ($k , $final_tab{$k});
-		}
-	#}
+	foreach my $k (reverse sort keys(%final_tab)) {
+	    rename ($k , $final_tab{$k});
+	}
 
 }
 
