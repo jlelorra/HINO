@@ -73,6 +73,8 @@ sub print_help {
         Display detailed help
     -v, --version
         Show version information
+    -f, --force
+        force to replace the old_char by new_char
     -o, --oldchar
         char to replace, by default : \" \"
     -n, --newchar
