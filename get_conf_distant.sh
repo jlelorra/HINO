@@ -66,6 +66,51 @@ function step_status {
         echo 
 }
 
+# some functions
+help()
+{
+    cat <<HELP
+
+usage: get_conf_distant {-c -e -h -r -v -d [@DNS] -l [@LDAP] -m [@SMTP] -n [@NTP] -p [@NRPE] -s [@SNMP]}
+recupere, test et affiche et modifie au besoin les configurations des services presents sur l'equipements
+
+ -c => delta_Conf_puppet
+ -d => Dns
+ -e => changeE_puppet_server_path
+ -h => Help
+ -l => Ldap
+ -m => sMtp
+ -n => Ntp
+ -p => nrPe
+ -r => print Results (like version 1.01)
+ -s => Snmp
+ -v => Version
+
+
+
+HELP
+    exit 0
+}
+
+
+function version {
+   echo -e  "
+
+$0  version 2.00 - May 6th, 2013
+2013 Jason LELORRAIN 
+This program is free software; you can redistribute it and/or modify it under the same terms as shell itself. 
+
+"
+exit 0
+}
+
+error()
+{
+    # display error
+    echo -e "\n[ERROR $1]\t$2\n\n----> Please run 'get_conf_distant -h' for the help\n" 2> stderr
+    exit 1
+}
+
 echo
 GLOBAL_VAR=""
 GLOBAL_CONF=""
@@ -246,51 +291,6 @@ function get_param {
 	fi ##fin de boucle if testOs
 }
 
-
-# some functions
-help()
-{
-    cat <<HELP
-
-usage: get_conf_distant {-c -e -h -r -v -d [@DNS] -l [@LDAP] -m [@SMTP] -n [@NTP] -p [@NRPE] -s [@SNMP]}
-recupere, test et affiche et modifie au besoin les configurations des services presents sur l'equipements
-
- -c => delta_Conf_puppet
- -d => Dns
- -e => changeE_puppet_server_path
- -h => Help
- -l => Ldap
- -m => sMtp
- -n => Ntp
- -p => nrPe
- -r => print Results (like version 1.01)
- -s => Snmp
- -v => Version
-
-
-
-HELP
-    exit 0
-}
-
-
-function version {
-   echo -e  "
-
-$0  version 2.00 - May 6th, 2013
-2013 Jason LELORRAIN 
-This program is free software; you can redistribute it and/or modify it under the same terms as shell itself. 
-
-"
-exit 0
-}
-
-error()
-{
-    # display error
-    echo -e "\n[ERROR $1]\t$2\n\n----> Please run 'get_conf_distant -h' for the help\n" 2> stderr
-    exit 1
-}
 
 function result {
 	
@@ -765,9 +765,9 @@ done
 testpresencedig=$(which dig | grep -qiE 'dig' && echo ok || echo ko) 2> /dev/null
 if [ "$testpresencedig" != 'ko' ]; then
 	# test DNS #
-	ADDR=$(dig www.sfr.fr)
-	testDNS=$(echo "$ADDR" | grep -qiE ';; Query time: 0 msec|;; connection timed out' && echo ko || echo ok)
-	if [ "$testDNS" != 'ko' ]; then
+	ADDR=$(dig +short www.sfr.fr)
+	testDNS=$(echo "$ADDR" | grep -qiE [0-9])
+	if [  $? -eq 0 ]; then
 	    NEWCOMMENT="`color_echo $Green   'OK'`"
 	    GLOBAL_VAR=${GLOBAL_VAR}."OK"
 	    NEWCOMMENT="[${NEWCOMMENT}]     Resolution de \"www.sfr.fr\" (=> dig)"
@@ -782,8 +782,8 @@ if [ "$testpresencedig" != 'ko' ]; then
 
 else 
 	ADDR=$(nslookup  www.sfr.fr)
-	testDNS=$(echo "$ADDR" | grep -qiE 'server can\047t find |;; connection timed out' && echo ko || echo ok)
-	if [ "$testDNS" != 'ko' ]; then
+	testDNS=$(echo "$ADDR" | grep -qiE [0-9])
+	if [  $? -eq 0 ]; then
 		    NEWCOMMENT="`color_echo $Green   'OK'`" 
 		    GLOBAL_VAR=${GLOBAL_VAR}."OK"
 		    NEWCOMMENT="[${NEWCOMMENT}]     Resolution de \"www.sfr.fr\" (=> nslookup)"
