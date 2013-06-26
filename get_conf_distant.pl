@@ -58,12 +58,17 @@ GetOptions(
            "i"		=> \$opt_insert,		"insert"			=> \$opt_insert,
 );
 
-if ($opt_insert) {
-    &insert_conf_file("DNS");
+#if ($opt_insert) {
+#    &insert_conf_file("DNS");
+#}
+
+if($opt_change_path){
+	&insert_path;
 }
 
 
 if ($opt_conf) {
+	&parametre;
     &delta_conf_puppet;
 
 }
@@ -87,72 +92,74 @@ if($opt_dns || $opt_ldap || $opt_smtp || $opt_ntp || $opt_nrpe || $opt_snmp){
 	 &parametre;
 }
 
-
 if ($opt_dns) {
-		 &get_conf_dns;	
-		 foreach my $IP (split(' ',$IP_DNS)){
-        	&test_conf($IP,"CONF DNS",$opt_dns);
-		 }
-
+	foreach my $opt (split(',',$opt_dns)) {
+			&get_conf_dns;	
+	       	&test_conf($IP_DNS,"CONF DNS",$opt);
+	}
 }
 
 if ($opt_ldap) {
-
-		 &get_conf_ldap;
-		 foreach my $IP (split(' ',$IP_LDAP)){	
-        	&test_conf($IP,"CONF LDAP",$opt_ldap);
-		 }
-       
+	foreach my $opt (split(',',$opt_ldap)) {
+		&get_conf_ldap;
+       	&test_conf($IP_LDAP,"CONF LDAP",$opt);
+	}
 }
 
 if ($opt_smtp) {
-
+	foreach my $opt (split(',',$opt_smtp)) {
 		 &get_conf_smtp;
-		 foreach my $IP_RH (split(' ',$IP_SMTP_RH)){
-	        &test_conf($IP_RH,"CONF SMTP relayhost",$opt_smtp);
+		 if($IP_SMTP_RH eq $IP_SMTP_FB){
+	     	&test_conf($IP_SMTP_RH,"CONF SMTP",$opt);
+		 }else{
+			if($IP_SMTP_RH){
+				$IP_SMTP_RH=~s/ //g;
+				$IP_SMTP_FB=~s/ //g;
+				$opt=~s/ //g;
+				if($IP_SMTP_FB ne $opt){
+			    	&test_conf($IP_SMTP_RH,"CONF SMTP relayhost",$opt);
+			    	$IP_SMTP_RH=~s/ //g;
+				}
+		    	if($IP_SMTP_RH ne $opt){
+		        	&test_conf($IP_SMTP_FB,"CONF SMTP fallback-relay",$opt);
+		    	}
+		 	}
 	    }
-	    if($IP_SMTP_FB){
-	    	foreach my $IP_FB (split(' ',$IP_SMTP_FB)){
-	        	&test_conf($IP_FB,"CONF SMTP fallback-relay",$opt_smtp);
-	        }
-	    }
+	}
 }
 
 if ($opt_ntp) {
-
+	foreach my $opt (split(',',$opt_ntp)) {
 		 &get_conf_ntp;	
-		 foreach my $IP (split(' ',$IP_NTP)){
-        	 &test_conf($IP,"CONF NTP",$opt_ntp);
-		 }
+       	 &test_conf($IP_NTP,"CONF NTP",$opt);
+	}
 }
 
 if ($opt_nrpe) {
-
+	foreach my $opt (split(',',$opt_nrpe)) {
 		 &get_conf_nrpe;	
-		 foreach my $IP (split(' ',$IP_NRPE)){
-        	&test_conf($IP,"CONF NRPE",$opt_nrpe);
-		 }
+       	&test_conf($IP_NRPE,"CONF NRPE",$opt);
+	}
 
 }
 
 if ($opt_snmp) {
-
+	foreach my $opt (split(',',$opt_snmp)) {
 		 &get_conf_snmp;	
-		 foreach my $IP (split(' ',$IP_SNMP)){
-        	&test_conf($IP,"CONF SNMP",$opt_snmp);
-		 }
+       	&test_conf($IP_SNMP,"CONF SNMP",$opt_snmp);
+	}
 }
 
 
 sub print_help {
 	
 print "	
-usage: get_conf_distant {-c -e -h -r -v -d [\@DNS] -l [\@LDAP] -m [\@SMTP] -n [\@NTP] -p [\@NRPE] -s [\@SNMP]}
+usage: get_conf_distant {-c -e -h -r -v -d [\@DNS1,\@DNS2...] -l [\@LDAP1,\@LDAP2...] -m [\@SMTP1,\@SMTP2...] -n [\@NTP1,\@NTP2...] -p [\@NRPE1,\@NRPE2...] -s [\@SNMP1,\@SNMP2...]}
 recupere, test et affiche et modifie au besoin les configurations des services presents sur l'equipements
 
  -c => delta_Conf_puppet
  -d => Dns
- -e => changeE_puppet_server_path
+ -e => changE_puppet_server_path
  -h => Help
  -l => Ldap
  -m => sMtp
@@ -163,10 +170,9 @@ recupere, test et affiche et modifie au besoin les configurations des services p
  -v => Version
 
 
-
-HELP
-    exit 0
 ";
+exit 0;
+
 }
 
 sub print_version {
@@ -246,12 +252,12 @@ sub get_conf_ldap{
 	
 		#echo "----------------------------------conf_LDAP : " >> tmp.txt
 	    if ( -f "${Pathrepoldap}$ldap"){
-			if(-f "libnss-ldap.conf"){
-				$package="libnss-ldap.conf";
+			if(-f "/etc/libnss-ldap.conf"){
+				$package="/etc/libnss-ldap.conf";
 			}else{ 
-				$package=$ldap;
+				$package="$Pathrepoldap$ldap";
 		    }
-		   $IP_LDAP=`grep 'host ' ${Pathrepoldap}${package} | sed "s+host ++g" | cut -d "#" -f1`;
+		   $IP_LDAP=`grep 'host ' ${package} | sed "s+host ++g" | cut -d "#" -f1`;
 		   $IP_LDAP=~ s/\n/ /g;
 	    }
 }
@@ -282,10 +288,9 @@ sub get_conf_snmp{
 	    if (-d $PathrepoSnmp){
 		    $package="$PathrepoSnmp$snmp";
 		    if($OS eq "debian"){
-		    	$IP_SNMP=`grep 'com2sec readonly  ' $package | grep -v '#' | sed "s+com2sec readonly  ++g" | sed "s+public++g"`;
+		    	$IP_SNMP=`grep 'com2sec ' $package | grep -v '#' | sed "s+com2sec ++g" | sed "s+public++g" | sed "s+readonly ++g" `;
 		    }else{
-		    	$IP_SNMP=`grep 'com2sec' $package | grep -v '#' | sed "s+com2sec readonly  ++g" | sed "s+public++g"`;
-		    	
+		    	$IP_SNMP=`grep 'com2sec ' $package | grep -v '#' | sed "s+com2sec ++g" | sed "s+public++g" | sed "s+readonly ++g" `;
 	    	}
 	    	$IP_SNMP=~ s/\n/ /g;
 	    }
@@ -331,7 +336,7 @@ sub modif_conf_file {
 			elsif(/DNS/){$FILES="/etc/resolv.conf";}
 			elsif(/puppet/){$FILES="/etc/puppet/puppet.conf";}
 		}
-		if (-e $FILES ){
+		if (-d $FILES ){
 			print "###########################################   CONTENU DE $FILES   ###########################################\n";
 			my $F=`cat $FILES | grep -v '#' | grep [0-9]`;
 			print $F."\n";
@@ -377,7 +382,7 @@ sub insert_conf_file {
 			elsif(<STDIN>=~/puppet/){$FILES="/etc/puppet/puppet.conf";}
 
 		if (-e $FILES ){
-			print "###########################################   CONTENU DE $FILES   ###########################################\n";
+			echo_color_blue("###########################################   CONTENU DE $FILES   ###########################################");
 			my $F=`cat $FILES | grep -v '#' | grep [0-9]`;
 			$F=~ s/[0-9]//g;
 			$F=~ s/\.//g;
@@ -385,18 +390,37 @@ sub insert_conf_file {
 			print "Parametre à ajouter : \n";
 			my $new_IP = <STDIN>;
 			$new_IP=~ s/\n//g;
-			CALDATE;
+			CALDATE;	
+			#
 			#my $FILE2=`echo "$FILES" | awk -F '/' '{ print \$NF }'`;
 			#`cp "$FILES" "/tmp/$FILE2-$datestamp-$timestamp"`;
 			#`sed -i "s+$old_IP+$new_IP+g" $FILES`;
 	
-		}else{ 	print "Le fichier $FILES  n'est pas present sur cet equipement ";}
+		}else{ 	print "Le fichier $FILES  n'est pas present sur cet equipement \n";}
 		#choice;
 	}
 			
 }
 
-
+sub insert_path{
+	my $FILES="/etc/puppet/puppet.conf";
+	if (-e $FILES){
+			echo_color_blue("###########################################   CONTENU DE $FILES   ###########################################");
+			my $F=`grep 'classfile' $FILES | sed 's+ ++g'`;
+			print $F."\n";
+			print "Parametre à modifier : \n";
+			my $old_IP = <STDIN>;
+			$old_IP=~ s/\n//g;
+			print "Nouveau parametre à implementer : \n";
+			my $new_IP = <STDIN>;
+			$new_IP=~ s/\n//g;
+			CALDATE;
+			my $FILE2=`echo "$FILES" | awk -F '/' '{ print \$NF }'`;
+			`cp "$FILES" "/tmp/$FILE2-$datestamp-$timestamp"`;
+			`sed -i "s+$old_IP+$new_IP+g" $FILES`;
+	
+		}else{ 	print "Le fichier $FILES  n'est pas present sur cet equipement \n";}
+}
 
 ###################################################### CONF PUPPET ################################################################################ 
 
@@ -473,8 +497,8 @@ sub delta_conf_puppet {
 
 print "\n=> DELTA PUPPET\n";
 my $puppet_run=`grep 'rundir' "/etc/puppet/puppet.conf" | sed "s+rundir=++g" | sed 's+ ++g'`;
-if (-e "/etc/puppet/puppet.conf"){
-	if (" ! -e /etc/puppet/puppetd.conf"){
+if (-d "/etc/puppet/puppet.conf"){
+	if (" ! -d /etc/puppet/puppetd.conf"){
 	
 		if ("$puppet_run" eq "/var/run/puppet" && `ls -A "$puppet_run" | wc -c` == 0 ){
 			`puppetd -tv --noop |grep "should be" 2> /dev/null`;
@@ -508,9 +532,9 @@ sub serv_smtp{
 					my $SMTP=`nc -z -w 1 -q 1 $SMTP_IP 25 2> /dev/null ; if [ $? = 0 ]; then echo "OK"; else echo "NOK"; fi;`;
 					$GLOBAL_VAR="$GLOBAL_VAR$SMTP";
 					unless ($SMTP=~/NOK/){
-						&echo_color_green("$SMTP_IP Service SMTP (test port 25 + telnet)");
+						&echo_color_green("$SMTP_IP Service SMTP relayHost (test port 25 + telnet)");
 					}else{
-						&echo_color_red ("$SMTP_IP Service SMTP (test port 25 + telnet)");
+						&echo_color_red ("$SMTP_IP Service SMTP relayHost (test port 25 + telnet)");
 					}
 				#}
 			}
@@ -525,9 +549,9 @@ sub serv_smtp{
 					my $SMTP=`nc -z -w 1 -q 1 $SMTP_IP 25 2> /dev/null ; if [ $? = 0 ]; then echo "OK"; else echo "NOK"; fi;`;
 					$GLOBAL_VAR="$GLOBAL_VAR$SMTP";
 					unless ($SMTP=~/NOK/){
-						&echo_color_green("$SMTP_IP Service SMTP (test port 25 + telnet)");
+						&echo_color_green("$SMTP_IP Service SMTP FallBack (test port 25 + telnet)");
 					}else{
-						&echo_color_red ("$SMTP_IP Service SMTP (test port 25 + telnet)");
+						&echo_color_red ("$SMTP_IP Service SMTP FallBack (test port 25 + telnet)");
 					}
 				#}
 			}
@@ -553,9 +577,9 @@ sub serv_dns{
 					my $DNS =`nc -z -w 1 -q 1 $DNS_IP 53 2> /dev/null ; if [ $? = 0 ]; then echo "OK"; else echo "NOK"; fi;`;
 					$GLOBAL_VAR="$GLOBAL_VAR$DNS";
 					unless ($DNS=~/NOK/){
-						&echo_color_green("$DNS_IP Service DNS (test port 53)");
+						&echo_color_green("$DNS_IP (test port 53)");
 					}else{
-						&echo_color_red ("$DNS_IP Service DNS (test port 53)");
+						&echo_color_red ("$DNS_IP (test port 53)");
 					}
 					
 					#test de concordance avec NSLOOKUP 
@@ -574,57 +598,55 @@ sub serv_dns{
 	    				$HOST3=~s/\n//g;
 	    				#my $testnslookup=`echo $HOST | grep '$HOST3'`;
 					    if($HOST =~/$HOST3/){
-						      &echo_color_green("CHECK SERVICE DNS - $DNS_IP (comparaison NAME/IP puis IP/NAME)");
+						      &echo_color_green("$DNS_IP (comparaison NAME/IP puis IP/NAME)\n");
 						      $GLOBAL_VAR=${GLOBAL_VAR}."OK";
 
 					    }else{
-						      &echo_color_red("CHECK SERVICE DNS - $DNS_IP (comparaison NAME/IP puis IP/NAME)");
+						      &echo_color_red("$DNS_IP (comparaison NAME/IP puis IP/NAME)\n");
 						      $GLOBAL_VAR=${GLOBAL_VAR}."NOK";
 					    }
 					}else{					    
-					    &echo_color_red("CHECK SERVICE DNS - $DNS_IP (comparaison NAME/IP puis IP/NAME)");
+					    &echo_color_red("$DNS_IP (comparaison NAME/IP puis IP/NAME)\n");
 					    $GLOBAL_VAR=${GLOBAL_VAR}."NOK"
 					}
-					
-					#test la presence de 'dig'
-					my $testpresencedig=`which dig | grep -E 'dig' 2> /dev/null`;
-					if($testpresencedig){
-						# test DNS #
-						my $ADDR=`dig +short www.sfr.fr | grep -E [0-9]`;
-						$ADDR=~s/127\.0\.0\.1//g;
-						if($ADDR){
-						    $GLOBAL_VAR=${GLOBAL_VAR}."OK";
-						    &echo_color_green("Resolution de \"www.sfr.fr\" (=> dig)");
-						    print "\n";
-						}else{
-						    &echo_color_red("Resolution de \"www.sfr.fr\" (=> dig)");
-						    $GLOBAL_VAR=${GLOBAL_VAR}."NOK";
-						    print "\n";
-					
-						} ##fin de boucle if testdns
-					
-					}else{
-						my $ADDR=`nslookup  www.sfr.fr | grep -E [0-9]`;
-						$ADDR=~s/127\.0\.0\.1//g;
-						if($ADDR){
-						    $GLOBAL_VAR=${GLOBAL_VAR}."OK";
-						    &echo_color_green("Resolution de \"www.sfr.fr\" (=> nslookup)");
-						}else{
-						     &echo_color_red("Resolution de \"www.sfr.fr\" (=> nslookup)");
-						    $GLOBAL_VAR=${GLOBAL_VAR}."NOK";
-					
-						} ##fin de boucle if testdns
-	
-					} ##fin de boucle testpresencedig
 			}
 		}else{ 
-			&echo_color_red("absence de conf DNS (${dns})");
+			&echo_color_red("absence de conf DNS (${dns})\n");
 			$GLOBAL_VAR=${GLOBAL_VAR}."NOK"
 		}
 	}else{ 
-		&echo_color_red ("absence de conf DNS (${dns})");
+		&echo_color_red ("absence de conf DNS (${dns})\n");
 		$GLOBAL_VAR=${GLOBAL_VAR}."NOK"
 	}
+}
+
+sub dig {
+		#test la presence de 'dig'
+		my $testpresencedig=`which dig | grep -E 'dig' 2> /dev/null`;
+		if($testpresencedig){
+			# test DNS #
+			my $ADDR=`dig +short www.sfr.fr | grep -E [0-9]`;
+			$ADDR=~s/127\.0\.0\.1//g;
+			if($ADDR){
+			    $GLOBAL_VAR=${GLOBAL_VAR}."OK";
+			    &echo_color_green("Resolution de \"www.sfr.fr\" (=> dig)");
+			    #print "\n";
+			}else{
+			    &echo_color_red("Resolution de \"www.sfr.fr\" (=> dig)");
+			    $GLOBAL_VAR=${GLOBAL_VAR}."NOK";
+			    #print "\n";
+			} ##fin de boucle if testdns
+		}else{
+			my $ADDR=`nslookup  www.sfr.fr | grep -E [0-9]`;
+			$ADDR=~s/127\.0\.0\.1//g;
+			if($ADDR){
+			$GLOBAL_VAR=${GLOBAL_VAR}."OK";
+			&echo_color_green("Resolution de \"www.sfr.fr\" (=> nslookup)");
+			}else{
+			    &echo_color_red("Resolution de \"www.sfr.fr\" (=> nslookup)");
+			    $GLOBAL_VAR=${GLOBAL_VAR}."NOK";
+			} ##fin de boucle if testdns
+		} ##fin de boucle testpresencedig
 }
 
 
@@ -643,11 +665,16 @@ sub serv_ntp{
 				}else{
 						&echo_color_red ("$NTP_IP (test port 123)");
 				}
-				if(`ntpdate -q 127.0.0.1 2> /dev/null | grep "$NTP" | awk '{ print \$3 }'` eq "16" ){
-						&echo_color_green("$NTP_IP (ntpdate)");
-				}else{
-						&echo_color_red ("$NTP_IP (ntpdate)");
-				}
+				my $testpresencedig=`which ntpdate | grep -E 'ntpdate' 2> /dev/null`;
+				if($testpresencedig){
+					`ntpdate -q 127.0.0.1 2> /dev/null`;
+					my $testntp=`echo $?`;
+					if ("$testntp" == 0){
+							&echo_color_green("$NTP_IP (ntpdate) \n");
+					}else{
+							&echo_color_red ("$NTP_IP (ntpdate) \n");
+					}
+				}else{&echo_color_red ("$NTP_IP (abcense de la cmd \'ntpdate\ \n')");}
 			}
 		}
 
@@ -689,7 +716,7 @@ sub Route{
 	
 	
 	if ($ROUTES){
-		print "\n=> ROUTES\n";
+		print "=> ROUTES\n";
 		print $ROUTES."\n";
 		$GLOBAL_VAR=${GLOBAL_VAR}."OK";
 	}else{
@@ -723,9 +750,9 @@ get_conf_dns;
 get_conf_snmp;
 get_conf_smtp;
 get_conf_nrpe;
-echo_color_yellow("------------------------------------------------------------------------------\n");
-echo_color_yellow("-----------------------------------RESULT-------------------------------------\n");
-echo_color_yellow("------------------------------------------------------------------------------\n");
+echo_color_yellow("------------------------------------------------------------------------------");
+echo_color_yellow("-----------------------------------RESULT-------------------------------------");
+echo_color_yellow("------------------------------------------------------------------------------");
 print "$IP_LDAP ; $IP_NTP ; $IP_DNS ; $IP_SNMP ; $IP_SMTP_RH ; $IP_SMTP_FB ; $IP_NRPE ;\n";
 exit 0
 
@@ -758,13 +785,22 @@ sub conf{
 sub test_conf {
 	
 	my ($IP,$conf,$opt) = @_;
-	if("$opt" eq "$IP"){
-		echo_color_green("$conf $IP");
-		$GLOBAL_CONF="$GLOBAL_CONF OK";
-	}else{
-		echo_color_red("$conf $IP");
+	my $LOCAL_CONF="";
+	my $IP_split;
+	foreach $IP_split (split(' ',$IP)){
+		if("$opt" eq "$IP_split"){
+			$LOCAL_CONF="$LOCAL_CONF Y";
+		}else{
+			$LOCAL_CONF="$LOCAL_CONF N";
+		}		
+	}
+	unless($LOCAL_CONF=~/Y/){
+		echo_color_red("$conf $opt");
 		$GLOBAL_CONF="$GLOBAL_CONF NOK";
 		&modif_conf_file("$conf");
+	}else{
+		echo_color_green("$conf $opt");
+		$GLOBAL_CONF="$GLOBAL_CONF OK";
 	}
 }
 
@@ -778,6 +814,8 @@ sub serv{
 	serv_smtp;
 	print "\n";
 	&serv_dns;
+	#print "\n";
+	&dig;
 	print "\n";
 	&serv_ntp;
 	print "\n";
