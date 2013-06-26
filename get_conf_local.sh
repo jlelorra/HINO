@@ -154,7 +154,7 @@ fi ##fin de boucle if ping SVCC
 ###############################################################################################################################
 #connexion
 echo
-ssh -t $user@$ip sudo /bin/bash /tmp/get_conf_distant.sh $arg
+ssh -t $user@$ip sudo /usr/bin/perl /tmp/get_conf_distant.pl $arg
 #./get_conf_distant.sh
 exit 0
 
