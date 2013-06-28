@@ -406,8 +406,15 @@ sub insert_path{
 	my $FILES="/etc/puppet/puppet.conf";
 	if (-e $FILES){
 			echo_color_blue("###########################################   CONTENU DE $FILES   ###########################################");
-			my $F=`grep 'classfile' $FILES | sed 's+ ++g'`;
-			print $F."\n";
+			my $R= `grep -i 'rundir' $FILES | sed 's+ ++g'`;
+			my $F=`grep -i 'classfile' $FILES | sed 's+ ++g'`;
+			my $S=`grep -i 'server' $FILES | sed 's+ ++g'`;
+			unless($S){
+				$S=`grep 'SERVER' $FILES | sed 's+ ++g'`;
+			}
+			print $R;
+			print $F;
+			print $S."\n";
 			print "Parametre à modifier : \n";
 			my $old_IP = <STDIN>;
 			$old_IP=~ s/\n//g;
@@ -448,8 +455,8 @@ sub conf_puppet {
 	my $puppet_server;
 	my $FILE="/etc/puppet/puppet.conf";
 	if (-e $FILE ){
-		$puppet_run=`grep 'rundir' $FILE | sed "s+rundir=++g" | sed 's+ ++g'`;
-		$puppet_class=`grep 'classfile' $FILE | sed "s+classfile =++g" | sed 's+ ++g'`;
+		$puppet_run=`grep -i 'rundir' $FILE | sed "s+rundir=++g" | sed 's+ ++g'`;
+		$puppet_class=`grep -i 'classfile' $FILE | sed "s+classfile =++g" | sed 's+ ++g'`;
 		$puppet_server=`grep 'server' $FILE | sed "s+server=++g" | sed 's+ ++g'`;
 		unless($puppet_server){
 			$puppet_server=`grep 'SERVER' $FILE | sed "s+SERVER :++g" | sed 's+ ++g'`;
@@ -497,8 +504,8 @@ sub delta_conf_puppet {
 
 print "\n=> DELTA PUPPET\n";
 my $puppet_run=`grep 'rundir' "/etc/puppet/puppet.conf" | sed "s+rundir=++g" | sed 's+ ++g'`;
-if (-d "/etc/puppet/puppet.conf"){
-	if (" ! -d /etc/puppet/puppetd.conf"){
+if (-e "/etc/puppet/puppet.conf"){
+	if (" ! -e /etc/puppet/puppetd.conf"){
 	
 		if ("$puppet_run" eq "/var/run/puppet" && `ls -A "$puppet_run" | wc -c` == 0 ){
 			`puppetd -tv --noop |grep "should be" 2> /dev/null`;
