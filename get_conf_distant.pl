@@ -9,6 +9,7 @@ use strict;
 use warnings;
 use Getopt::Long;
 use Term::ANSIColor;
+use Sys::Hostname;
 #use DateTime;
 #use DateTime::TimeZone;
 
@@ -146,7 +147,7 @@ if ($opt_nrpe) {
 if ($opt_snmp) {
 	foreach my $opt (split(',',$opt_snmp)) {
 		 &get_conf_snmp;	
-       	&test_conf($IP_SNMP,"CONF SNMP",$opt_snmp);
+       	&test_conf($IP_SNMP,"CONF SNMP",$opt);
 	}
 }
 
@@ -435,8 +436,8 @@ sub check_cmd_puppetd {
 #test la precense de la cmd puppetd
 
 	print "\n=> TEST PRESENCE PUPPETD\n";
-	my $testpresencepuppetd=`which puppetd 2> /dev/null | grep -qiE 'puppetd'`;
-	if ($testpresencepuppetd){
+	my $testpresencepuppetd=`which puppetd | grep -iE puppetd`;
+	unless (undef($testpresencepuppetd)){
 		$GLOBAL_CONF="$GLOBAL_CONF OK";
 		echo_color_green("presence de la commande \"puppetd\"");
 
@@ -538,15 +539,15 @@ sub serv_smtp{
 					$SMTP_IP=~s/\n//g;
 					my $SMTP=`nc -z -w 1 -q 1 $SMTP_IP 25 2> /dev/null ; if [ $? = 0 ]; then echo "OK"; else echo "NOK"; fi;`;
 					$GLOBAL_VAR="$GLOBAL_VAR$SMTP";
-					unless ($SMTP=~/NOK/){
-						&echo_color_green("$SMTP_IP Service SMTP relayHost (test port 25 + telnet)");
-					}else{
+					if ($SMTP=~/NOK/){
 						&echo_color_red ("$SMTP_IP Service SMTP relayHost (test port 25 + telnet)");
+					}else{
+						&echo_color_green("$SMTP_IP Service SMTP relayHost (test port 25 + telnet)");
 					}
 				#}
 			}
 		}else{ 
-			&echo_color_red("absence de conf SMTP (/etc/postfix/main.cf)");
+			&echo_color_red("absence d'adresse \"RelayHost\"");
 			$GLOBAL_VAR=${GLOBAL_VAR}."NOK"
 		}
 		if ("$IP_SMTP_FB" ne ""){
@@ -555,16 +556,17 @@ sub serv_smtp{
 					$SMTP_IP=~s/\n//g;
 					my $SMTP=`nc -z -w 1 -q 1 $SMTP_IP 25 2> /dev/null ; if [ $? = 0 ]; then echo "OK"; else echo "NOK"; fi;`;
 					$GLOBAL_VAR="$GLOBAL_VAR$SMTP";
-					unless ($SMTP=~/NOK/){
-						&echo_color_green("$SMTP_IP Service SMTP FallBack (test port 25 + telnet)");
-					}else{
+					if($SMTP=~/NOK/){
 						&echo_color_red ("$SMTP_IP Service SMTP FallBack (test port 25 + telnet)");
+						
+					}else{
+						&echo_color_green("$SMTP_IP Service SMTP FallBack (test port 25 + telnet)");
 					}
 				#}
 			}
 		}else{ 
-			&echo_color_red("absence de conf SMTP (/etc/postfix/main.cf)");
-			$GLOBAL_VAR=${GLOBAL_VAR}."NOK"
+			&echo_color_red("absence d'adresse \"FallBack_relay\"");
+			#$GLOBAL_VAR=${GLOBAL_VAR}."NOK"
 		}
 	}else{ 
 		&echo_color_red ("absence de conf SMTP (/etc/postfix/main.cf)");
@@ -572,13 +574,13 @@ sub serv_smtp{
 	}
 }
 
-
 sub serv_dns{
 	&get_conf_dns;
 	if ("$IP_DNS" ne ""){
 		print "\n=> DNS\n";
 		my $FILE=$dns;
 		if(-e $FILE){
+			my $DNS_IP2;
 			foreach my $DNS_IP (split(' ',$IP_DNS)){
 					$DNS_IP=~s/\n//g;
 					my $DNS =`nc -z -w 1 -q 1 $DNS_IP 53 2> /dev/null ; if [ $? = 0 ]; then echo "OK"; else echo "NOK"; fi;`;
@@ -589,32 +591,42 @@ sub serv_dns{
 						&echo_color_red ("$DNS_IP (test port 53)");
 					}
 					
-					#test de concordance avec NSLOOKUP 
-					my $ADDR=`nslookup \$HOSTNAME "$DNS_IP"`;
-					my $rep_IP=`nslookup \$HOSTNAME "$DNS_IP" | grep 'Address' | sed 's+Address:++g' | cut -d '#' -f1`;
-					$rep_IP=~ s/[\t\s]//g;
-					my $DNS_IP2=`nslookup \$HOSTNAME "$DNS_IP" | grep 'Server:' | sed 's+Server:++g'`;
-					$DNS_IP2=~ s/[\t\s]//g;
-					$DNS_IP=~ s/[\t\s]//g;
-					if($DNS_IP2=~/$DNS_IP/){
-	    				my $HOST=`nslookup "$rep_IP" | grep -i "name" | cut -d '=' -f2 `;
-	    				$HOST=~s/\n//g;
-	    				my $short_HOST1=`\$HOSTNAME | cut -d '-' -f1`;
-	    				my $short_HOST2=`\$HOSTNAME | cut -d '-' -f2`;
-	    				my $HOST3="$short_HOST1-$short_HOST2";
-	    				$HOST3=~s/\n//g;
-	    				#my $testnslookup=`echo $HOST | grep '$HOST3'`;
-					    if($HOST =~/$HOST3/){
-						      &echo_color_green("$DNS_IP (comparaison NAME/IP puis IP/NAME)\n");
-						      $GLOBAL_VAR=${GLOBAL_VAR}."OK";
+					#test de concordance avec NSLOOKUP
+					my $testpresencenslookup=`which nslookup | grep -iE nslookup`;
+					unless (undef($testpresencenslookup)){
+						my $Host = hostname;
+						my $ADDR=`nslookup hostname "$DNS_IP"`;
+						my $rep_IP=`nslookup hostname "$DNS_IP" | grep 'Address' | sed 's+Address:++g' | cut -d '#' -f1`;
+						$rep_IP=~ s/[\t\s]//g;
+						$DNS_IP2=`nslookup hostname "$DNS_IP" | grep 'Server:' | sed 's+Server:++g'`;
+						$DNS_IP2=~ s/[\t\s]//g;
+						$DNS_IP=~ s/[\t\s]//g;
+						if($DNS_IP2=~/$DNS_IP/){
+			    				my $HOST=`nslookup "$rep_IP" | grep -i "name" | cut -d '=' -f2 `;
+			    				$HOST=~s/\n//g;
+			    				$HOST=~s/ //g;
+			    				#my $HOST_ref=`hostname --fqdn`;
+			    				my $short_HOST1=`\$HOSTNAME | cut -d '-' -f1`;
+			    				my $short_HOST2=`\$HOSTNAME | cut -d '-' -f2`;
+			    				my $HOST3="$short_HOST1-$short_HOST2";
+			    				$HOST3=~s/\n//g;
+			    				#$HOST_ref=~s/\n//g;
+			    				#my $testnslookup=`echo $HOST | grep '$HOST3'`;
+							    if($HOST =~/$HOST3/){
+								      &echo_color_green("$DNS_IP (comparaison NAME/IP puis IP/NAME)\n");
+								      $GLOBAL_VAR=${GLOBAL_VAR}."OK";
 
-					    }else{
-						      &echo_color_red("$DNS_IP (comparaison NAME/IP puis IP/NAME)\n");
-						      $GLOBAL_VAR=${GLOBAL_VAR}."NOK";
-					    }
-					}else{					    
-					    &echo_color_red("$DNS_IP (comparaison NAME/IP puis IP/NAME)\n");
-					    $GLOBAL_VAR=${GLOBAL_VAR}."NOK"
+							    }else{
+								      &echo_color_red("$DNS_IP (comparaison NAME/IP puis IP/NAME)\n");
+								      $GLOBAL_VAR=${GLOBAL_VAR}."NOK";
+							    }
+						}else{					    
+						    &echo_color_red("$DNS_IP (comparaison NAME/IP puis IP/NAME)\n");
+						    $GLOBAL_VAR=${GLOBAL_VAR}."NOK"
+						}
+					}else{
+						&echo_color_red("$DNS_IP (cmd nslookup absente)\n");
+						$GLOBAL_VAR=${GLOBAL_VAR}."NOK"
 					}
 			}
 		}else{ 
@@ -673,7 +685,7 @@ sub serv_ntp{
 						&echo_color_red ("$NTP_IP (test port 123)");
 				}
 				my $testpresencedig=`which ntpdate | grep -E 'ntpdate' 2> /dev/null`;
-				if($testpresencedig){
+				unless(undef($testpresencedig)){
 					`ntpdate -q 127.0.0.1 2> /dev/null`;
 					my $testntp=`echo $?`;
 					if ("$testntp" == 0){
@@ -681,7 +693,7 @@ sub serv_ntp{
 					}else{
 							&echo_color_red ("$NTP_IP (ntpdate) \n");
 					}
-				}else{&echo_color_red ("$NTP_IP (abcense de la cmd \'ntpdate\ \n')");}
+				}else{&echo_color_red ("$NTP_IP (absence de la cmd \'ntpdate\ \n')");}
 			}
 		}
 
@@ -840,3 +852,4 @@ sub serv{
 
 &conf;
 &serv;
+
