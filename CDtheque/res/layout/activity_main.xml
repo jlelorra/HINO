@@ -1,0 +1,139 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".MainActivity" >
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical" >
+
+    </LinearLayout>    
+
+       <TextView
+            android:id="@+id/lbl_artist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/artist"
+            android:layout_alignLeft="@+id/linearLayout1"
+            android:text="Artist name :" />
+       
+        <EditText 
+            android:id="@+id/artist" 
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content" 
+            android:layout_alignLeft="@+id/lbl_artist" 
+            android:layout_below="@+id/linearLayout1" 
+            android:layout_marginLeft="85dp"
+            android:ems="10" />
+        
+        <TextView
+            android:id="@+id/lbl_album"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/album"
+            android:layout_alignLeft="@+id/linearLayout1"
+            android:text="Album :" />
+        
+        <EditText
+            android:id="@+id/album"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/artist"
+            android:layout_below="@+id/artist"
+            android:ems="10" />
+        
+       <TextView
+            android:id="@+id/lbl_year"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/year"
+            android:layout_alignLeft="@+id/linearLayout1"
+            android:text="Year : "/>
+        
+        <EditText 
+            android:id="@+id/year" 
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content" 
+			android:layout_alignLeft="@+id/artist"
+			android:layout_below="@+id/album"
+            android:ems="10" 
+            android:inputType="number"/>
+
+       <RatingBar
+            android:id="@+id/ratingBar1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/linearLayout1"
+            android:layout_alignRight="@+id/year"
+            android:layout_below="@+id/year"
+            android:layout_marginTop="25dp" 
+            android:layout_toRightOf="@+id/linearLayout1"/>
+
+        <CheckBox
+            android:id="@+id/cb_Vynil"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/linearLayout1"
+            android:layout_below="@+id/ratingBar1"
+            android:text="Vinyl" />
+
+        <CheckBox
+            android:id="@+id/cb_demat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/cb_Vynil"
+            android:layout_alignBottom="@+id/cb_Vynil"
+            android:layout_toRightOf="@+id/cb_Vynil"
+            android:layout_below="@+id/ratingBar1"
+            android:text="Numerique" />
+
+        <CheckBox
+            android:id="@+id/cb_CD"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/cb_demat"
+            android:layout_alignBottom="@+id/cb_demat"
+            android:layout_toRightOf="@+id/cb_demat"
+            android:layout_below="@+id/ratingBar1"
+            android:layout_alignRight="@+id/ratingBar1"
+            android:text="CD" />
+        
+       <TextView
+            android:id="@+id/lbl_borrower"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/cb_Vynil"
+            android:layout_alignLeft="@+id/linearLayout1"
+            android:layout_marginTop="25dp" 
+            android:text="Emprunteur : "/>
+       
+        <TextView
+            android:id="@+id/borrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/cb_CD"
+            android:layout_alignLeft="@+id/artist"
+            android:layout_alignBottom="@+id/lbl_borrower"
+            android:layout_marginTop="25dp" 
+			android:layout_below="@+id/cb_CD"/>
+
+        
+        <Button
+            android:id="@+id/OK"
+            android:layout_width="3000dp"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/ratingBar1"
+            android:layout_below="@+id/borrow"
+            android:layout_marginTop="25dp" 
+            android:text="OK" />
+
+</RelativeLayout>
