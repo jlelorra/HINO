@@ -4,13 +4,14 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 public class CDBDD {
 
 	private static final int VERSION_BDD = 1;
 	private static final String NOM_BDD = "CD.db";
  
-	private static final String TABLE_CD = "table_CD";
+	private static final String TABLE_CD = "table_cd";
 	private static final String COL_ID = "ID";
 	private static final int NUM_COL_ID = 0;
 	private static final String ARTIST = "ARTIST";
@@ -54,8 +55,10 @@ public class CDBDD {
 		values.put(ARTIST, cd.getArtist());
 		values.put(ALBUM, cd.getAlbum());
 		values.put(YEAR, cd.getYear());
-		values.put(CONTACT, cd.getContact());
-		values.put(RATE, cd.getRate());
+		if(cd.getContact()!=null)values.put(CONTACT, cd.getContact());
+		else values.put(CONTACT, "FREE");
+		if(cd.getRate()>0)values.put(RATE, cd.getRate());
+		else values.put(RATE, 0.0);
 		//on insère l'objet dans la BDD via le ContentValues
 		return bdd.insert(TABLE_CD, null, values);
 	}
@@ -63,7 +66,7 @@ public class CDBDD {
 	public int updateCD(int id, CD cd){
 		//La mise à jour d'un livre dans la BDD fonctionne plus ou moins comme une insertion
 		//il faut simple préciser quelle livre on doit mettre à jour grâce à l'ID
-		ContentValues values = new ContentValues();
+		ContentValues values = new ContentValues();	
 		values.put(ARTIST, cd.getArtist());
 		values.put(ALBUM, cd.getAlbum());
 		values.put(YEAR, cd.getYear());
@@ -79,8 +82,30 @@ public class CDBDD {
  
 	public CD getCDWithAlbum(String Album){
 		//Récupère dans un Cursor les valeur correspondant à un livre contenu dans la BDD (ici on sélectionne le livre grâce à son titre)
-		Cursor c = bdd.query(TABLE_CD, new String[] {COL_ID, ARTIST , YEAR , CONTACT, RATE, ALBUM}, ALBUM + " LIKE \"" + Album +"\"", null, null, null, null);
+		Cursor c = bdd.query(TABLE_CD, new String[] {COL_ID, ARTIST, ALBUM , YEAR , CONTACT, RATE}, ALBUM + " LIKE \"" + Album +"\"", null, null, null, null);
 		return cursorToCD(c);
+	}
+	
+	public CD[] getAllAlbum(){
+		//Récupère dans un Cursor les valeur correspondant à un livre contenu dans la BDD (ici on sélectionne le livre grâce à son titre)
+		Cursor c = bdd.query(TABLE_CD, null,null, null, null, null, null);
+		if (c.getCount() == 0)
+			return null;
+		CD[] CDs= new CD[c.getCount()];
+		int i = 0;
+		c.moveToFirst();
+		while(!c.isAfterLast()){
+			CDs[i].setId(c.getInt(NUM_COL_ID));
+			CDs[i].setArtist(c.getString(NUM_ARTIST));
+			CDs[i].setAlbum(c.getString(NUM_ALBUM));
+			CDs[i].setYear(c.getString(NUM_YEAR));
+			CDs[i].setContact(c.getString(NUM_CONTACT));
+			CDs[i].setRate(c.getFloat(NUM_RATE));
+			i++;
+			c.moveToNext();
+			Log.d("CD name",CDs[i].getAlbum());
+		}
+		return CDs;
 	}
  
 	

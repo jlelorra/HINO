@@ -11,7 +11,7 @@ public class CD {
 	
 	public CD() {}
 	
-	public CD(String artist, String album, String year, String contact) {
+	public CD(String artist, String album, String year, String contact,float rate) {
 		super();
 		this.artist = artist;
 		this.album = album;

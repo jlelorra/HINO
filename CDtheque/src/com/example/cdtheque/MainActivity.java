@@ -20,6 +20,7 @@ public class MainActivity extends Activity{
 	 private RatingBar rate = null;
 	 private Button OK = null;
 	 private Menu Contact = null;
+	 private Menu ListOfAlbum = null;
 	 private Toast Toast =null;
 	 private TextView borrow;
 	 String str_artist;
@@ -85,13 +86,12 @@ public class MainActivity extends Activity{
 	                	 	
 	                    	
 	                        //Création d'un CD
-	                        CD cd = new CD(str_artist, str_album , str_year, str_borrow);
+	                        CD cd = new CD(str_artist, str_album , str_year, str_borrow , int_rate);
 	                        
 	                        //On ouvre la base de données pour écrire dedans
 	                        cdBdd.open();
 	                        //On insère le livre que l'on vient de créer
 	                        cdBdd.insertCD(cd);
-	                        cdBdd.close();
 	
 	                        // TODO Auto-generated method stub
 	                        Intent i = new Intent(getApplicationContext(),affich_text.class);
@@ -106,6 +106,7 @@ public class MainActivity extends Activity{
 	                        //Log.d("borrow", str_borrow);
 	                        Log.d("rate", String.valueOf(int_rate));
 	                        startActivity(i);
+	                        cdBdd.close();
 	                    }
 	                }); 
  }
@@ -117,6 +118,7 @@ public class MainActivity extends Activity{
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         Contact = menu;
+        ListOfAlbum = menu;
         return true;
         }
             
@@ -150,6 +152,9 @@ public class MainActivity extends Activity{
   	                    //}
   	                //});
             return true;
+          	case R.id.ListOfAlbum:
+          					Intent intent = new Intent(getApplicationContext(),affich_album.class);
+          					startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
       }
