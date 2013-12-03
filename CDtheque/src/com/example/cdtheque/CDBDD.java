@@ -87,11 +87,12 @@ public class CDBDD {
 	}
 	
 	public CD[] getAllAlbum(){
-		//Récupère dans un Cursor les valeur correspondant à un livre contenu dans la BDD (ici on sélectionne le livre grâce à son titre)
+
 		Cursor c = bdd.query(TABLE_CD, null,null, null, null, null, null);
 		if (c.getCount() == 0)
 			return null;
 		CD[] CDs= new CD[c.getCount()];
+		Log.d("NB ROWS", String.valueOf(c.getCount()));
 		int i = 0;
 		c.moveToFirst();
 		while(!c.isAfterLast()){
@@ -101,11 +102,19 @@ public class CDBDD {
 			CDs[i].setYear(c.getString(NUM_YEAR));
 			CDs[i].setContact(c.getString(NUM_CONTACT));
 			CDs[i].setRate(c.getFloat(NUM_RATE));
-			i++;
-			c.moveToNext();
 			Log.d("CD name",CDs[i].getAlbum());
+			i++;
+			
+			c.moveToNext();
 		}
+		c.close();
 		return CDs;
+	}
+	
+	public Cursor getListOfAlbum(){
+		//Récupère dans un Cursor les valeur correspondant à un livre contenu dans la BDD (ici on sélectionne le livre grâce à son titre)
+		Cursor c = bdd.query(TABLE_CD, new String[] {COL_ID, ARTIST, ALBUM , YEAR , CONTACT, RATE}, null, null, null, null, null);
+		return c;
 	}
  
 	

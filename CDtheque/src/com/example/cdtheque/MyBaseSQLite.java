@@ -10,7 +10,7 @@ public class MyBaseSQLite  extends SQLiteOpenHelper{
 	private static final String TABLE_CD = "table_cd";
 	private static final String COL_ID = "ID";
 	private static final String ARTIST = "ARTIST";
-	private static final String ALBUM = "ALBUM";
+	static final String ALBUM = "ALBUM";
 	private static final String YEAR = "YEAR";
 	private static final String CONTACT = "CONTACT";
 	private static final String RATE = "RATE";

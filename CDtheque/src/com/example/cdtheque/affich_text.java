@@ -67,6 +67,7 @@ public class affich_text extends Activity {
           	case R.id.ListOfAlbum:
           					Intent intent = new Intent(getApplicationContext(),affich_album.class);
           					startActivity(intent);
+  	                        return true;
         }
         return super.onOptionsItemSelected(item);
       }
