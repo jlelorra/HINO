@@ -2,6 +2,7 @@
     
     <item android:id="@+id/ChooseAContact" android:titleCondensed="Contact" android:menuCategory="system" android:title="Contact"></item>
     <item android:id="@+id/ListOfAlbum" android:titleCondensed="ListOfAlbum" android:menuCategory="system" android:title="List Of Album"></item>
+    <item android:id="@+id/addCD" android:titleCondensed="Ajout" android:menuCategory="system" android:title="Add CD"></item>
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"

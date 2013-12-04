@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,8 +17,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Toast;
 
 public class affich_album extends ListActivity{
+	private static final int DELETE_ALBUM = 1;
+	private static final int ADD_ALBUM = 0;
 	ListView liste = null;
     ArrayList<Object> listActivities;
     ListAdapter adapter;
@@ -24,6 +29,9 @@ public class affich_album extends ListActivity{
     ArrayAdapter<String> arr;
 	private Menu Contact = null;
 	private Menu ListOfAlbum = null;
+	private Menu Supprimer = null;
+	String str[];
+
 
 
 
@@ -34,7 +42,7 @@ public class affich_album extends ListActivity{
 	    cdBdd = new CDBDD(this);
 	    cdBdd.open();
 	    Cursor c = cdBdd.getListOfAlbum();
-		String str[]= new String[c.getCount()];
+		str= new String[c.getCount()];
 		if (c.getCount() != 0){
 	
 			//Sinon on se place sur le premier élément
@@ -50,6 +58,7 @@ public class affich_album extends ListActivity{
 		     arr = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,str);
 		     setListAdapter(arr);
 			 ListView list = this.getListView();   
+		     registerForContextMenu(list);
 			 list.setOnItemClickListener(new OnItemClickListener() {
 					
 		         @Override
@@ -57,11 +66,18 @@ public class affich_album extends ListActivity{
 		        	Log.d("ALBUM NAME",arr.getItem(position));
 		     	    cdBdd.open();
 		            CD cdFromBdd = cdBdd.getCDWithAlbum(arr.getItem(position));
-		            //arr = new ArrayAdapter<String>(this,android.R.id.listTextView,arr.getItem(position));
-		            cdBdd.removeCDWithID(cdFromBdd.getId());
+                    Intent i = new Intent(getApplicationContext(),affich_CD.class);
+                    i.putExtra("ID",cdFromBdd.getId());
+                    i.putExtra("ALBUM",cdFromBdd.getAlbum());
+                    i.putExtra("YEAR",cdFromBdd.getYear());
+                    i.putExtra("RATE",cdFromBdd.getRate());
+                    i.putExtra("ARTIST",cdFromBdd.getArtist());
+                    if(cdFromBdd.getContact()==null){
+                    	i.putExtra("CONTACT","diponible");
+                    }
+                    startActivity(i);
 		     	 	cdBdd.close();
-		     	 	onResume();
-		         	//Toast.makeText(this, cdFromBdd.toString(), Toast.LENGTH_LONG).show();
+		     	 	
 		          }	
 		         
 		      });
@@ -98,9 +114,56 @@ public class affich_album extends ListActivity{
 	          		Intent intent = new Intent(getApplicationContext(),affich_album.class);
 	          		startActivity(intent);
 	          		return true;
+	          	case R.id.addCD:
+	          		Intent intent2 = new Intent(getApplicationContext(),MainActivity.class);
+	          		startActivity(intent2);
+	          		return true;
 	        }
 	        return super.onOptionsItemSelected(item);
 	      }
+	    
+		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuinfo) {
+			
+			  super.onCreateContextMenu(menu, v, menuinfo);
+			  //getMenuInflater().inflate(R.menu.contect, menu);
+			  //Supprimer = menu;
+			  menu.add(Menu.NONE, ADD_ALBUM, Menu.NONE, "Ajouter");
+			  menu.add(Menu.NONE, DELETE_ALBUM, Menu.NONE, "Supprimer");
+		  }
+		  
+		
+		
+		  @Override
+		  public boolean onContextItemSelected(MenuItem item) {
+			  
+		    
+			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+			int position=item.getItemId();
+  	    	Log.d("position",String.valueOf(info.position));
+		    switch (item.getItemId()) {
+			    case DELETE_ALBUM:
+	
+	
+			    	  	cdBdd = new CDBDD(this);
+			  	    	cdBdd.open();
+			  	    	Log.d("ALBUM NAME",arr.getItem(position));
+			            CD cdFromBdd = cdBdd.getCDWithAlbum(arr.getItem(info.position));
+			            cdBdd.removeCDWithID(cdFromBdd.getId());
+			            Toast.makeText(this, String.valueOf(info.id), Toast.LENGTH_SHORT).show();
+			     	 	cdBdd.close();
+			     	 	onResume();
+			     	 	return true;
+			     	 	
+			    case ADD_ALBUM:
+				    	Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+	  					startActivity(intent);
+			    		return true;
+
+		    }	
+		    return super.onContextItemSelected(item);
+		  }
+		  
+		
 
 }
 

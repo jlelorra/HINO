@@ -55,10 +55,12 @@ public class CDBDD {
 		values.put(ARTIST, cd.getArtist());
 		values.put(ALBUM, cd.getAlbum());
 		values.put(YEAR, cd.getYear());
+		values.put(RATE, cd.getRate());
+		Log.d("RATE", String.valueOf(cd.getRate()));
 		if(cd.getContact()!=null)values.put(CONTACT, cd.getContact());
 		else values.put(CONTACT, "FREE");
-		if(cd.getRate()>0)values.put(RATE, cd.getRate());
-		else values.put(RATE, 0.0);
+		//if(cd.getRate()!=0)values.put(RATE, cd.getRate());
+		//else values.put(RATE, 0.0);
 		//on insère l'objet dans la BDD via le ContentValues
 		return bdd.insert(TABLE_CD, null, values);
 	}
@@ -92,7 +94,6 @@ public class CDBDD {
 		if (c.getCount() == 0)
 			return null;
 		CD[] CDs= new CD[c.getCount()];
-		Log.d("NB ROWS", String.valueOf(c.getCount()));
 		int i = 0;
 		c.moveToFirst();
 		while(!c.isAfterLast()){

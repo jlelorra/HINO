@@ -40,7 +40,7 @@ public class affich_text extends Activity {
         	//On affiche les infos du livre dans un Toast
         	Toast.makeText(this, cdFromBdd.toString(), Toast.LENGTH_LONG).show();
         	textchamp = (TextView) findViewById(R.id.display);
-        	contenu.append("Vous venez de créer l'entrée suivante avec succés !\nAlbum : "+cdFromBdd.getAlbum()+" \nArtist : "+cdFromBdd.getArtist()+" \nYear : "+cdFromBdd.getYear()+" \nContact : "+cdFromBdd.getContact());
+        	contenu.append("Vous venez de créer l'entrée suivante avec succés !\nAlbum : "+cdFromBdd.getAlbum()+" \nArtist : "+cdFromBdd.getArtist()+" \nYear : "+cdFromBdd.getYear()+" \nRate : "+cdFromBdd.getRate()+" \nContact : "+cdFromBdd.getContact());
         	textchamp.setText(contenu);
         }
     }
@@ -68,6 +68,10 @@ public class affich_text extends Activity {
           					Intent intent = new Intent(getApplicationContext(),affich_album.class);
           					startActivity(intent);
   	                        return true;
+          	case R.id.addCD:
+          		Intent intent2 = new Intent(getApplicationContext(),MainActivity.class);
+          		startActivity(intent2);
+          		return true;
         }
         return super.onOptionsItemSelected(item);
       }

@@ -151,10 +151,15 @@ public class MainActivity extends Activity{
   	                        startActivity(i);
   	                    //}
   	                //});
-            return true;
+  	             return true;
           	case R.id.ListOfAlbum:
           					Intent intent = new Intent(getApplicationContext(),affich_album.class);
           					startActivity(intent);
+          	          		return true;
+          	case R.id.addCD:
+          		Intent intent2 = new Intent(getApplicationContext(),MainActivity.class);
+          		startActivity(intent2);
+          		return true;
         }
         return super.onOptionsItemSelected(item);
       }
