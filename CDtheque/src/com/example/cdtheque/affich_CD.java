@@ -19,7 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class affich_CD extends FragmentActivity {
+public class affich_CD extends Activity {
 	private static final int UPDATE_CD = 0;
 	LinearLayout layout;
 	private TextView textchamp;
@@ -38,12 +38,16 @@ public class affich_CD extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.affich_text);
         Intent intent = getIntent();
+        cdBdd = new CDBDD(this);
+        cdBdd.open();
+        CD cdFromBdd = cdBdd.getCDWithAlbum(intent.getStringExtra("ALBUM"));
+        cdBdd.close();
         Log.d("CONTENT", intent.getStringExtra("ALBUM"));
-        //idCD=intent.getIntExtra("ID", 0);
+        Log.d("ID CD",String.valueOf(cdFromBdd.getId()));
         StringBuffer contenu = new StringBuffer();
         album = intent.getStringExtra("ALBUM");
        	textchamp = (TextView) findViewById(R.id.display);
-       	contenu.append("Album : "+intent.getStringExtra("ALBUM")+" \nArtist : "+intent.getStringExtra("ARTIST")+" \nYear : "+intent.getStringExtra("YEAR")+" \nRate : "+intent.getStringExtra("RATE")+" \nContact : "+intent.getStringExtra("CONTACT"));
+       	contenu.append("Album : "+cdFromBdd.getAlbum()+" \nArtist : "+cdFromBdd.getArtist()+" \nYear : "+cdFromBdd.getYear()+" \nRate : "+String.valueOf(cdFromBdd.getRate())+" \nContact : "+cdFromBdd.getContact());
        	textchamp.setText(contenu);
        	textchamp.setTextColor(Color.DKGRAY);
        	textchamp.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
@@ -60,6 +64,7 @@ public class affich_CD extends FragmentActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         Contact = menu;
+        ListOfAlbum = menu;
         ListOfAlbum = menu;
         return true;
         }
@@ -79,9 +84,13 @@ public class affich_CD extends FragmentActivity {
           					startActivity(intent);
   	                        return true;
           	case R.id.addCD:
-          		Intent intent2 = new Intent(getApplicationContext(),MainActivity.class);
-          		startActivity(intent2);
-          		return true;
+			          		Intent intent2 = new Intent(getApplicationContext(),MainActivity.class);
+			          		startActivity(intent2);
+			          		return true;
+          	case R.id.ListOfArtist:
+			          		Intent intent3 = new Intent(getApplicationContext(),affich_artist.class);
+			          		startActivity(intent3);
+			          		return true;
         }
         return super.onOptionsItemSelected(item);
       }
@@ -89,10 +98,7 @@ public class affich_CD extends FragmentActivity {
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuinfo) {
 		
 		  super.onCreateContextMenu(menu, v, menuinfo);
-		  //getMenuInflater().inflate(R.menu.contect, menu);
-		  //Supprimer = menu;
 		  menu.add(Menu.NONE, UPDATE_CD, Menu.NONE, "Mettre à jour les infos");
-		  //menu.add(Menu.NONE, DELETE_ALBUM, Menu.NONE, "Supprimer");
 	  }
 	  
 	
@@ -109,12 +115,16 @@ public class affich_CD extends FragmentActivity {
 
 		    	  	cdBdd = new CDBDD(this);
 		  	    	cdBdd.open();
-		  	    	Log.d("ALBUM NAME",album);
 		            CD cdFromBdd = cdBdd.getCDWithAlbum(album);
-		            //Toast.makeText(this, String.valueOf(info.id), Toast.LENGTH_SHORT).show();
-			    	//Intent intent = new Intent(getApplicationContext(),UpdateCD.class);
-		     	 	//onResume();
-					//startActivity(intent);
+		  	    	Log.d("ALBUM NAME",cdFromBdd.getAlbum());
+			    	Intent intent = new Intent(getApplicationContext(),UpdateCD.class);
+			    	intent.putExtra("ID", cdFromBdd.getId());
+			    	intent.putExtra("ALBUM", cdFromBdd.getAlbum());
+			    	intent.putExtra("ARTIST", cdFromBdd.getArtist());
+			    	intent.putExtra("YEAR", cdFromBdd.getYear());
+			    	intent.putExtra("RATE", cdFromBdd.getRate());
+			    	intent.putExtra("CONTACT", cdFromBdd.getContact());
+					startActivity(intent);
 		     	 	cdBdd.close();
 		     	 	return true;
 		     	 	

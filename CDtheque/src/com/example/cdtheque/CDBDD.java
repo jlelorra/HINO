@@ -88,6 +88,18 @@ public class CDBDD {
 		return cursorToCD(c);
 	}
 	
+	public CD getCDWithID(int id){
+		//Récupère dans un Cursor les valeur correspondant à un livre contenu dans la BDD (ici on sélectionne le livre grâce à son titre)
+		Cursor c = bdd.query(TABLE_CD, new String[] {COL_ID, ARTIST, ALBUM , YEAR , CONTACT, RATE}, COL_ID + " LIKE \"" + id +"\"", null, null, null, null);
+		return cursorToCD(c);
+	}
+	
+	public CD getCDWithArtist(String Artist){
+		//Récupère dans un Cursor les valeur correspondant à un livre contenu dans la BDD (ici on sélectionne le livre grâce à son titre)
+		Cursor c = bdd.query(TABLE_CD, new String[] {COL_ID, ARTIST, ALBUM , YEAR , CONTACT, RATE}, ARTIST + " LIKE \"" + Artist +"\"", null, null, null, null);
+		return cursorToCD(c);
+	}
+	
 	public CD[] getAllAlbum(){
 
 		Cursor c = bdd.query(TABLE_CD, null,null, null, null, null, null);
@@ -118,9 +130,11 @@ public class CDBDD {
 		return c;
 	}
  
-	
-	
-	
+	public Cursor getListOfArtist(){
+		//Récupère dans un Cursor les valeur correspondant à un livre contenu dans la BDD (ici on sélectionne le livre grâce à son titre)
+		Cursor c = bdd.query(TABLE_CD, new String[] {COL_ID, ARTIST, ALBUM , YEAR , CONTACT, RATE}, null, null, null, null, null);
+		return c;
+	}
 	
 	//Cette méthode permet de convertir un cursor en un livre
 	private CD cursorToCD(Cursor c){

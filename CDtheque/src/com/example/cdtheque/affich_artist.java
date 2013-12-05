@@ -9,18 +9,18 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 
-public class affich_album extends ListActivity{
+public class affich_artist extends ListActivity{
 	private static final int DELETE_ALBUM = 1;
 	private static final int ADD_ALBUM = 0;
 	private static final int UPDATE_CD = 2;
@@ -30,6 +30,7 @@ public class affich_album extends ListActivity{
     CDBDD cdBdd;
     ArrayAdapter<String> arr;
 	private Menu Contact = null;
+	private Menu ListOfArtist = null;
 	private Menu ListOfAlbum = null;
 	private Menu Supprimer = null;
 	String str[];
@@ -40,7 +41,7 @@ public class affich_album extends ListActivity{
 	@SuppressWarnings("unchecked")
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
-	    liste = (ListView) findViewById(R.id.ListOfAlbum);
+	    liste = (ListView) findViewById(R.id.ListOfArtist);
 	    cdBdd = new CDBDD(this);
 	    cdBdd.open();
 	    Cursor c = cdBdd.getListOfAlbum();
@@ -51,11 +52,12 @@ public class affich_album extends ListActivity{
 			c.moveToFirst();
 			int i = 0;
 			while(!c.isAfterLast()){
-		    	Log.d("CONTENT",c.getString(2));
-				str[i] = c.getString(2);
+		    	Log.d("CONTENT",c.getString(1));
+				str[i] = c.getString(1);
 				c.moveToNext();
 				i++;
 			}
+			
 			 //arr = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,str);
 			Arrays.sort(str);
 		    arr = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,str);
@@ -68,7 +70,7 @@ public class affich_album extends ListActivity{
 		          public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
 		        	Log.d("ALBUM NAME",arr.getItem(position));
 		     	    cdBdd.open();
-		            CD cdFromBdd = cdBdd.getCDWithAlbum(arr.getItem(position));
+		            CD cdFromBdd = cdBdd.getCDWithArtist(arr.getItem(position));
                     Intent i = new Intent(getApplicationContext(),affich_CD.class);
                     i.putExtra("ID",cdFromBdd.getId());
                     i.putExtra("ALBUM",cdFromBdd.getAlbum());
@@ -101,6 +103,7 @@ public class affich_album extends ListActivity{
 	        // Inflate the menu; this adds items to the action bar if it is present.
 	        getMenuInflater().inflate(R.menu.main, menu);
 	        Contact = menu;
+	        ListOfArtist = menu;
 	        ListOfAlbum = menu;
 	        return true;
 	        }
@@ -134,8 +137,6 @@ public class affich_album extends ListActivity{
 		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuinfo) {
 			
 			  super.onCreateContextMenu(menu, v, menuinfo);
-			  //getMenuInflater().inflate(R.menu.contect, menu);
-			  //Supprimer = menu;
 			  menu.add(Menu.NONE, ADD_ALBUM, Menu.NONE, "Ajouter");
 			  menu.add(Menu.NONE, DELETE_ALBUM, Menu.NONE, "Supprimer");
 			  menu.add(Menu.NONE, UPDATE_CD, Menu.NONE, "Mettre à jour les infos");
@@ -145,7 +146,6 @@ public class affich_album extends ListActivity{
 		
 		  @Override
 		  public boolean onContextItemSelected(MenuItem item) {
-			  
 		    
 			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
 			int position=item.getItemId();
@@ -154,8 +154,8 @@ public class affich_album extends ListActivity{
 			    case DELETE_ALBUM:
 			    	  	cdBdd = new CDBDD(this);
 			  	    	cdBdd.open();
-			  	    	Log.d("ALBUM NAME",arr.getItem(position));
-			            CD cdFromBdd = cdBdd.getCDWithAlbum(arr.getItem(info.position));
+			  	    	Log.d("ARTIST NAME",arr.getItem(info.position));
+			            CD cdFromBdd = cdBdd.getCDWithArtist(arr.getItem(info.position));
 			            cdBdd.removeCDWithID(cdFromBdd.getId());
 			            Toast.makeText(this, String.valueOf(info.id), Toast.LENGTH_SHORT).show();
 			     	 	cdBdd.close();
@@ -186,8 +186,4 @@ public class affich_album extends ListActivity{
 		    }	
 		    return super.onContextItemSelected(item);
 		  }
-		  
-		
-
 }
-

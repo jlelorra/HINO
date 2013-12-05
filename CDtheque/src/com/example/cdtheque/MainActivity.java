@@ -61,8 +61,8 @@ public class MainActivity extends Activity{
         }
         
 	 	rate = (RatingBar)this.findViewById(R.id.ratingBar1);
-        if(intent.getStringExtra("YEAR")!= null){
-        	int_rate = intent.getFloatExtra("RATE",2);
+        if(intent.getFloatExtra("RATE",0)>= 0){
+        	int_rate = intent.getFloatExtra("RATE",0);
         	rate.setRating(intent.getFloatExtra("RATE",0));
         }
         OK=(Button)this.findViewById(R.id.OK);
@@ -83,6 +83,7 @@ public class MainActivity extends Activity{
 	                   	 	str_album = album.getEditableText().toString();
 	                   	 	str_year = year.getEditableText().toString();
 	                	 	int_rate = (float) rate.getRating();
+	                	 	str_borrow= borrow.getText().toString();
 	                	 	
 	                    	
 	                        //Création d'un CD
@@ -95,15 +96,17 @@ public class MainActivity extends Activity{
 	
 	                        // TODO Auto-generated method stub
 	                        Intent i = new Intent(getApplicationContext(),affich_text.class);
+	                        //i.putExtra("ID",idCd);
 	                        i.putExtra("ALBUM",str_album);
 	                        i.putExtra("YEAR",str_year);
 	                        i.putExtra("RATE",int_rate);
-  	                        i.putExtra("ARTIST",str_artist);
+ 	                        i.putExtra("ARTIST",str_artist);
 	                        i.putExtra("BORROW",str_borrow);
+	                        //Log.d("ID",String.valueOf(idCd));
 	                        Log.d("artist_name",str_artist);
 	                        Log.d("album_name", str_album);
 	                        Log.d("year", str_year);
-	                        //Log.d("borrow", str_borrow);
+	                        Log.d("borrowMain", str_borrow);
 	                        Log.d("rate", String.valueOf(int_rate));
 	                        startActivity(i);
 	                        cdBdd.close();
@@ -157,9 +160,13 @@ public class MainActivity extends Activity{
           					startActivity(intent);
           	          		return true;
           	case R.id.addCD:
-          		Intent intent2 = new Intent(getApplicationContext(),MainActivity.class);
-          		startActivity(intent2);
-          		return true;
+			          		Intent intent2 = new Intent(getApplicationContext(),MainActivity.class);
+			          		startActivity(intent2);
+			          		return true;
+          	case R.id.ListOfArtist:
+			          		Intent intent3 = new Intent(getApplicationContext(),affich_artist.class);
+			          		startActivity(intent3);
+			          		return true;
         }
         return super.onOptionsItemSelected(item);
       }
