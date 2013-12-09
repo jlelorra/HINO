@@ -29,10 +29,8 @@ public class affich_album extends ListActivity{
     ListAdapter adapter;
     CDBDD cdBdd;
     ArrayAdapter<String> arr;
-	private Menu Contact = null;
-	private Menu ListOfAlbum = null;
-	private Menu Supprimer = null;
 	String str[];
+	String art[];
 
 
 
@@ -58,6 +56,7 @@ public class affich_album extends ListActivity{
 			}
 			 //arr = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,str);
 			Arrays.sort(str);
+			
 		    arr = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,str);
 		    setListAdapter(arr);
 			ListView list = this.getListView();   
@@ -100,8 +99,6 @@ public class affich_album extends ListActivity{
 	    public boolean onCreateOptionsMenu(Menu menu) {
 	        // Inflate the menu; this adds items to the action bar if it is present.
 	        getMenuInflater().inflate(R.menu.main, menu);
-	        Contact = menu;
-	        ListOfAlbum = menu;
 	        return true;
 	        }
 	            
@@ -170,7 +167,7 @@ public class affich_album extends ListActivity{
 			    case UPDATE_CD:
 			    	  	cdBdd = new CDBDD(this);
 			  	    	cdBdd.open();
-			  	    	Log.d("ALBUM NAME",arr.getItem(position));
+			  	    	Log.d("ALBUM NAME",arr.getItem(info.position));
 			            cdFromBdd = cdBdd.getCDWithAlbum(arr.getItem(info.position));
 				    	intent = new Intent(getApplicationContext(),UpdateCD.class);
 				    	intent.putExtra("ID", cdFromBdd.getId());

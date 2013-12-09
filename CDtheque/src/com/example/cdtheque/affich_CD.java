@@ -106,11 +106,7 @@ public class affich_CD extends Activity {
 	  @Override
 	  public boolean onContextItemSelected(MenuItem item) {
 		  
-	    
-		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-		//int position=item.getItemId();
-    	//Log.d("position",String.valueOf(info.position));
-	    switch (item.getItemId()) {
+   	    switch (item.getItemId()) {
 		    case UPDATE_CD:
 
 		    	  	cdBdd = new CDBDD(this);
