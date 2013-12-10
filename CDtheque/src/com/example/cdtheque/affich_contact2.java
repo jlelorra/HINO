@@ -2,10 +2,14 @@ package com.example.cdtheque;
 
 import java.util.ArrayList;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.ListActivity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -27,6 +31,8 @@ public class affich_contact2 extends ListActivity {
 
 
 
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+@SuppressLint("NewApi")
 @SuppressWarnings("unchecked")
 public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -47,6 +53,8 @@ public void onCreate(Bundle savedInstanceState) {
 	 //str[idx+1]="FREE (disponible)";   
 	 arr = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,str);
 	 setListAdapter(arr);
+     ActionBar actionBar = getActionBar();
+     actionBar.setDisplayHomeAsUpEnabled(true);
 	 ListView list = this.getListView();   
 	 list.setOnItemClickListener(new OnItemClickListener() {
 			

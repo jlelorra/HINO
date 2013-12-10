@@ -27,6 +27,7 @@ public class MainActivity extends Activity{
 	
 	private static final int LISTOFALBUM = 0;
 	private static final int LISTOFARTIST = 1;
+	private static final int CONTACT = 2;
 	 private EditText artist = null;
 	 private EditText album = null;
      private EditText year = null;
@@ -285,6 +286,7 @@ public class MainActivity extends Activity{
 		  //menu.add(Menu.NONE, UPDATE_CD, Menu.NONE, "Mettre à jour les infos");
 		  menu.add(Menu.NONE, LISTOFALBUM, Menu.NONE, "Liste des Albums");
 		  menu.add(Menu.NONE, LISTOFARTIST, Menu.NONE, "Liste des Artistes");
+		  menu.add(Menu.NONE, CONTACT, Menu.NONE, "Contact");
 	  }
 	  
 	
@@ -298,24 +300,21 @@ public class MainActivity extends Activity{
 		    /*case ADD_ALBUM:
 			    	intent = new Intent(getApplicationContext(),MainActivity.class);
 					startActivity(intent);
-		    		return true;
+		    		return true;*/
 		    		
-		    case UPDATE_CD:
-		    		cdBdd = new CDBDD(this);
-		    	  	intent = new Intent(getApplicationContext(),UpdateCD.class);
-		  	    	cdBdd.open();
-		  	    	Log.d("ALBUM NAME",intent.getStringExtra("ALBUM"));
-		  	    	CD cdFromBdd = cdBdd.getCDWithAlbum(intent.getStringExtra("ALBUM"));
-			    	intent = new Intent(getApplicationContext(),UpdateCD.class);
-			    	intent.putExtra("ID", cdFromBdd.getId());
-			    	intent.putExtra("ALBUM", cdFromBdd.getAlbum());
-			    	intent.putExtra("ARTIST", cdFromBdd.getArtist());
-			    	intent.putExtra("YEAR", cdFromBdd.getYear());
-			    	intent.putExtra("RATE", cdFromBdd.getRate());
-			    	intent.putExtra("CONTACT", cdFromBdd.getContact());
-					startActivity(intent);
-		     	 	cdBdd.close();
-		     	 	return true;*/
+		    case CONTACT:
+		         	str_artist = artist.getEditableText().toString();
+		         	str_album = album.getEditableText().toString();
+		         	str_year = year.getEditableText().toString();
+		      	 	int_rate = (float) rate.getRating();
+		    	  	Intent intent2 = new Intent(getApplicationContext(),affich_contact.class);
+		  	    	Log.d("ALBUM NAME",str_album);
+		  	    	intent2.putExtra("ALBUM", str_album);
+		  	    	intent2.putExtra("ARTIST", str_artist);
+		  	    	intent2.putExtra("YEAR", str_year);
+		  	    	intent2.putExtra("RATE", int_rate);
+					startActivity(intent2);
+		     	 	return true;
 		     	 	
 		    case LISTOFALBUM:
 		    	  	Intent intent = new Intent(getApplicationContext(),affich_album.class);
