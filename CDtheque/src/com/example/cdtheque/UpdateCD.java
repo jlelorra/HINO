@@ -92,6 +92,7 @@ public class UpdateCD extends Activity{
        if(intent.getStringExtra("CONTACT")!= null){
 
        	str_borrow = intent.getStringExtra("CONTACT");
+       	Log.d("CONTACT_BORROW",intent.getStringExtra("CONTACT"));
        	borrow.setText(intent.getStringExtra("CONTACT"));
        }
        ActionBar actionBar = getActionBar();
@@ -106,7 +107,6 @@ public class UpdateCD extends Activity{
 	                   	 	str_album = album.getText().toString();
 	                   	 	str_year = year.getText().toString();
 	                	 	int_rate = (float) rate.getRating();
-	                	 	str_borrow= borrow.getText().toString();
 	                	 	
 
 	                        //Création d'un CD
