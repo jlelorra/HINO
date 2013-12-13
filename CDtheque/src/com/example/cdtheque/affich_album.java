@@ -3,6 +3,7 @@ package com.example.cdtheque;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+
 import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -113,7 +114,7 @@ public class affich_album extends ListActivity{
                    startActivity(i);
                    return true;
 	          	case R.id.ListOfAlbum:
-	          		Intent intent = new Intent(getApplicationContext(),affich_album.class);
+	          		Intent intent = new Intent(getApplicationContext(),MainFragments.class);
 	          		startActivity(intent);
 	          		return true;
 	          	case R.id.addCD:
@@ -121,7 +122,7 @@ public class affich_album extends ListActivity{
 	          		startActivity(intent2);
 	          		return true;
 	          	case R.id.ListOfArtist:
-	          		Intent intent3 = new Intent(getApplicationContext(),affich_artist.class);
+	          		Intent intent3 = new Intent(getApplicationContext(),MainFragments.class);
 	          		startActivity(intent3);
 	          		return true;
 	        }

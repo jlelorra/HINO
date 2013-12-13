@@ -1,5 +1,6 @@
 package com.example.cdtheque;
 
+
 import android.os.Build;
 import android.os.Bundle;
 import android.annotation.SuppressLint;
@@ -181,7 +182,7 @@ public class MainActivity extends Activity{
   	                //});
   	             return true;
           	case R.id.ListOfAlbum:
-          					Intent intent = new Intent(getApplicationContext(),affich_album.class);
+          					Intent intent = new Intent(getApplicationContext(),MainFragments.class);
           					startActivity(intent);
           	          		return true;
           	case R.id.addCD:
@@ -189,7 +190,7 @@ public class MainActivity extends Activity{
 			          		startActivity(intent2);
 			          		return true;
           	case R.id.ListOfArtist:
-			          		Intent intent3 = new Intent(getApplicationContext(),affich_artist.class);
+			          		Intent intent3 = new Intent(getApplicationContext(),MainFragments.class);
 			          		startActivity(intent3);
 			          		return true;
         }
@@ -317,12 +318,12 @@ public class MainActivity extends Activity{
 		     	 	return true;
 		     	 	
 		    case LISTOFALBUM:
-		    	  	Intent intent = new Intent(getApplicationContext(),affich_album.class);
+		    	  	Intent intent = new Intent(getApplicationContext(),MainFragments.class);
 					startActivity(intent);
 		     	 	return true;
 	     	 	
 		    case LISTOFARTIST:
-		    		Intent i = new Intent(getApplicationContext(),affich_artist.class);
+		    		Intent i = new Intent(getApplicationContext(),MainFragments.class);
 					startActivity(i);
 		     	 	return true;
 

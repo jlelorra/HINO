@@ -1,5 +1,6 @@
 package com.example.cdtheque;
 
+
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
@@ -182,7 +183,7 @@ public class UpdateCD extends Activity{
  	                        startActivity(i);
  	                        return true;
          	case R.id.ListOfAlbum:
-         					Intent intent = new Intent(getApplicationContext(),affich_album.class);
+         					Intent intent = new Intent(getApplicationContext(),MainFragments.class);
          					startActivity(intent);
          	          		return true;
          	case R.id.addCD:
@@ -190,7 +191,7 @@ public class UpdateCD extends Activity{
 			         		startActivity(intent2);
 			         		return true;
           	case R.id.ListOfArtist:
-			          		Intent intent4 = new Intent(getApplicationContext(),affich_artist.class);
+			          		Intent intent4 = new Intent(getApplicationContext(),MainFragments.class);
 			          		startActivity(intent4);
 			          		return true;
        }
@@ -314,12 +315,12 @@ public class UpdateCD extends Activity{
 		     	 	return true;
 		     	 	
 		    case LISTOFALBUM:
-		    	  	Intent intent = new Intent(getApplicationContext(),affich_album.class);
+		    	  	Intent intent = new Intent(getApplicationContext(),MainFragments.class);
 					startActivity(intent);
 		     	 	return true;
 	     	 	
 		    case LISTOFARTIST:
-		    		Intent i = new Intent(getApplicationContext(),affich_artist.class);
+		    		Intent i = new Intent(getApplicationContext(),MainFragments.class);
 					startActivity(i);
 		     	 	return true;
 

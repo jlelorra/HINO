@@ -1,5 +1,6 @@
 package com.example.cdtheque;
 
+
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
@@ -13,7 +14,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -83,7 +83,7 @@ public class affich_text extends Activity {
   	                        startActivity(i);
   	                        return true;
           	case R.id.ListOfAlbum:
-          					Intent intent = new Intent(getApplicationContext(),affich_album.class);
+          					Intent intent = new Intent(getApplicationContext(),MainFragments.class);
           					startActivity(intent);
   	                        return true;
           	case R.id.addCD:
@@ -91,7 +91,7 @@ public class affich_text extends Activity {
 			          		startActivity(intent2);
 			          		return true;
           	case R.id.ListOfArtist:
-			          		Intent intent3 = new Intent(getApplicationContext(),affich_artist.class);
+			          		Intent intent3 = new Intent(getApplicationContext(),MainFragments.class);
 			          		startActivity(intent3);
 			          		return true;
         }
@@ -142,12 +142,12 @@ public class affich_text extends Activity {
 		     	 	return true;
 		     	 	
 		    case LISTOFALBUM:
-		    	  	intent = new Intent(getApplicationContext(),affich_album.class);
+		    	  	intent = new Intent(getApplicationContext(),MainFragments.class);
 					startActivity(intent);
 		     	 	return true;
 	     	 	
 		    case LISTOFARTIST:
-		    	  	intent = new Intent(getApplicationContext(),affich_artist.class);
+		    	  	intent = new Intent(getApplicationContext(),MainFragments.class);
 					startActivity(intent);
 		     	 	return true;
 

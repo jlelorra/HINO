@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -13,14 +12,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.View.OnDragListener;
-import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class affich_CD extends Activity {
-	private static final int UPDATE_CD = 0;
+	private static final int UPDATE_CD = 2;
+	private static final int ADD_ALBUM = 0;
+	private static final int DELETE_ALBUM = 1;
 	LinearLayout layout;
 	private TextView textchamp;
 	String artist;
@@ -80,7 +79,7 @@ public class affich_CD extends Activity {
   	                        startActivity(i);
   	                        return true;
           	case R.id.ListOfAlbum:
-          					Intent intent = new Intent(getApplicationContext(),affich_album.class);
+          					Intent intent = new Intent(getApplicationContext(),MainFragments.class);
           					startActivity(intent);
   	                        return true;
           	case R.id.addCD:
@@ -88,7 +87,7 @@ public class affich_CD extends Activity {
 			          		startActivity(intent2);
 			          		return true;
           	case R.id.ListOfArtist:
-			          		Intent intent3 = new Intent(getApplicationContext(),affich_artist.class);
+			          		Intent intent3 = new Intent(getApplicationContext(),MainFragments.class);
 			          		startActivity(intent3);
 			          		return true;
         }
@@ -99,6 +98,8 @@ public class affich_CD extends Activity {
 		
 		  super.onCreateContextMenu(menu, v, menuinfo);
 		  menu.add(Menu.NONE, UPDATE_CD, Menu.NONE, "Mettre à jour les infos");
+		  menu.add(Menu.NONE, ADD_ALBUM, Menu.NONE, "Ajouter");
+		  menu.add(Menu.NONE, DELETE_ALBUM, Menu.NONE, "Supprimer");
 	  }
 	  
 	
@@ -108,7 +109,6 @@ public class affich_CD extends Activity {
 		  
    	    switch (item.getItemId()) {
 		    case UPDATE_CD:
-
 		    	  	cdBdd = new CDBDD(this);
 		  	    	cdBdd.open();
 		            CD cdFromBdd = cdBdd.getCDWithAlbum(album);
@@ -124,10 +124,20 @@ public class affich_CD extends Activity {
 		     	 	cdBdd.close();
 		     	 	return true;
 		     	 	
-		    /*case ADD_ALBUM:
-			    	Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-					startActivity(intent);
-		    		return true;*/
+		    case ADD_ALBUM:
+			    	Intent intent2 = new Intent(getApplicationContext(),MainActivity.class);
+					startActivity(intent2);
+		    		return true;
+		    		
+		    case DELETE_ALBUM:
+	    	  	cdBdd = new CDBDD(this);
+	  	    	cdBdd.open();
+	  	    	CD cdFBdd = cdBdd.getCDWithAlbum(album);
+	            cdBdd.removeCDWithID(cdFBdd.getId());
+	     	 	cdBdd.close();
+	     	 	onResume();
+	     	 	return true;
+	     	 	
 
 	    }	
 	    return super.onContextItemSelected(item);
