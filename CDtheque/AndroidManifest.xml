@@ -17,10 +17,14 @@
             android:name="com.example.cdtheque.MainActivity"
             android:label="@string/app_name" 
             android:configChanges="orientation|screenSize"
-            android:parentActivityName=".affich_album">
+            android:parentActivityName=".MainFragments">
             <meta-data 
             	android:name="android.support.PARENT_ACTIVITY"
-            	android:value="com.example.CDTheque.affich_album"/>
+            	android:value="com.example.CDTheque.MainFragments"/>
+           <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>     
         </activity>
         <activity
 		     android:name="com.example.cdtheque.affich_text"
@@ -53,7 +57,7 @@
 		<activity
 		     android:name="com.example.cdtheque.affich_CD"
 		     android:label="@string/app_name"
-		     android:parentActivityName=".affich_album">
+		     android:parentActivityName=".MainFragments">
             <meta-data 
             	android:name="android.support.PARENT_ACTIVITY"
             	android:value="com.example.CDTheque.MainFragments"/>             
@@ -62,10 +66,10 @@
 		     android:name="com.example.cdtheque.UpdateCD"
 		     android:label="@string/app_name"
 		     android:configChanges="orientation|screenSize"
-             android:parentActivityName=".affich_album">
+             android:parentActivityName=".MainFragments">
              <meta-data 
             	android:name="android.support.PARENT_ACTIVITY"
-            	android:value="com.example.CDTheque.affich_album"/>        
+            	android:value="com.example.CDTheque.MainFragments"/>        
 		</activity>
 		<activity
 		     android:name="com.example.cdtheque.affich_artist"
@@ -74,11 +78,11 @@
 		<activity
 		     android:name="com.example.cdtheque.MainFragments"
 		     android:configChanges="orientation|screenSize"
+		     android:parentActivityName=".MainActivity"
 		     android:label="@string/app_name"> 
-		     <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>            
+		     <meta-data 
+            	android:name="android.support.PARENT_ACTIVITY"
+            	android:value="com.example.CDTheque.MainActivity"/>        
 		</activity>
     </application>
     <uses-permission android:name="android.permission.READ_CONTACTS"></uses-permission>
