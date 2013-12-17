@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
 	    mSeconds = dt.getSeconds();
 	    String curTime = mHours + ":"+ mMinutes + ":" + mSeconds;
 
-	    player.setVideoPath(Environment.getExternalStorageDirectory().getPath() +"/American.Horror.Story.S03E09.HDTV.x264-ASAP.mp4");
+	    player.setVideoPath(Environment.getExternalStorageDirectory().getPath() +"/American.Horror.Story.S03E09.HDTV.x264-ASAP");
 	    //player.setMediaController(new MediaController(this));
 	    player.start();
 
