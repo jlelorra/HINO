@@ -60,7 +60,7 @@ public class affich_video extends ListActivity{
 
 	                Intent i = new Intent(getApplicationContext(),selectPath.class);
 	                name =  arr.getItem(position);
-	                ContentResolver cr = getContentResolver();
+	                //ContentResolver cr = getContentResolver();
 	                Uri = MediaStore.Video.Media.getContentUri(arr.getItem(position));
 	                Log.d("NAME",name);
 	                i.putExtra("NAME", name);

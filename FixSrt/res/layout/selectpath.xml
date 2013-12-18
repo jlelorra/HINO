@@ -4,6 +4,14 @@
     android:layout_height="match_parent"
     android:id="@+id/selectPathLayout" >
     
+     <TextView 
+        android:id="@+id/lbl_1" 
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:layout_below="@+id/lbl_Chooseavideo"
+        android:ems="10" 
+        android:text="1"/>
+    
     <TextView 
         android:id="@+id/lbl_Chooseavideo" 
         android:layout_width="wrap_content" 
@@ -32,6 +40,14 @@
         android:layout_below="@+id/lbl_Chooseavideo"
         android:text="Browse"
         android:ems="10" />
+     
+      <TextView 
+        android:id="@+id/lbl_2" 
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:layout_below="@+id/lbl_Choosesrt"
+        android:ems="10" 
+        android:text="2"/>
      
      <TextView 
         android:id="@+id/lbl_Choosesrt" 
@@ -63,6 +79,13 @@
         android:text="Browse"
         android:ems="10" />
      
+      <TextView 
+        android:id="@+id/lbl_3" 
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:layout_below="@+id/lbl_setdelay"
+        android:ems="10" 
+        android:text="3"/>
      
       <TextView 
         android:id="@+id/lbl_setdelay" 
@@ -70,7 +93,7 @@
         android:layout_height="wrap_content" 
         android:layout_alignLeft="@+id/pathvideo" 
         android:layout_below="@+id/pathsrt"
-        android:layout_marginTop="30dp" 
+        android:layout_marginTop="50dp" 
         android:ems="10" 
         android:text="Please set the delay :"/>
 
