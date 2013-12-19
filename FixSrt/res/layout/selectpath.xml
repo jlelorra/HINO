@@ -11,6 +11,27 @@
         android:layout_below="@+id/lbl_Chooseavideo"
         android:ems="10" 
         android:text="1"/>
+     
+      <Switch
+         android:id="@+id/switch1"
+         android:layout_width="90dp"
+         android:layout_height="wrap_content"
+         android:layout_alignLeft="@+id/lbl_setdelay"
+         android:layout_below="@+id/lbl_setdelay"
+         android:layout_marginTop="80dp"
+         android:layout_marginLeft="20dp"
+         android:textOff="+"
+         android:textOn="-" />
+
+     <NumberPicker
+         android:id="@+id/timePicker1"
+         android:layout_width="70dp"
+         android:layout_height="wrap_content"
+         android:layout_below="@+id/lbl_setdelay"
+         android:layout_marginLeft="15dp"
+         android:layout_marginTop="15dp"
+         android:layout_toLeftOf="@+id/btn_srt"
+         android:layout_toRightOf="@+id/switch1"/>
     
     <TextView 
         android:id="@+id/lbl_Chooseavideo" 
@@ -97,26 +118,7 @@
         android:ems="10" 
         android:text="Please set the delay :"/>
 
-     <Switch
-         android:id="@+id/switch1"
-         android:layout_width="90dp"
-         android:layout_height="wrap_content"
-         android:layout_alignLeft="@+id/lbl_setdelay"
-         android:layout_below="@+id/lbl_setdelay"
-         android:layout_marginTop="80dp"
-         android:layout_marginLeft="20dp"
-         android:textOff="+"
-         android:textOn="-" />
 
-     <NumberPicker
-         android:id="@+id/timePicker1"
-         android:layout_width="90dp"
-         android:layout_height="wrap_content"
-         android:layout_below="@+id/lbl_setdelay"
-         android:layout_marginLeft="15dp"
-         android:layout_marginTop="10dp"
-         android:layout_toLeftOf="@+id/btn_srt"
-         android:layout_toRightOf="@+id/switch1"/>
 
      <TextView
          android:id="@+id/lbl_second"
@@ -136,7 +138,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentLeft="true"
-        android:text="Test"
+        android:text="GO TO VLC"
         android:ems="10" />
        
 </RelativeLayout>
