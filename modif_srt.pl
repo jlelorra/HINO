@@ -5,13 +5,14 @@ use warnings;
 use Getopt::Long;
 
 my $FILE;
+my $ASS_FILE;
 my $DELTA;
 my $DELTAMILLI;
 my $DELTAMINUTE;
 
 ############################GESTION DES OPTIONS##################################"
 
-my ($opt_h, $opt_ver, $opt_file , $opt_seconds, $opt_milliseconds,$opt_minute);
+my ($opt_h, $opt_ver, $opt_file , $opt_seconds, $opt_milliseconds,$opt_minute,$opt_asstosrt);
 GetOptions(
            "h"   => \$opt_h, 				"help"  	=> \$opt_h,
            "v"   => \$opt_ver,    			"version"  	=> \$opt_ver,
@@ -19,8 +20,15 @@ GetOptions(
            "s=s"   => \$opt_seconds,		"second=s" 	=> \$opt_seconds,
            "ms=s"   => \$opt_milliseconds,	"millisecond=s" => \$opt_milliseconds,
            "m=s"   => \$opt_minute,			"minute=s" => \$opt_minute,
+		   "t=s"   => \$opt_asstosrt,		"transform=s" => \$opt_asstosrt,
 );
 
+
+if($opt_asstosrt){
+	$ASS_FILE=$opt_asstosrt;
+	ass_to_srt();
+    exit;
+}
 
 if ($opt_h) {
     print_help();
@@ -53,7 +61,7 @@ if ($opt_minute) {
 
 
 sub print_help {
-    print "    Usage: $0 {-v -h } -f \"FILENAME\" -s \"DELTATIME\" -ms \"DELTATIME\" \n";
+    print "    Usage: $0 {-v -h } -f \"FILENAME.srt\" -t \"FILENAME\.ass\"-s \"DELTATIME\" -ms \"DELTATIME\" \n";
     print "    2013 Jason LELORRAIN
     This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. 
 
@@ -62,16 +70,22 @@ sub print_help {
     -v, --version
         Show version information
     -f, --file
-        filename to modify
+        srt filename to modify 
+		work with parameter -s or/and -ms or/and -m
     -s, --second
-        time to add of srt balise in seconds
+        time to add of srt balise in seconds 
+		work with parameter -f or/and -ms or/and -m
     -ms, --millisecond
         time to add of srt balise in millisecond
+		work with parameter -s or/and -f or/and -m
     -m, --minute
         time to add of srt balise in minute
+		work with parameter -s or/and -ms or/and -f
+    -t, --transform
+        transform \.ass file in \.srt file		
     
-    This program will create a new srt file which will be in time with the delta include by parameter -s or --second and -ms or --millisecond and -m or --minute
-      
+    This program will create a new srt file which will be in time with the delta include by parameter -s or --second and -ms or --millisecond and -m or --minute.
+    This program will transform a ass file in srt file with the file include by parameter -t.  
 
 ";
 
@@ -80,11 +94,39 @@ exit 0
 
 sub print_version {
         print "
-    $0 version 1.02 - September 24th, 2013
+    $0 version 1.03 - September 12th, 2013
     2013 Jason LELORRAIN 
     This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. 
 ";
 exit 0
+}
+
+sub ass_to_srt{
+	open(ASS,"+<$ASS_FILE") or die"open: $!";
+	my $line;
+	my $lineinc=0;
+	$ASS_FILE=~s/.ass/.srt/;
+	my $srtfilename = $ASS_FILE;
+	while( defined( $line = <ASS> ) ) {
+		if ($line =~/^Dialogue: /){
+			open(WRITE,">>$srtfilename");
+			$lineinc++;
+			my @tab_srt=split(',',$line);
+			if(scalar(@tab_srt)>9){
+				for(my $i=10;$i<scalar(@tab_srt);$i++){
+					$tab_srt[9].=",".$tab_srt[$i];
+				}
+			}
+			$line=$lineinc."\n";
+			$line.="0".${tab_srt[1]}."0 --> 0".${tab_srt[2]}."0"."\n";
+			$line.=$tab_srt[9]."\n"."\n";
+			print (WRITE "$line");
+			close(WRITE);
+		}
+	}
+	close(ASS);
+	print $srtfilename." CREATE";
+
 }
 
 #####################################################################################################################################################
