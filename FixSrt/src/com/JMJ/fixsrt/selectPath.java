@@ -86,7 +86,7 @@ public class selectPath extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	    i1 = getIntent();
-		if(i1.getStringExtra("VIEW")!=null)View=i1.getStringExtra("VIEW");
+		if(i1.getStringExtra("VIEW")!=null && View!=i1.getStringExtra("VIEW") )View=i1.getStringExtra("VIEW");
 		if(View.equals("selectpath")){
 			setContentView(R.layout.selectpath);
 		}else{
@@ -346,21 +346,38 @@ public class selectPath extends Activity {
 					    			bw.write(newline+"\n");	
 					    			Log.d("NEWLINE",newline);
 				    			}else{
+				    				String newline;
 					    			int goodtime1 = Integer.parseInt(badtime1) - delay;
 					    			int goodtime2 = Integer.parseInt(badtime2) - delay;
-					    			if(goodtime1<0){
+					    			if(goodtime1<0 && goodtime2<0){
 							    		String mintime1 = line.substring(3, 5);
 							    		int newmintime1 = Integer.parseInt(mintime1)-1;
-							    		//goodtime1=goodtime1+60;
-					    			}
-					    			if(goodtime2<0){
+							    		goodtime1=goodtime1+60;
 							    		String mintime2 = line.substring(20, 22);
 							    		int newmintime2 = Integer.parseInt(mintime2)-1;
-					    				//goodtime2=goodtime2+60;
+					    				goodtime2=goodtime2+60;
+					    				newline = line.substring(0, 3)+newmintime1+":"+String.valueOf(goodtime1)+line.substring(8, 20)+newmintime2+":"+String.valueOf(goodtime2)+line.substring(25);
+						    			bw.write(newline+"\n");	
+						    			Log.d("NEWLINE",newline);
+					    			}else if(goodtime1<0){
+							    		String mintime1 = line.substring(3, 5);
+							    		int newmintime1 = Integer.parseInt(mintime1)-1;
+							    		goodtime1=goodtime1+60;
+						    			newline = line.substring(0, 3)+newmintime1+":"+String.valueOf(goodtime1)+line.substring(8, 23)+String.valueOf(goodtime2)+line.substring(25);
+						    			bw.write(newline+"\n");	
+						    			Log.d("NEWLINE",newline);
+					    			}else if(goodtime2<0){
+							    		String mintime2 = line.substring(20, 22);
+							    		int newmintime2 = Integer.parseInt(mintime2)-1;
+					    				goodtime2=goodtime2+60;
+						    			newline = line.substring(0, 6)+String.valueOf(goodtime1)+line.substring(8, 20)+newmintime2+":"+String.valueOf(goodtime2)+line.substring(25);
+						    			bw.write(newline+"\n");	
+						    			Log.d("NEWLINE",newline);
+					    			}else{
+						    			newline = line.substring(0, 6)+String.valueOf(goodtime1)+line.substring(8, 23)+String.valueOf(goodtime2)+line.substring(25);
+						    			bw.write(newline+"\n");	
+						    			Log.d("NEWLINE",newline);
 					    			}
-					    			String newline = line.substring(0, 6)+String.valueOf(goodtime1)+line.substring(8, 23)+String.valueOf(goodtime2)+line.substring(25);
-					    			bw.write(newline+"\n");	
-					    			Log.d("NEWLINE",newline);
 				    			}
 				    		}
 				    		
