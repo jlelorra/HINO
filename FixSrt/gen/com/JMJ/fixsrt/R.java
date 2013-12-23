@@ -36,21 +36,26 @@ public final class R {
         public static final int lbl_Choosesrt=0x7f08000d;
         public static final int lbl_second=0x7f080010;
         public static final int lbl_setdelay=0x7f080007;
+        public static final int path=0x7f080015;
         public static final int pathsrt=0x7f08000e;
         public static final int pathvideo=0x7f08000a;
         public static final int selectPathLayout=0x7f080003;
+        public static final int srt=0x7f080014;
         public static final int switch1=0x7f080006;
         public static final int textview=0x7f080001;
         public static final int timePicker1=0x7f080008;
+        public static final int video=0x7f080013;
         public static final int videoView1=0x7f080000;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
         public static final int affich_video=0x7f030001;
         public static final int selectpath=0x7f030002;
+        public static final int selectpath_fr=0x7f030003;
     }
     public static final class menu {
         public static final int main=0x7f070000;
+        public static final int main2=0x7f070001;
     }
     public static final class string {
         public static final int action_settings=0x7f050001;
