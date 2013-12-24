@@ -11,7 +11,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.List;
 
-
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -23,6 +22,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -59,6 +59,7 @@ public class selectPath extends Activity {
 	TextView lbl_video;
 	TextView lbl_Srt;
 	TextView lbl_sec;
+	TextView lbl_millisec;
 	TextView lbl_time;
 	TextView lbl_1;
 	TextView lbl_2;
@@ -68,9 +69,10 @@ public class selectPath extends Activity {
 	Button Test;
 	Cursor cursor;
 	NumberPicker picker;
+	NumberPicker picker1;
+	NumberPicker picker2;
+	NumberPicker picker3;
 	Switch toggle;
-	public String pathh;
-	public List<String> path = null;
 	Intent i1;
 	CharSequence[] items = {"FR","EN"};
 	String View ="selectpath";
@@ -86,12 +88,29 @@ public class selectPath extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	    i1 = getIntent();
-		if(i1.getStringExtra("VIEW")!=null && View!=i1.getStringExtra("VIEW") )View=i1.getStringExtra("VIEW");
-		if(View.equals("selectpath")){
-			setContentView(R.layout.selectpath);
-		}else{
-		    setContentView(R.layout.selectpath_fr);
+		if(i1.getStringExtra("VIEW")!=null){
+			View=i1.getStringExtra("VIEW");
+			Log.d("Intent1",i1.getStringExtra("VIEW"));
 		}
+		Configuration newConfig = getResources().getConfiguration();
+    	if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
+    		if(View.equals("selectpath")){
+	            setContentView(R.layout.selectpath_ms); 
+	            populate();
+	            return;
+    		}else{
+    		    setContentView(R.layout.selectpath_ms_fr);
+	            populate();
+	            return;
+    		}
+    	}else{
+    		if(View.equals("selectpath")){
+    			setContentView(R.layout.selectpath);
+    		}else{
+    		    setContentView(R.layout.selectpath_fr);
+    		}
+    	}
+	    Log.d("VIEW1",View);
 	    RelativeLayout rl = (RelativeLayout)findViewById(R.id.selectPathLayout);
 	    rl.setBackgroundColor(Color.BLACK);
 	    DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -182,12 +201,19 @@ public class selectPath extends Activity {
 		    }
 		});
 		picker=(NumberPicker) findViewById(R.id.timePicker1);
+		picker1=(NumberPicker) findViewById(R.id.timePicker2);
+		picker2=(NumberPicker) findViewById(R.id.timePicker3);
+		picker3=(NumberPicker) findViewById(R.id.timePicker4);
 		if(i1.getIntExtra("DELAY", 0)!=0){
 			picker.setValue(i1.getIntExtra("DELAY",0));
 		}
 		picker.setBackgroundColor(Color.DKGRAY);
 		picker.setMaxValue(59);
+		/*picker1.setMaxValue(59);
+		picker2.setMaxValue(59);
+		picker3.setMaxValue(59);*/
 		lbl_sec=(TextView)findViewById(R.id.lbl_second);
+		lbl_millisec=(TextView)findViewById(R.id.lbl_millisecond);
 		lbl_sec.setTextColor(Color.LTGRAY);
 		setVideo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -218,7 +244,7 @@ public class selectPath extends Activity {
 			
 			public void onClick(View v) {
 				if(!String.valueOf(pathvideo.getText()).trim().equals("")&&!String.valueOf(pathSrt.getText()).trim().equals("")){
-					modif_srt(String.valueOf(pathvideo.getText()),String.valueOf(pathSrt.getText()),i1.getStringExtra("PATHSRT"),picker.getValue());
+					modif_srt(String.valueOf(pathvideo.getText()),String.valueOf(pathSrt.getText()),i1.getStringExtra("PATHSRT"),picker.getValue(),-1);
 					if(doesPackageExist("org.videolan.vlc.betav7neon")){
 						Intent LaunchIntent = new Intent("android.intent.action.MAIN");
 						/*LaunchIntent.addCategory("android.intent.category.LAUNCHER");
@@ -303,7 +329,7 @@ public class selectPath extends Activity {
 	}
 	
 	@SuppressLint("NewApi")
-	public void modif_srt(String Uri, String uriSrt,String path,int delay) {
+	public void modif_srt(String Uri, String uriSrt,String path,int delay, int msdelay) {
 		String line;
 		int value;
 		if(Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())){
@@ -312,6 +338,9 @@ public class selectPath extends Activity {
 		    		Uri=Uri.replace(".mp4/video/media", "");
 		    		Uri=Uri.replace("content://media", "");
 		    		Uri=Uri.replace(".mp4", "");
+		    		Uri=Uri.replace(".wmv", "");
+		    		Uri=Uri.replace(".m4a", "");
+		    		Uri=Uri.replace(".mkv", "");
 		    		Log.d("URI",path+Uri+".2.srt");
 		    	}
 		    	if(uriSrt.endsWith("/file"))
@@ -328,7 +357,7 @@ public class selectPath extends Activity {
 		    	BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(out));
 		    	String regexp="[0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3} --> [0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3}";
 		    	String Secregexp="[0-9]{2}";
-		    	//String testregexp="[0-9]{1}";
+		    	String MilliSecregexp="[0-9]{3}";
 		    	int jazz=0;
 		    	while((line = br.readLine()) != null) {
 
@@ -380,7 +409,54 @@ public class selectPath extends Activity {
 					    			}
 				    			}
 				    		}
-				    		
+				    	}else{bw.write(line+"\n");}
+				    	if(msdelay>0){
+				    		Log.d("VALUE",line);
+				    		jazz++;
+				    		String badtime1 = line.substring(9, 12);
+				    		String badtime2 = line.substring(26, 29);
+				    		if(badtime1.matches(MilliSecregexp)&&badtime2.matches(MilliSecregexp)){
+				    			if(!toggle.isChecked()){
+					    			int goodtime1 = Integer.parseInt(badtime1) + delay;
+					    			int goodtime2 = Integer.parseInt(badtime2) + delay;					    			
+					    			String newline = line.substring(0, 9)+String.valueOf(goodtime1)+line.substring(12, 26)+String.valueOf(goodtime2);
+					    			bw.write(newline+"\n");	
+					    			Log.d("NEWLINE",newline);
+				    			}else{
+				    				String newline;
+					    			int goodtime1 = Integer.parseInt(badtime1) - delay;
+					    			int goodtime2 = Integer.parseInt(badtime2) - delay;
+					    			/*if(goodtime1<0 && goodtime2<0){
+							    		String mintime1 = line.substring(3, 5);
+							    		int newmintime1 = Integer.parseInt(mintime1)-1;
+							    		goodtime1=goodtime1+60;
+							    		String mintime2 = line.substring(20, 22);
+							    		int newmintime2 = Integer.parseInt(mintime2)-1;
+					    				goodtime2=goodtime2+60;
+					    				newline = line.substring(0, 6)+newmintime1+":"+String.valueOf(goodtime1)+line.substring(8, 20)+newmintime2+":"+String.valueOf(goodtime2);
+						    			bw.write(newline+"\n");	
+						    			Log.d("NEWLINE",newline);
+					    			}else if(goodtime1<0){
+							    		String mintime1 = line.substring(3, 5);
+							    		int newmintime1 = Integer.parseInt(mintime1)-1;
+							    		goodtime1=goodtime1+60;
+						    			newline = line.substring(0, 3)+newmintime1+":"+String.valueOf(goodtime1)+line.substring(8, 23)+String.valueOf(goodtime2)+line.substring(25);
+						    			bw.write(newline+"\n");	
+						    			Log.d("NEWLINE",newline);
+					    			}else if(goodtime2<0){
+							    		String mintime2 = line.substring(20, 22);
+							    		int newmintime2 = Integer.parseInt(mintime2)-1;
+					    				goodtime2=goodtime2+60;
+						    			newline = line.substring(0, 6)+String.valueOf(goodtime1)+line.substring(8, 20)+newmintime2+":"+String.valueOf(goodtime2)+line.substring(25);
+						    			bw.write(newline+"\n");	
+						    			Log.d("NEWLINE",newline);
+					    			}else{*/
+						    			newline = line.substring(0, 9)+String.valueOf(goodtime1)+line.substring(12, 26)+String.valueOf(goodtime2)+line.substring(25);
+						    			bw.write(newline+"\n");	
+						    			Log.d("NEWLINE",newline);
+					    			//}
+				    			}
+				    		}
 				    	}else{bw.write(line+"\n");}
 			    	}else{
 			    		bw.write(line+"\n");
@@ -430,11 +506,13 @@ public class selectPath extends Activity {
 				        	              if(items[whichButton]=="FR"){
 				        	            	  setContentView(R.layout.selectpath_fr);		
 				        	            	  View="selectpath_fr";
+				        	          	    	Log.d("VIEW2",View);
 				        	            	  onResume();
 				        	            	  
 				        	              }else{
 				        	            	  setContentView(R.layout.selectpath);
 				        	            	  View="selectpath";
+				        	          	    	Log.d("VIEW2",View);
 				        	            	  onResume();
 				        	              }
 				        	            }
@@ -545,5 +623,257 @@ public class selectPath extends Activity {
 		    }	
 		    return super.onContextItemSelected(item);
 		  }
+		  
+		    public void onConfigurationChanged(Configuration newConfig){
+		    	super.onConfigurationChanged(newConfig);
+		    	if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
+		            setContentView(R.layout.selectpath_ms); 
+		            populate();
+
+		    	}else{
+		            setContentView(R.layout.selectpath);
+		            populate2();
+		    	}
+			}
+		    
+		    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+			@SuppressLint("NewApi")
+			public void populate(){
+		    	 RelativeLayout rl = (RelativeLayout)findViewById(R.id.selectPathLayout);
+		 	    rl.setBackgroundColor(Color.BLACK);
+		 	    textsize1=15;
+		 	    Log.d("SIZE",String.valueOf(textsize1));
+		 	    lbl_video=(TextView)findViewById(R.id.lbl_Chooseavideo);
+		 	    lbl_video.setTextColor(Color.LTGRAY);
+		 	    lbl_video.setTextSize(1*textsize1);
+		 		pathvideo = (TextView)findViewById(R.id.pathvideo);
+		 		if(i1.getStringExtra("URI")!=null){
+		 			pathvideo.setText(i1.getStringExtra("URI"));
+		 			pathvideo.setTextColor(Color.LTGRAY);
+		 			pathvideo.setTextSize(textsize1/2);
+		 		}
+		 		lbl_Srt=(TextView)findViewById(R.id.lbl_Choosesrt);
+		 	    lbl_Srt.setTextColor(Color.LTGRAY);
+		 	    lbl_Srt.setTextSize(1*textsize1);
+		 		pathSrt = (TextView)findViewById(R.id.pathsrt);
+		 		if(i1.getStringExtra("URISRT")!=null){
+		 			pathSrt.setText(i1.getStringExtra("URISRT"));
+		 			pathSrt.setTextColor(Color.LTGRAY);
+		 			pathSrt.setTextSize(textsize1/2);
+		 		}
+		 		setVideo=(Button)findViewById(R.id.btn_video);
+		 		setVideo.setTextSize(10);
+		 		setSrt=(Button)findViewById(R.id.btn_srt);
+		 		setSrt.setTextSize(10);
+		 		Test=(Button)findViewById(R.id.btn_test);
+		 		lbl_time=(TextView)findViewById(R.id.lbl_setdelay);
+		 		lbl_time.setTextColor(Color.LTGRAY);
+		 		lbl_time.setTextSize(1*textsize1);
+		 		toggle = (Switch)findViewById(R.id.switch1);
+		 		if(i1.getBooleanExtra("SWITCH",false)){
+		 			toggle.setChecked(i1.getBooleanExtra("SWITCH", false));
+		 		}
+		 		toggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+		 		    @SuppressLint("NewApi")
+		 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		 		        if(toggle.isChecked()){
+		 		        	if(!View.equals("selectpath"))Toast.makeText(getApplicationContext(), "Les sous titres seront avancé par rapport à la video", Toast.LENGTH_LONG).show();
+		 		        	else Toast.makeText(getApplicationContext(), "Subtitles will be advanced compared to video", Toast.LENGTH_LONG).show();
+		 		        }else{
+		 		        	if(!View.equals("selectpath"))Toast.makeText(getApplicationContext(), "Les sous titres seront reculé par rapport à la video", Toast.LENGTH_LONG).show();
+		 		        	else Toast.makeText(getApplicationContext(), "Subtitles will be decreased compared to video", Toast.LENGTH_LONG).show();
+		 		        }
+		 		    }
+		 		});
+		 		picker=(NumberPicker) findViewById(R.id.timePicker1);
+		 		if(i1.getIntExtra("DELAY", 0)!=0){
+		 			picker.setValue(i1.getIntExtra("DELAY",0));
+		 		}
+		 		picker.setBackgroundColor(Color.DKGRAY);
+		 		picker.setMaxValue(59);
+				picker1=(NumberPicker) findViewById(R.id.timePicker2);
+		 		picker1.setBackgroundColor(Color.DKGRAY);
+				picker2=(NumberPicker) findViewById(R.id.timePicker3);
+		 		picker2.setBackgroundColor(Color.DKGRAY);
+				picker3=(NumberPicker) findViewById(R.id.timePicker4);
+		 		picker3.setBackgroundColor(Color.DKGRAY);
+		 		picker1.setMaxValue(9);
+				picker2.setMaxValue(9);
+				picker3.setMaxValue(9);
+		 		lbl_sec=(TextView)findViewById(R.id.lbl_second);
+		 		lbl_sec.setTextColor(Color.LTGRAY);
+				lbl_millisec=(TextView)findViewById(R.id.lbl_millisecond);
+				lbl_millisec.setTextColor(Color.LTGRAY);
+		 		setVideo.setOnClickListener(new View.OnClickListener() {
+		             @SuppressLint("NewApi")
+					@Override
+		             public void onClick(View v) {
+		             	Intent intent = new Intent(getApplicationContext(),affich_video.class);
+		             	intent.putExtra("URISRT",i1.getStringExtra("URISRT"));
+		             	intent.putExtra("DELAY",picker.getValue());
+		             	intent.putExtra("SWITCH",toggle.isChecked());
+		             	intent.putExtra("VIEW",View);
+
+		 				startActivity(intent);
+		     		}
+		             
+		 		});
+		 		setSrt.setOnClickListener(new View.OnClickListener() {
+		             @SuppressLint("NewApi")
+					@Override
+		             public void onClick(View v) {
+		             	Intent intent = new Intent(getApplicationContext(),affich_srt.class);
+		             	intent.putExtra("URI", i1.getStringExtra("URI"));
+		             	intent.putExtra("DELAY",picker.getValue());
+		             	intent.putExtra("SWITCH",toggle.isChecked());
+		             	intent.putExtra("VIEW",View);
+		 				startActivity(intent);
+		     			}
+		             
+		 		});
+		 		Test.setOnClickListener(new View.OnClickListener(){
+		 			
+		 			public void onClick(View v) {
+		 				if(!String.valueOf(pathvideo.getText()).trim().equals("")&&!String.valueOf(pathSrt.getText()).trim().equals("")){
+		 					modif_srt(String.valueOf(pathvideo.getText()),String.valueOf(pathSrt.getText()),i1.getStringExtra("PATHSRT"),picker.getValue(),Integer.parseInt(String.valueOf(picker1.getValue()+picker2.getValue()+picker3.getValue())));
+		 					if(doesPackageExist("org.videolan.vlc.betav7neon")){
+		 						Intent LaunchIntent = new Intent("android.intent.action.MAIN");
+		 						startApplication("org.videolan.vlc.betav7neon");
+		 					}else{
+		 						Toast.makeText(getApplicationContext(), "Please install VLCBeta For android", Toast.LENGTH_LONG).show();
+		 						showInMarket("org.videolan.vlc.betav7neon");
+		 					}
+		 				}else{Toast.makeText(getApplicationContext(), "No Video or Subtitle selected", Toast.LENGTH_LONG).show();}
+		 			}
+
+		 		});
+		        registerForContextMenu(lbl_video);
+		        registerForContextMenu(pathvideo);
+		        registerForContextMenu(lbl_Srt);
+		        registerForContextMenu(pathSrt);
+		        registerForContextMenu(lbl_time);
+		        registerForContextMenu(lbl_sec);
+		    }
+		    
+		    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+			@SuppressLint("NewApi")
+			public void populate2(){
+		    	 RelativeLayout rl = (RelativeLayout)findViewById(R.id.selectPathLayout);
+		 	    rl.setBackgroundColor(Color.BLACK);
+		 	    textsize1=15;
+		 	    Log.d("SIZE",String.valueOf(textsize1));
+		 	    lbl_1=(TextView)findViewById(R.id.lbl_1);
+		 	    lbl_1.setTextSize(50+textsize1);
+		 	    lbl_1.setTextColor(Color.GRAY);
+		 	    lbl_1.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+		 	    lbl_video=(TextView)findViewById(R.id.lbl_Chooseavideo);
+		 	    lbl_video.setTextColor(Color.LTGRAY);
+		 	    lbl_video.setTextSize(1*textsize1);
+		 		pathvideo = (TextView)findViewById(R.id.pathvideo);
+		 		if(i1.getStringExtra("URI")!=null){
+		 			pathvideo.setText(i1.getStringExtra("URI"));
+		 			pathvideo.setTextColor(Color.LTGRAY);
+		 			pathvideo.setTextSize(textsize1/2);
+		 		}
+		 		lbl_2=(TextView)findViewById(R.id.lbl_2);
+		 	    lbl_2.setTextSize(50+textsize1);
+		 	    lbl_2.setTextColor(Color.GRAY);
+		 	    lbl_2.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+		 		lbl_Srt=(TextView)findViewById(R.id.lbl_Choosesrt);
+		 	    lbl_Srt.setTextColor(Color.LTGRAY);
+		 	    lbl_Srt.setTextSize(1*textsize1);
+		 		pathSrt = (TextView)findViewById(R.id.pathsrt);
+		 		if(i1.getStringExtra("URISRT")!=null){
+		 			pathSrt.setText(i1.getStringExtra("URISRT"));
+		 			pathSrt.setTextColor(Color.LTGRAY);
+		 			pathSrt.setTextSize(textsize1/2);
+		 		}
+		 		setVideo=(Button)findViewById(R.id.btn_video);
+		 		setSrt=(Button)findViewById(R.id.btn_srt);
+		 		Test=(Button)findViewById(R.id.btn_test);
+		 		lbl_3=(TextView)findViewById(R.id.lbl_3);
+		 	    lbl_3.setTextSize(50+textsize1);
+		 	    lbl_3.setTextColor(Color.GRAY);
+		 	    lbl_3.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+		 		lbl_time=(TextView)findViewById(R.id.lbl_setdelay);
+		 		lbl_time.setTextColor(Color.LTGRAY);
+		 		lbl_time.setTextSize(1*textsize1);
+		 		toggle = (Switch)findViewById(R.id.switch1);
+		 		if(i1.getBooleanExtra("SWITCH",false)){
+		 			toggle.setChecked(i1.getBooleanExtra("SWITCH", false));
+		 		}
+		 		toggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+		 		    @SuppressLint("NewApi")
+		 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		 		        if(toggle.isChecked()){
+		 		        	if(!View.equals("selectpath"))Toast.makeText(getApplicationContext(), "Les sous titres seront avancé par rapport à la video", Toast.LENGTH_LONG).show();
+		 		        	else Toast.makeText(getApplicationContext(), "Subtitles will be advanced compared to video", Toast.LENGTH_LONG).show();
+		 		        }else{
+		 		        	if(!View.equals("selectpath"))Toast.makeText(getApplicationContext(), "Les sous titres seront reculé par rapport à la video", Toast.LENGTH_LONG).show();
+		 		        	else Toast.makeText(getApplicationContext(), "Subtitles will be decreased compared to video", Toast.LENGTH_LONG).show();
+		 		        }
+		 		    }
+		 		});
+		 		picker=(NumberPicker) findViewById(R.id.timePicker1);
+		 		if(i1.getIntExtra("DELAY", 0)!=0){
+		 			picker.setValue(i1.getIntExtra("DELAY",0));
+		 		}
+		 		picker.setBackgroundColor(Color.DKGRAY);
+		 		picker.setMaxValue(59);
+		 		lbl_sec=(TextView)findViewById(R.id.lbl_second);
+		 		lbl_sec.setTextColor(Color.LTGRAY);
+		 		setVideo.setOnClickListener(new View.OnClickListener() {
+		             @SuppressLint("NewApi")
+					@Override
+		             public void onClick(View v) {
+		             	Intent intent = new Intent(getApplicationContext(),affich_video.class);
+		             	intent.putExtra("URISRT",i1.getStringExtra("URISRT"));
+		             	intent.putExtra("DELAY",picker.getValue());
+		             	intent.putExtra("SWITCH",toggle.isChecked());
+		             	intent.putExtra("VIEW",View);
+
+		 				startActivity(intent);
+		     		}
+		             
+		 		});
+		 		setSrt.setOnClickListener(new View.OnClickListener() {
+		             @SuppressLint("NewApi")
+					@Override
+		             public void onClick(View v) {
+		             	Intent intent = new Intent(getApplicationContext(),affich_srt.class);
+		             	intent.putExtra("URI", i1.getStringExtra("URI"));
+		             	intent.putExtra("DELAY",picker.getValue());
+		             	intent.putExtra("SWITCH",toggle.isChecked());
+		             	intent.putExtra("VIEW",View);
+		 				startActivity(intent);
+		     			}
+		             
+		 		});
+		 		Test.setOnClickListener(new View.OnClickListener(){
+		 			
+		 			public void onClick(View v) {
+		 				if(!String.valueOf(pathvideo.getText()).trim().equals("")&&!String.valueOf(pathSrt.getText()).trim().equals("")){
+		 					modif_srt(String.valueOf(pathvideo.getText()),String.valueOf(pathSrt.getText()),i1.getStringExtra("PATHSRT"),picker.getValue(),-1);
+		 					if(doesPackageExist("org.videolan.vlc.betav7neon")){
+		 						Intent LaunchIntent = new Intent("android.intent.action.MAIN");
+		 						startApplication("org.videolan.vlc.betav7neon");
+		 					}else{
+		 						Toast.makeText(getApplicationContext(), "Please install VLCBeta For android", Toast.LENGTH_LONG).show();
+		 						showInMarket("org.videolan.vlc.betav7neon");
+		 					}
+		 				}else{Toast.makeText(getApplicationContext(), "No Video or Subtitle selected", Toast.LENGTH_LONG).show();}
+		 			}
+
+		 		});
+		        registerForContextMenu(lbl_1);
+		        registerForContextMenu(lbl_video);
+		        registerForContextMenu(pathvideo);
+		        registerForContextMenu(lbl_2);
+		        registerForContextMenu(lbl_Srt);
+		        registerForContextMenu(pathSrt);
+		        registerForContextMenu(lbl_3);
+		        registerForContextMenu(lbl_time);
+		        registerForContextMenu(lbl_sec);
+		    }
 	
 }
