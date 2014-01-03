@@ -24,40 +24,43 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int ListOfVideo=0x7f080002;
-        public static final int action_settings=0x7f080016;
-        public static final int btn_srt=0x7f080009;
-        public static final int btn_test=0x7f080011;
-        public static final int btn_video=0x7f08000b;
-        public static final int lbl_1=0x7f080004;
-        public static final int lbl_2=0x7f08000c;
-        public static final int lbl_3=0x7f08000f;
-        public static final int lbl_Chooseavideo=0x7f080005;
-        public static final int lbl_Choosesrt=0x7f08000d;
-        public static final int lbl_millisecond=0x7f080015;
-        public static final int lbl_second=0x7f080010;
-        public static final int lbl_setdelay=0x7f080007;
-        public static final int path=0x7f080019;
-        public static final int pathsrt=0x7f08000e;
-        public static final int pathvideo=0x7f08000a;
-        public static final int selectPathLayout=0x7f080003;
-        public static final int srt=0x7f080018;
-        public static final int switch1=0x7f080006;
+        public static final int ListOfVideo=0x7f080003;
+        public static final int action_settings=0x7f080017;
+        public static final int btn_srt=0x7f08000a;
+        public static final int btn_test=0x7f080012;
+        public static final int btn_video=0x7f08000c;
+        public static final int editText1=0x7f080002;
+        public static final int lbl_1=0x7f080005;
+        public static final int lbl_2=0x7f08000d;
+        public static final int lbl_3=0x7f080010;
+        public static final int lbl_Chooseavideo=0x7f080006;
+        public static final int lbl_Choosesrt=0x7f08000e;
+        public static final int lbl_millisecond=0x7f080016;
+        public static final int lbl_second=0x7f080011;
+        public static final int lbl_setdelay=0x7f080008;
+        public static final int path=0x7f08001a;
+        public static final int pathsrt=0x7f08000f;
+        public static final int pathvideo=0x7f08000b;
+        public static final int selectPathLayout=0x7f080004;
+        public static final int srt=0x7f080019;
+        public static final int switch1=0x7f080007;
         public static final int textview=0x7f080001;
-        public static final int timePicker1=0x7f080008;
-        public static final int timePicker2=0x7f080012;
-        public static final int timePicker3=0x7f080013;
-        public static final int timePicker4=0x7f080014;
-        public static final int video=0x7f080017;
+        public static final int timePicker1=0x7f080009;
+        public static final int timePicker2=0x7f080013;
+        public static final int timePicker3=0x7f080014;
+        public static final int timePicker4=0x7f080015;
+        public static final int video=0x7f080018;
         public static final int videoView1=0x7f080000;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
-        public static final int affich_video=0x7f030001;
-        public static final int selectpath=0x7f030002;
-        public static final int selectpath_fr=0x7f030003;
-        public static final int selectpath_ms=0x7f030004;
-        public static final int selectpath_ms_fr=0x7f030005;
+        public static final int affich_srt=0x7f030001;
+        public static final int affich_srt_text=0x7f030002;
+        public static final int affich_video=0x7f030003;
+        public static final int selectpath=0x7f030004;
+        public static final int selectpath_fr=0x7f030005;
+        public static final int selectpath_ms=0x7f030006;
+        public static final int selectpath_ms_fr=0x7f030007;
     }
     public static final class menu {
         public static final int main=0x7f070000;

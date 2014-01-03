@@ -32,11 +32,12 @@ public class affich_srt extends ListActivity{
 	private static final int PATH = 0;
 	private static final int VIDEO = 1;
 	private static final int SRT = 2;
+	private static final int CONTENTSRT = 3;
 	ListView liste = null;
 	Cursor cursor;
 	int nameIdx;
 	String name; 
-    ArrayAdapter<String> arr;
+	private static ArrayAdapter<String> arr;
     Intent MainIntent;
     File yourDir;
     Uri Uri;
@@ -49,7 +50,6 @@ public class affich_srt extends ListActivity{
     	MainIntent= getIntent();
 	    ArrayList<String>nameList = new ArrayList<String>();
 	    yourDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "");
-	    Log.d("PATH",Environment.getExternalStorageDirectory().getAbsolutePath());
 	    if(android.os.Build.DEVICE.toLowerCase().contains("samsung") 
 		    || android.os.Build.MANUFACTURER.toLowerCase().contains("samsung") 
 		    || android.os.Build.PRODUCT.toLowerCase().contains("samsung") 
@@ -101,7 +101,6 @@ public class affich_srt extends ListActivity{
 		    {
 		       if (f.isFile())
 		       {	
-		    	   Log.d("FILE",f.getName());
 		    	   if(f.getName().endsWith(".srt")){
 		    		   nameList.add(f.getName());
 		    	   }
@@ -124,7 +123,6 @@ public class affich_srt extends ListActivity{
 		                name =  arr.getItem(position);
 		                Uri = MediaStore.Files.getContentUri(arr.getItem(position));
 		                i.putExtra("NAMESRT", name);
-		                Log.d("URI",String.valueOf(Uri));
 		                i.putExtra("URISRT", String.valueOf(Uri));
 		                i.putExtra("URI", MainIntent.getStringExtra("URI"));
 		                i.putExtra("PATHSRT",yourDir.getAbsolutePath());
@@ -193,6 +191,7 @@ public class affich_srt extends ListActivity{
 					  menu.add(Menu.NONE, PATH, Menu.NONE, "Language");
 					  menu.add(Menu.NONE, VIDEO, Menu.NONE, "Video");
 					  menu.add(Menu.NONE, SRT, Menu.NONE, "Srt");
+					  menu.add(Menu.NONE, CONTENTSRT, Menu.NONE, "Display Srt Content");
 
 				  }
 				  
@@ -208,8 +207,8 @@ public class affich_srt extends ListActivity{
 					    		
 					    case PATH:
 					        	Intent intent3 = new Intent(getApplicationContext(),selectPath.class);
-					        	intent3.putExtra("URI", String.valueOf(Uri));
-					        	intent3.putExtra("URISRT", MainIntent.getStringExtra("URISRT"));
+					        	intent3.putExtra("URISRT", String.valueOf(Uri));
+					        	intent3.putExtra("URI", MainIntent.getStringExtra("URI"));
 					        	intent3.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
 					        	intent3.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
 				            	intent3.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
@@ -218,8 +217,8 @@ public class affich_srt extends ListActivity{
 					     	 	
 					    case VIDEO:
 				            	Intent intent = new Intent(getApplicationContext(),affich_video.class);
-				            	intent.putExtra("URI", String.valueOf(Uri));
-				            	intent.putExtra("URISRT", MainIntent.getStringExtra("URISRT"));
+				            	intent.putExtra("URISRT", String.valueOf(Uri));
+				            	intent.putExtra("URI", MainIntent.getStringExtra("URI"));
 				            	intent.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
 				            	intent.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
 				            	intent.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
@@ -228,12 +227,26 @@ public class affich_srt extends ListActivity{
 				     	 	
 					    case SRT:
 				            	Intent intent2 = new Intent(getApplicationContext(),affich_srt.class);
-				            	intent2.putExtra("URI", String.valueOf(Uri));
-				            	intent2.putExtra("URISRT", MainIntent.getStringExtra("URISRT"));
+				            	intent2.putExtra("URISRT", String.valueOf(Uri));
+				            	intent2.putExtra("URI", MainIntent.getStringExtra("URI"));
 				            	intent2.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
 				            	intent2.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
 				            	intent2.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+				            	startActivity(intent2);
 						        return true;
+						        
+					    case CONTENTSRT:
+								AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+								int position=item.getItemId();
+				            	Intent intent5 = new Intent(getApplicationContext(),affich_srt_txt.class);
+				            	intent5.putExtra("PATHSRT",  yourDir.getAbsolutePath());
+				            	intent5.putExtra("URISRT",   arr.getItem(info.position));
+				            	intent5.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
+				            	intent5.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
+				            	intent5.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+				            	startActivity(intent5);
+					        return true;
+						    
 
 				    }	
 				    return super.onContextItemSelected(item);

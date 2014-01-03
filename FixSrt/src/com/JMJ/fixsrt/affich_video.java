@@ -73,9 +73,7 @@ public class affich_video extends ListActivity{
 	                name =  arr.getItem(position);
 	                //ContentResolver cr = getContentResolver();
 	                Uri = MediaStore.Video.Media.getContentUri(arr.getItem(position));
-	                Log.d("NAME",name);
 	                i.putExtra("NAME", name);
-	                Log.d("URI",String.valueOf(Uri));
 	                i.putExtra("URI", String.valueOf(Uri));
 	                i.putExtra("URISRT", MainIntent.getStringExtra("URISRT"));
 	                i.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
