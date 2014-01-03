@@ -33,6 +33,7 @@ public class affich_srt extends ListActivity{
 	private static final int VIDEO = 1;
 	private static final int SRT = 2;
 	private static final int CONTENTSRT = 3;
+	private static final int DELETESRT = 4;
 	ListView liste = null;
 	Cursor cursor;
 	int nameIdx;
@@ -101,7 +102,7 @@ public class affich_srt extends ListActivity{
 		    {
 		       if (f.isFile())
 		       {	
-		    	   if(f.getName().endsWith(".srt")){
+		    	   if(f.getName().endsWith(".srt")||f.getName().endsWith(".ass")){
 		    		   nameList.add(f.getName());
 		    	   }
 		       }
@@ -192,6 +193,7 @@ public class affich_srt extends ListActivity{
 					  menu.add(Menu.NONE, VIDEO, Menu.NONE, "Video");
 					  menu.add(Menu.NONE, SRT, Menu.NONE, "Srt");
 					  menu.add(Menu.NONE, CONTENTSRT, Menu.NONE, "Display Srt Content");
+					  menu.add(Menu.NONE, DELETESRT, Menu.NONE, "Delete Srt File");
 
 				  }
 				  
@@ -246,11 +248,25 @@ public class affich_srt extends ListActivity{
 				            	intent5.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
 				            	startActivity(intent5);
 					        return true;
+					        
+					    case DELETESRT:
+								info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+								position=item.getItemId();
+								File file = new File( yourDir.getAbsolutePath()+"/"+arr.getItem(info.position));
+								boolean deleted = file.delete();
+								if(deleted)	onResume();
+					        return true;
 						    
 
 				    }	
 				    return super.onContextItemSelected(item);
-				}		    
-			    
+				}	
+				  
+				  
+					@Override
+					protected void onResume(){
+						super.onResume();
+						this.onCreate(null);
+					}
 			    
 }

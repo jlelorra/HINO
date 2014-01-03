@@ -30,7 +30,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -181,17 +180,21 @@ public class selectPath extends Activity {
 		if(Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())){
 		    try {
 		    	if(Uri.endsWith("/media")){
-		    		Uri=Uri.replace(".mp4/video/media", "");
+		    		Uri=Uri.replace("/video/media", "");
 		    		Uri=Uri.replace("content://media", "");
 		    		Uri=Uri.replace(".mp4", "");
 		    		Uri=Uri.replace(".wmv", "");
 		    		Uri=Uri.replace(".m4a", "");
 		    		Uri=Uri.replace(".mkv", "");
 		    	}
-		    	if(uriSrt.endsWith("/file"))
-		    	{
+		    	if(uriSrt.endsWith("/file")){
 		    		uriSrt=uriSrt.replace("/file", "");
 		    		uriSrt=uriSrt.replace("content://media", path);
+		    	}
+		    	if(uriSrt.endsWith(".ass")){
+					Log.d("NEWSRT1",uriSrt);
+		    		uriSrt=convertAssToSrt(uriSrt);
+					Log.d("NEWSRT2",uriSrt);
 		    	}
 		    	FileInputStream input = new FileInputStream(uriSrt);
 		    	FileOutputStream output = new FileOutputStream(path+Uri+".2.srt");
@@ -218,7 +221,30 @@ public class selectPath extends Activity {
 					    			int goodtime2 = Integer.parseInt(badtime2) + delay;	
 					    			int goodtime3 = Integer.parseInt(badtime3) + msdelay;
 					    			int goodtime4 = Integer.parseInt(badtime4) + msdelay;
-					    			newline = line.substring(0, 6)+String.valueOf(goodtime1)+","+String.valueOf(goodtime3)+line.substring(12, 23)+String.valueOf(goodtime2)+","+String.valueOf(goodtime4);
+					    			int newmintime3=Integer.parseInt(line.substring(3, 5));
+					    			int newmintime4=Integer.parseInt(line.substring(20, 22));
+					    			int newmintime1=goodtime1;
+					    			int newmintime2=goodtime2;
+					    			if(goodtime3>999){
+							    		newmintime1++;
+							    		goodtime3=goodtime3-1000;
+					    			}
+					    			if(goodtime4>999){
+							    		newmintime2++;
+					    				goodtime4=goodtime4-1000;
+					    			}
+					    			if(newmintime1>59){
+					    				newmintime3++;
+							    		goodtime1=newmintime1-60;
+							    		newmintime1=goodtime1;
+					    			}
+					    			if(newmintime2>59){
+					    				newmintime4++;
+					    				goodtime2=newmintime2-60;
+						    			newmintime2=goodtime2;
+					    			}
+					    			newline = line.substring(0, 3)+newmintime3+":"+newmintime1+","+String.valueOf(goodtime3)+line.substring(12, 20)+newmintime4+":"+newmintime2+","+String.valueOf(goodtime4);
+					    			//newline = line.substring(0, 6)+String.valueOf(goodtime1)+","+String.valueOf(goodtime3)+line.substring(12, 23)+String.valueOf(goodtime2)+","+String.valueOf(goodtime4);
 				    			}else{
 					    			int goodtime1 = Integer.parseInt(badtime1) - delay;
 					    			int goodtime2 = Integer.parseInt(badtime2) - delay;	
@@ -239,13 +265,13 @@ public class selectPath extends Activity {
 					    			if(newmintime1<0){
 					    				newmintime3--;
 							    		goodtime1=newmintime1+60;
+							    		newmintime1=goodtime1;
 					    			}
 					    			if(newmintime2<0){
 					    				newmintime4--;
 					    				goodtime2=newmintime2+60;
+						    			newmintime2=goodtime2;
 					    			}
-					    			newmintime1=goodtime1;
-					    			newmintime2=goodtime2;
 					    			newline = line.substring(0, 3)+newmintime3+":"+newmintime1+","+String.valueOf(goodtime3)+line.substring(12, 20)+newmintime4+":"+newmintime2+","+String.valueOf(goodtime4);
 				    			}
 				    		}
@@ -256,8 +282,25 @@ public class selectPath extends Activity {
 				    		if(badtime1.matches(Secregexp)&&badtime2.matches(Secregexp)){
 				    			if(!toggle.isChecked()){
 					    			int goodtime1 = Integer.parseInt(badtime1) + delay;
-					    			int goodtime2 = Integer.parseInt(badtime2) + delay;					    			
-					    			newline = line.substring(0, 6)+String.valueOf(goodtime1)+line.substring(8, 23)+String.valueOf(goodtime2)+line.substring(25);
+					    			int goodtime2 = Integer.parseInt(badtime2) + delay;	
+					    			
+					    			int newmintime3=Integer.parseInt(line.substring(3, 5));
+					    			int newmintime4=Integer.parseInt(line.substring(20, 22));
+					    			int newmintime1=goodtime1;
+					    			int newmintime2=goodtime2;
+					    			
+					    			if(newmintime1>59){
+					    				newmintime3++;
+							    		goodtime1=newmintime1-60;
+							    		newmintime1=goodtime1;
+					    			}
+					    			if(newmintime2>59){
+					    				newmintime4++;
+					    				goodtime2=newmintime2-60;
+						    			newmintime2=goodtime2;
+					    			}
+					    			newline = line.substring(0, 3)+newmintime3+":"+newmintime1+line.substring(8, 20)+newmintime4+":"+newmintime2+line.substring(25);
+					    			//newline = line.substring(0, 6)+String.valueOf(goodtime1)+line.substring(8, 23)+String.valueOf(goodtime2)+line.substring(25);
 				    			}else{
 
 					    			int goodtime1 = Integer.parseInt(badtime1) - delay;
@@ -296,9 +339,20 @@ public class selectPath extends Activity {
 				    		String badtime2 = line.substring(26, 29);
 				    		if(badtime1.matches(MilliSecregexp)&&badtime2.matches(MilliSecregexp)){
 				    			if(!toggle.isChecked()){
+						    		int mintime1 = Integer.parseInt(line.substring(6,8));
+						    		int mintime2 = Integer.parseInt(line.substring(23, 25));
 					    			int goodtime1 = Integer.parseInt(badtime1) + msdelay;
-					    			int goodtime2 = Integer.parseInt(badtime2) + msdelay;					    			
-					    			newline = line.substring(0, 9)+String.valueOf(goodtime1)+line.substring(12, 26)+String.valueOf(goodtime2);
+					    			int goodtime2 = Integer.parseInt(badtime2) + msdelay;	
+					    			if(goodtime1>999){
+					    				mintime1++;
+					    				goodtime1=goodtime1-1000;
+					    			}
+					    			if(goodtime2>999){
+					    				mintime2++;
+					    				goodtime2=goodtime2-1000;
+					    			}
+					    			newline = line.substring(0, 6)+mintime1+","+String.valueOf(goodtime1)+line.substring(12, 23)+mintime2+","+String.valueOf(goodtime2);
+					    			//newline = line.substring(0, 9)+String.valueOf(goodtime1)+line.substring(12, 26)+String.valueOf(goodtime2);
 
 				    			}else{
 
@@ -344,7 +398,7 @@ public class selectPath extends Activity {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
+		}else{Toast.makeText(getApplicationContext(), "No external card mount", Toast.LENGTH_LONG).show();}
 	}
 	
 	
@@ -660,5 +714,53 @@ public class selectPath extends Activity {
 		        registerForContextMenu(pathSrt);
 		        registerForContextMenu(lbl_time);
 		        registerForContextMenu(lbl_sec);
+		    }
+		    
+		    
+		    public String convertAssToSrt(String srt){
+		    	
+		    	String line;
+		    	String newSrt = srt.replace(".ass", ".srt");
+				Log.d("NEWSRT",newSrt);
+		    	try {
+			    	FileInputStream input = new FileInputStream(srt);
+			    	FileOutputStream output = new FileOutputStream(newSrt);
+			    	DataInputStream in = new DataInputStream(input);
+			    	DataOutputStream out = new DataOutputStream(output);
+			    	BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			    	BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(out));
+			    	int jazz=0;
+					while((line = br.readLine()) != null) {
+						if(line.startsWith("Dialogue:")){
+							jazz++;
+							String[] tab = line.split(",");
+							if(tab.length>9){
+								for(int i=10;i<tab.length;i++){
+									tab[9]+=","+tab[i];
+								}
+							}
+							line=String.valueOf(jazz)+"\n";
+							Log.d("LINE",line);
+							bw.write(line);
+							line="0"+tab[1]+"0 --> 0"+tab[2]+"0\n";
+							Log.d("LINE2",line);
+							bw.write(line);
+							line=tab[9]+"\n";
+							Log.d("LINE3",line);
+							bw.write(line+"\n");
+						}
+					}
+	        		br.close();
+			    	if(input != null)input.close();
+			    	if(output != null)output.close();
+					Toast.makeText(getApplicationContext(), srt+" CONVERT into : "+newSrt, Toast.LENGTH_LONG).show();
+			    	//i1.putExtra("URISRT", newSrt);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+		    	return newSrt;
+
 		    }
 }
