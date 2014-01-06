@@ -157,8 +157,8 @@ public class selectPath extends Activity {
 	{
 	    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + packageName));
 	    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-	    intent.setDataAndType(Uri.parse(i1.getStringExtra("URI")), "video/*");
-	    intent.setDataAndType(Uri.parse(i1.getStringExtra("URISRT")), "file/*");
+	    //intent.setDataAndType(Uri.parse(i1.getStringExtra("URI")), "video/*");
+	    //intent.setDataAndType(Uri.parse(i1.getStringExtra("URISRT")), "file/*");
 	    startActivity(intent);
 	}
 	
@@ -192,9 +192,7 @@ public class selectPath extends Activity {
 		    		uriSrt=uriSrt.replace("content://media", path);
 		    	}
 		    	if(uriSrt.endsWith(".ass")){
-					Log.d("NEWSRT1",uriSrt);
 		    		uriSrt=convertAssToSrt(uriSrt);
-					Log.d("NEWSRT2",uriSrt);
 		    	}
 		    	FileInputStream input = new FileInputStream(uriSrt);
 		    	FileOutputStream output = new FileOutputStream(path+Uri+".2.srt");
@@ -203,19 +201,20 @@ public class selectPath extends Activity {
 		    	BufferedReader br = new BufferedReader(new InputStreamReader(in));
 		    	BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(out));
 		    	String regexp="[0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3} --> [0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3}";
+		    	String AssRegexp="[0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{2} --> [0-9]{1}:[0-9]{2}:[0-9]{2},[0-9]{2}";
 		    	String Secregexp="[0-9]{2}";
 		    	String MilliSecregexp="[0-9]{3}";
 		    	int jazz=0;
 		    	while((line = br.readLine()) != null) {
 		    		String newline=null;
-				    if (line.matches(regexp)){
+				    if (line.matches(regexp)||line.matches(AssRegexp)){
 				    	if(delay!=0 && msdelay !=0){
 				    		jazz++;
 				    		String badtime1 = line.substring(6, 8);
 				    		String badtime2 = line.substring(23, 25);
 				    		String badtime3 = line.substring(9, 12);
 				    		String badtime4 = line.substring(26, 29);		
-				    		if(badtime3.matches(MilliSecregexp)&&badtime4.matches(MilliSecregexp) && badtime1.matches(Secregexp)&&badtime2.matches(Secregexp)){
+				    		if(badtime3.matches(MilliSecregexp) && badtime4.matches(MilliSecregexp) && badtime1.matches(Secregexp)&&badtime2.matches(Secregexp)){
 				    			if(!toggle.isChecked()){
 					    			int goodtime1 = Integer.parseInt(badtime1) + delay;
 					    			int goodtime2 = Integer.parseInt(badtime2) + delay;	
@@ -721,7 +720,6 @@ public class selectPath extends Activity {
 		    	
 		    	String line;
 		    	String newSrt = srt.replace(".ass", ".srt");
-				Log.d("NEWSRT",newSrt);
 		    	try {
 			    	FileInputStream input = new FileInputStream(srt);
 			    	FileOutputStream output = new FileOutputStream(newSrt);
@@ -740,20 +738,19 @@ public class selectPath extends Activity {
 								}
 							}
 							line=String.valueOf(jazz)+"\n";
-							Log.d("LINE",line);
 							bw.write(line);
+							tab[1]=tab[1].replace(".", ",");
+							tab[2]=tab[2].replace(".", ",");
 							line="0"+tab[1]+"0 --> 0"+tab[2]+"0\n";
-							Log.d("LINE2",line);
 							bw.write(line);
 							line=tab[9]+"\n";
-							Log.d("LINE3",line);
 							bw.write(line+"\n");
 						}
 					}
-	        		br.close();
+	        		//br.close();
 			    	if(input != null)input.close();
 			    	if(output != null)output.close();
-					Toast.makeText(getApplicationContext(), srt+" CONVERT into : "+newSrt, Toast.LENGTH_LONG).show();
+					//Toast.makeText(getApplicationContext(), srt+" CONVERT into : "+newSrt, Toast.LENGTH_LONG).show();
 			    	//i1.putExtra("URISRT", newSrt);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
