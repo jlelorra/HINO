@@ -1,6 +1,8 @@
 package com.JMJ.fixsrt;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
@@ -50,8 +52,8 @@ public class affich_srt extends ListActivity{
 	    super.onCreate(savedInstanceState);   
     	MainIntent= getIntent();
 	    ArrayList<String>nameList = new ArrayList<String>();
-	    yourDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "");
-	    if(android.os.Build.DEVICE.toLowerCase().contains("samsung") 
+	    yourDir = getExternalSDCardDirectory(); //new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "");
+	    /*if(android.os.Build.DEVICE.toLowerCase().contains("samsung") 
 		    || android.os.Build.MANUFACTURER.toLowerCase().contains("samsung") 
 		    || android.os.Build.PRODUCT.toLowerCase().contains("samsung") 
 		    ||android.os.Build.BRAND.toLowerCase().contains("samsung")
@@ -97,7 +99,7 @@ public class affich_srt extends ListActivity{
 			||android.os.Build.BRAND.toLowerCase().contains("clust")) 
 		    {
 		            yourDir = new File("/mnt/ext-sd", "");
-		    }
+		    }*/
 		    for (File f : yourDir.listFiles()) 
 		    {
 		       if (f.isFile())
@@ -267,6 +269,51 @@ public class affich_srt extends ListActivity{
 					protected void onResume(){
 						super.onResume();
 						this.onCreate(null);
+					}
+					
+					
+					public File getExternalSDCardDirectory(){
+						
+					    File innerDir = Environment.getExternalStorageDirectory();
+					    File rootDir = innerDir.getParentFile();
+					    File firstExtSdCard = innerDir ;
+					    File[] files = rootDir.getParentFile().listFiles();
+					    for (File file : files) {
+					    	if( file.isDirectory()){
+						        Log.d("file",file.getAbsolutePath().toString());
+						       if ((file.getAbsolutePath().toString().toLowerCase().contains("ext") && file.getAbsolutePath().toString().toLowerCase().contains("sd")) || file.getAbsolutePath().toString().toLowerCase().contains("sdcard2") ){
+						            firstExtSdCard = file;
+						            break;
+						        }else{
+						        	File[] files2 = file.listFiles();
+						        	if(files2!=null){
+							        	 for (File file2 : files2) {
+										    	if( file2.isDirectory()){
+											        Log.d("file2",file2.getAbsolutePath().toString());
+											       if ((file2.getAbsolutePath().toString().toLowerCase().contains("ext") && file2.getAbsolutePath().toString().toLowerCase().contains("sd")) || file2.getAbsolutePath().toString().toLowerCase().contains("sdcard2") || (file2.getAbsolutePath().toString().toLowerCase().contains("mnt") && file2.getAbsolutePath().toString().toLowerCase().contains("sdcard")) ) {
+											            firstExtSdCard = file2;
+											            break;
+											        }else{
+											        	File[] files3 = file2.listFiles();
+											        	if(files3!=null){
+												        	 for (File file3 : files3) {
+															    	if( file2.isDirectory()){
+																       Log.d("file3",file3.getAbsolutePath().toString());
+																       if ((file3.getAbsolutePath().toString().toLowerCase().contains("ext") && file3.getAbsolutePath().toString().toLowerCase().contains("sd")) || file3.getAbsolutePath().toString().toLowerCase().contains("sdcard2")) {
+																            firstExtSdCard = file3;
+																            break;
+																        }
+															    	}
+												        	 }
+											        	}
+											        }
+										    	}
+							        	 }
+						        	}
+						        }
+					    	}
+					    }
+					    return firstExtSdCard;
 					}
 			    
 }
