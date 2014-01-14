@@ -43,6 +43,8 @@ public class affich_srt extends ListActivity{
 	private static ArrayAdapter<String> arr;
     Intent MainIntent;
     File yourDir;
+    File DownloadDir;
+    File BlueToothDir;
     Uri Uri;
 	
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -109,6 +111,32 @@ public class affich_srt extends ListActivity{
 		    	   }
 		       }
 	
+		   }
+		    DownloadDir = getDownloadSDCardDirectory(); 
+			if(DownloadDir!=null){
+				    for (File f : DownloadDir.listFiles()) 
+				    {
+				       if (f.isFile())
+				       {	
+				    	   if(f.getName().endsWith(".srt")||f.getName().endsWith(".ass")){
+				    		   nameList.add(f.getName());
+				    	   }
+				       }
+			
+				   }
+			}
+		   BlueToothDir = getBlueToothSDCardDirectory(); 
+		   if(BlueToothDir!=null){
+			    for (File f : BlueToothDir.listFiles()) 
+			    {
+			       if (f.isFile())
+			       {	
+			    	   if(f.getName().endsWith(".srt")||f.getName().endsWith(".ass")){
+			    		   nameList.add(f.getName());
+			    	   }
+			       }
+		
+			   }
 		   }
 	    	arr = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,nameList);
 			setListAdapter(arr);
@@ -184,6 +212,10 @@ public class affich_srt extends ListActivity{
 						        	intent3.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
 									startActivity(intent3);
 							        return true;
+			        case R.id.about:
+			        	Intent intent5 = new Intent(getApplicationContext(),about.class);
+						startActivity(intent5);
+				        return true;
 
 			        }
 			        return super.onOptionsItemSelected(item);
@@ -316,4 +348,90 @@ public class affich_srt extends ListActivity{
 					    return firstExtSdCard;
 					}
 			    
+					public File getDownloadSDCardDirectory(){
+						
+					    File innerDir = Environment.getExternalStorageDirectory();
+					    File rootDir = innerDir.getParentFile();
+					    File firstExtSdCard = null ;
+					    File[] files = rootDir.getParentFile().listFiles();
+					    for (File file : files) {
+					    	if( file.isDirectory()){
+						       if ((file.getAbsolutePath().toString().toLowerCase().contains("download") && file.getAbsolutePath().toString().toLowerCase().contains("sd")) || (file.getAbsolutePath().toString().toLowerCase().contains("download") && file.getAbsolutePath().toString().toLowerCase().contains("storage")) ){
+						            firstExtSdCard = file;
+						            break;
+						        }else{
+						        	File[] files2 = file.listFiles();
+						        	if(files2!=null){
+							        	 for (File file2 : files2) {
+										    	if( file2.isDirectory()){
+											        Log.d("file2",file2.getAbsolutePath().toString());
+											       if ((file2.getAbsolutePath().toString().toLowerCase().contains("download") && file2.getAbsolutePath().toString().toLowerCase().contains("sd")) || (file2.getAbsolutePath().toString().toLowerCase().contains("download") && file2.getAbsolutePath().toString().toLowerCase().contains("storage"))) {
+											            firstExtSdCard = file2;
+											            break;
+											        }else{
+											        	File[] files3 = file2.listFiles();
+											        	if(files3!=null){
+												        	 for (File file3 : files3) {
+															    	if( file3.isDirectory()){
+																       Log.d("file3",file3.getAbsolutePath().toString());
+																       if ((file3.getAbsolutePath().toString().toLowerCase().contains("download") && file3.getAbsolutePath().toString().toLowerCase().contains("sd")) || (file3.getAbsolutePath().toString().toLowerCase().contains("download") && file3.getAbsolutePath().toString().toLowerCase().contains("storage"))) {
+																            firstExtSdCard = file3;
+																            break;
+																        }
+															    	}
+												        	 }
+											        	}
+											        }
+										    	}
+							        	 }
+						        	}
+						        }
+					    	}
+					    }
+					    return firstExtSdCard;
+					}			
+					
+					public File getBlueToothSDCardDirectory(){
+						
+					    File innerDir = Environment.getExternalStorageDirectory();
+					    File rootDir = innerDir.getParentFile();
+					    File firstExtSdCard=null;
+					    File[] files = rootDir.getParentFile().listFiles();
+					    for (File file : files) {
+					    	if( file.isDirectory()){
+						       if ((file.getAbsolutePath().toString().toLowerCase().contains("bluetooth") && file.getAbsolutePath().toString().toLowerCase().contains("sd")) || (file.getAbsolutePath().toString().toLowerCase().contains("bluetooth") && file.getAbsolutePath().toString().toLowerCase().contains("storage")) ){
+						            firstExtSdCard = file;
+						            break;
+						        }else{
+						        	File[] files2 = file.listFiles();
+						        	if(files2!=null){
+							        	 for (File file2 : files2) {
+										    	if( file2.isDirectory()){
+											        Log.d("file2",file2.getAbsolutePath().toString());
+											       if ((file2.getAbsolutePath().toString().toLowerCase().contains("bluetooth") && file2.getAbsolutePath().toString().toLowerCase().contains("sd")) || (file2.getAbsolutePath().toString().toLowerCase().contains("bluetooth") && file2.getAbsolutePath().toString().toLowerCase().contains("storage"))) {
+											            firstExtSdCard = file2;
+											            break;
+											        }else{
+											        	File[] files3 = file2.listFiles();
+											        	if(files3!=null){
+												        	 for (File file3 : files3) {
+															    	if( file3.isDirectory()){
+																       Log.d("file3",file3.getAbsolutePath().toString());
+																       if ((file3.getAbsolutePath().toString().toLowerCase().contains("bluetooth") && file3.getAbsolutePath().toString().toLowerCase().contains("sd")) || (file3.getAbsolutePath().toString().toLowerCase().contains("bluetooth") && file3.getAbsolutePath().toString().toLowerCase().contains("storage"))) {
+																            firstExtSdCard = file3;
+																            break;
+																        }
+															    	}
+												        	 }
+											        	}
+											        }
+										    	}
+							        	 }
+						        	}
+						        }
+					    	}
+					    }
+					    return firstExtSdCard;
+					}	
+					
 }

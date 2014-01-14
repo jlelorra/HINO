@@ -25,6 +25,7 @@ public final class R {
     }
     public static final class id {
         public static final int ListOfVideo=0x7f080003;
+        public static final int about=0x7f08001b;
         public static final int action_settings=0x7f080017;
         public static final int btn_srt=0x7f08000a;
         public static final int btn_test=0x7f080012;

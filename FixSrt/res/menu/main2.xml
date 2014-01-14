@@ -19,5 +19,11 @@
         android:titleCondensed="path" 
         android:menuCategory="system" 
         android:title="path"></item>
+      
+       <item
+        android:id="@+id/about"
+        android:titleCondensed="About" 
+        android:menuCategory="system" 
+        android:title="about"></item>
 
 </menu>

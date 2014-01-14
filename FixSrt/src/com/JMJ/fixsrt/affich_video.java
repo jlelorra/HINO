@@ -130,6 +130,11 @@ public class affich_video extends ListActivity{
 			            	intent3.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
 							startActivity(intent3);
 					        return true;
+					        
+	        case R.id.about:
+	        	Intent intent5 = new Intent(getApplicationContext(),about.class);
+				startActivity(intent5);
+		        return true;
 
 	        }
 	        return super.onOptionsItemSelected(item);

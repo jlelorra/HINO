@@ -473,6 +473,11 @@ public class selectPath extends Activity {
 				        	intent3.putExtra("VIEW",View);
 							startActivity(intent3);
 					        return true;
+					        
+	        case R.id.about:
+		        	Intent intent5 = new Intent(getApplicationContext(),about.class);
+					startActivity(intent5);
+			        return true;
 
 	        }
 	        return super.onOptionsItemSelected(item);

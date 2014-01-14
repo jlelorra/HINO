@@ -54,6 +54,15 @@
             	android:name="android.support.PARENT_ACTIVITY"
             	android:value="com.example.CDTheque.affich_srt"/>
         </activity>
+         <activity
+            android:name="com.JMJ.fixsrt.about"
+            android:label="@string/app_name"
+            android:parentActivityName=".selectPath"
+            android:configChanges="orientation|screenSize">
+             <meta-data 
+            	android:name="android.support.PARENT_ACTIVITY"
+            	android:value="com.example.CDTheque.selectPath"/>
+        </activity>
     </application>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
