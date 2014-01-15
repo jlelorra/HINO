@@ -213,6 +213,7 @@ public class affich_srt extends ListActivity{
 							        return true;
 			        case R.id.about:
 			        	Intent intent5 = new Intent(getApplicationContext(),about.class);
+			        	intent5.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
 						startActivity(intent5);
 				        return true;
 
@@ -441,9 +442,7 @@ public class affich_srt extends ListActivity{
 		                	}
 		                	
 		                }
-		                Log.d("PATHHHHHHH",Dir);
 		                Dir=Dir.replace("/"+pos, "");
-		                Log.d("PATHHH",Dir);
 		                return Dir;
 					}
 					

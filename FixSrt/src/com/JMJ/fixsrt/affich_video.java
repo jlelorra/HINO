@@ -72,6 +72,7 @@ public class affich_video extends ListActivity{
 	                i.putExtra("NAME", name);
 	                i.putExtra("URI", String.valueOf(Uri));
 	                i.putExtra("URISRT", MainIntent.getStringExtra("URISRT"));
+	                i.putExtra("PATHSRT", MainIntent.getStringExtra("PATHSRT"));
 	                i.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
 	                i.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
 		        	i.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
@@ -129,6 +130,7 @@ public class affich_video extends ListActivity{
 					        
 	        case R.id.about:
 	        	Intent intent5 = new Intent(getApplicationContext(),about.class);
+	        	intent5.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
 				startActivity(intent5);
 		        return true;
 

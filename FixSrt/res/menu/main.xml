@@ -10,25 +10,25 @@
         android:id="@+id/video"
         android:titleCondensed="video" 
         android:menuCategory="system" 
-        android:title="video"></item>
+        android:title="Video"></item>
 
         
       <item
         android:id="@+id/srt"
         android:titleCondensed="srt" 
         android:menuCategory="system" 
-        android:title="srt"></item>
+        android:title="Srt"></item>
       
       <item
         android:id="@+id/path"
         android:titleCondensed="path" 
         android:menuCategory="system" 
-        android:title="path"></item>
+        android:title="Path"></item>
       
        <item
         android:id="@+id/about"
         android:titleCondensed="About" 
         android:menuCategory="system" 
-        android:title="about"></item>
+        android:title="About ?"></item>
 
 </menu>

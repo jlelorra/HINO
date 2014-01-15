@@ -52,6 +52,7 @@ public class selectPath extends Activity {
 	private static final int SRT = 2;
 	String UriVideo;
 	String UriSrt;
+	String pathMain;
 	TextView pathvideo;
 	TextView pathSrt;
 	TextView lbl_video;
@@ -377,8 +378,8 @@ public class selectPath extends Activity {
 
 					    			}
 				    			}
-				    		}
-				    	}
+				    		}	
+				    	}else{newline=line;}
 				    	bw.write(newline+"\n");	
 			    	}else{
 			    		bw.write(line+"\n");
@@ -447,6 +448,7 @@ public class selectPath extends Activity {
 			            	intent.putExtra("DELAY",picker.getValue());
 			            	intent.putExtra("SWITCH",toggle.isChecked());
 			            	intent.putExtra("VIEW",View);
+			             	intent.putExtra("PATHSRT",i1.getStringExtra("PATHSRT"));
 			            	startActivity(intent);
 	          	          	return true;
 	          	          	
@@ -470,6 +472,7 @@ public class selectPath extends Activity {
 					        
 	        case R.id.about:
 		        	Intent intent5 = new Intent(getApplicationContext(),about.class);
+		        	intent5.putExtra("VIEW",View);
 					startActivity(intent5);
 			        return true;
 
@@ -506,7 +509,7 @@ public class selectPath extends Activity {
 		            //Dans le Menu "m", on active tous les items dans le groupe d'identifiant "R.id.group2"
 			        	AlertDialog.Builder box = new AlertDialog.Builder(this);  
 			        	int checkedView;
-			        	if(View.equals("selectpath"))
+			        	if(View.equals("selectpath")||View.equals("selectpath_ms"))
 			        	{
 			        		checkedView=1;
 			        	}else{
@@ -537,6 +540,7 @@ public class selectPath extends Activity {
 		            	intent.putExtra("DELAY",picker.getValue());
 		            	intent.putExtra("SWITCH",toggle.isChecked());
 		            	intent.putExtra("VIEW",View);
+		             	intent.putExtra("PATHSRT",i1.getStringExtra("PATHSRT"));
 		            	startActivity(intent);
 	      	          	return true;
 		     	 	
@@ -604,6 +608,9 @@ public class selectPath extends Activity {
 		 			pathSrt.setText(i1.getStringExtra("URISRT"));
 		 			pathSrt.setTextColor(Color.LTGRAY);
 		 		}
+		 		if(i1.getStringExtra("PATHSRT")!=null){
+		 			pathMain=i1.getStringExtra("PATHSRT");
+		 		}
 		 		setVideo=(Button)findViewById(R.id.btn_video);
 		 		setSrt=(Button)findViewById(R.id.btn_srt);
 		 		Test=(Button)findViewById(R.id.btn_test);
@@ -657,7 +664,7 @@ public class selectPath extends Activity {
 		             	intent.putExtra("DELAY",picker.getValue());
 		             	intent.putExtra("SWITCH",toggle.isChecked());
 		             	intent.putExtra("VIEW",View);
-
+		             	intent.putExtra("PATHSRT",i1.getStringExtra("PATHSRT"));
 		 				startActivity(intent);
 		     		}
 		             
@@ -682,13 +689,13 @@ public class selectPath extends Activity {
 		 					if(View.equals("selectpath_ms")||View.equals("selectpath_ms_fr")){
 			 					modif_srt(String.valueOf(pathvideo.getText()),
 			 							String.valueOf(pathSrt.getText()),
-			 							i1.getStringExtra("PATHSRT"),
+			 							pathMain,
 			 							picker.getValue(),
 			 							Integer.parseInt(String.valueOf(picker1.getValue()).concat(String.valueOf(picker2.getValue())).concat(String.valueOf(picker3.getValue()))));
 			 				}else{
 			 					modif_srt(String.valueOf(pathvideo.getText()),
 			 							String.valueOf(pathSrt.getText()),
-			 							i1.getStringExtra("PATHSRT"),
+			 							pathMain,
 			 							picker.getValue(),
 			 							0);
 			 				}
@@ -746,11 +753,9 @@ public class selectPath extends Activity {
 							bw.write(line+"\n");
 						}
 					}
-	        		//br.close();
 			    	if(input != null)input.close();
 			    	if(output != null)output.close();
-					//Toast.makeText(getApplicationContext(), srt+" CONVERT into : "+newSrt, Toast.LENGTH_LONG).show();
-			    	//i1.putExtra("URISRT", newSrt);
+
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
