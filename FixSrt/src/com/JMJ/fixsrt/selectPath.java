@@ -30,7 +30,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -176,7 +175,6 @@ public class selectPath extends Activity {
 	@SuppressLint("NewApi")
 	public void modif_srt(String Uri, String uriSrt,String path,int delay, int msdelay) {
 		String line;
-		int value;
 		if(Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())){
 		    try {
 		    	if(Uri.endsWith("/media")){
@@ -204,12 +202,10 @@ public class selectPath extends Activity {
 		    	String AssRegexp="[0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{2} --> [0-9]{1}:[0-9]{2}:[0-9]{2},[0-9]{2}";
 		    	String Secregexp="[0-9]{2}";
 		    	String MilliSecregexp="[0-9]{3}";
-		    	int jazz=0;
 		    	while((line = br.readLine()) != null) {
 		    		String newline=null;
 				    if (line.matches(regexp)||line.matches(AssRegexp)){
 				    	if(delay!=0 && msdelay !=0){
-				    		jazz++;
 				    		String badtime1 = line.substring(6, 8);
 				    		String badtime2 = line.substring(23, 25);
 				    		String badtime3 = line.substring(9, 12);
@@ -275,7 +271,6 @@ public class selectPath extends Activity {
 				    			}
 				    		}
 				    	}else if(delay!=0){
-				    		jazz++;
 				    		String badtime1 = line.substring(6, 8);
 				    		String badtime2 = line.substring(23, 25);
 				    		if(badtime1.matches(Secregexp)&&badtime2.matches(Secregexp)){
@@ -333,7 +328,6 @@ public class selectPath extends Activity {
 				    		}
 				    	}else if(msdelay!=0){
 
-				    		jazz++;
 				    		String badtime1 = line.substring(9, 12);
 				    		String badtime2 = line.substring(26, 29);
 				    		if(badtime1.matches(MilliSecregexp)&&badtime2.matches(MilliSecregexp)){

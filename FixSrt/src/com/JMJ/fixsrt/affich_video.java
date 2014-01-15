@@ -4,16 +4,13 @@ package com.JMJ.fixsrt;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
-import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.ContentResolver;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,8 +38,7 @@ public class affich_video extends ListActivity{
 	
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@SuppressLint("NewApi")
-	@SuppressWarnings("unchecked")
-    public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
     	MainIntent= getIntent();
 	    super.onCreate(savedInstanceState);
 	    ContentResolver cr = getContentResolver();

@@ -1,8 +1,6 @@
 package com.JMJ.fixsrt;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
@@ -43,14 +41,14 @@ public class affich_srt extends ListActivity{
 	private static ArrayAdapter<String> arr;
     Intent MainIntent;
     File yourDir;
+    String path;
     File DownloadDir;
     File BlueToothDir;
     Uri Uri;
 	
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@SuppressLint({ "NewApi", "DefaultLocale" })
-	@SuppressWarnings("unchecked")
-    public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);   
     	MainIntent= getIntent();
 	    ArrayList<String>nameList = new ArrayList<String>();
@@ -153,10 +151,11 @@ public class affich_srt extends ListActivity{
 		                Intent i = new Intent(getApplicationContext(),selectPath.class);
 		                name =  arr.getItem(position);
 		                Uri = MediaStore.Files.getContentUri(arr.getItem(position));
+		                path = getSrtPath(arr.getItem(position));
 		                i.putExtra("NAMESRT", name);
 		                i.putExtra("URISRT", String.valueOf(Uri));
 		                i.putExtra("URI", MainIntent.getStringExtra("URI"));
-		                i.putExtra("PATHSRT",yourDir.getAbsolutePath());
+		                i.putExtra("PATHSRT",path);
 		                i.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
 		                i.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
 		                i.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
@@ -274,8 +273,9 @@ public class affich_srt extends ListActivity{
 					    case CONTENTSRT:
 								AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
 								int position=item.getItemId();
+				                path = getSrtPath(arr.getItem(info.position));
 				            	Intent intent5 = new Intent(getApplicationContext(),affich_srt_txt.class);
-				            	intent5.putExtra("PATHSRT",  yourDir.getAbsolutePath());
+				            	intent5.putExtra("PATHSRT", path);
 				            	intent5.putExtra("URISRT",   arr.getItem(info.position));
 				            	intent5.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
 				            	intent5.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
@@ -286,7 +286,8 @@ public class affich_srt extends ListActivity{
 					    case DELETESRT:
 								info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
 								position=item.getItemId();
-								File file = new File( yourDir.getAbsolutePath()+"/"+arr.getItem(info.position));
+								path = getSrtPath(arr.getItem(info.position));
+								File file = new File( path +"/"+arr.getItem(info.position));
 								boolean deleted = file.delete();
 								if(deleted)	onResume();
 					        return true;
@@ -312,7 +313,6 @@ public class affich_srt extends ListActivity{
 					    File[] files = rootDir.getParentFile().listFiles();
 					    for (File file : files) {
 					    	if( file.isDirectory()){
-						        Log.d("file",file.getAbsolutePath().toString());
 						       if ((file.getAbsolutePath().toString().toLowerCase().contains("ext") && file.getAbsolutePath().toString().toLowerCase().contains("sd")) || file.getAbsolutePath().toString().toLowerCase().contains("sdcard2") ){
 						            firstExtSdCard = file;
 						            break;
@@ -321,7 +321,6 @@ public class affich_srt extends ListActivity{
 						        	if(files2!=null){
 							        	 for (File file2 : files2) {
 										    	if( file2.isDirectory()){
-											        Log.d("file2",file2.getAbsolutePath().toString());
 											       if ((file2.getAbsolutePath().toString().toLowerCase().contains("ext") && file2.getAbsolutePath().toString().toLowerCase().contains("sd")) || file2.getAbsolutePath().toString().toLowerCase().contains("sdcard2") || (file2.getAbsolutePath().toString().toLowerCase().contains("mnt") && file2.getAbsolutePath().toString().toLowerCase().contains("sdcard")) ) {
 											            firstExtSdCard = file2;
 											            break;
@@ -330,7 +329,6 @@ public class affich_srt extends ListActivity{
 											        	if(files3!=null){
 												        	 for (File file3 : files3) {
 															    	if( file2.isDirectory()){
-																       Log.d("file3",file3.getAbsolutePath().toString());
 																       if ((file3.getAbsolutePath().toString().toLowerCase().contains("ext") && file3.getAbsolutePath().toString().toLowerCase().contains("sd")) || file3.getAbsolutePath().toString().toLowerCase().contains("sdcard2")) {
 																            firstExtSdCard = file3;
 																            break;
@@ -364,7 +362,6 @@ public class affich_srt extends ListActivity{
 						        	if(files2!=null){
 							        	 for (File file2 : files2) {
 										    	if( file2.isDirectory()){
-											        Log.d("file2",file2.getAbsolutePath().toString());
 											       if ((file2.getAbsolutePath().toString().toLowerCase().contains("download") && file2.getAbsolutePath().toString().toLowerCase().contains("sd")) || (file2.getAbsolutePath().toString().toLowerCase().contains("download") && file2.getAbsolutePath().toString().toLowerCase().contains("storage"))) {
 											            firstExtSdCard = file2;
 											            break;
@@ -373,7 +370,6 @@ public class affich_srt extends ListActivity{
 											        	if(files3!=null){
 												        	 for (File file3 : files3) {
 															    	if( file3.isDirectory()){
-																       Log.d("file3",file3.getAbsolutePath().toString());
 																       if ((file3.getAbsolutePath().toString().toLowerCase().contains("download") && file3.getAbsolutePath().toString().toLowerCase().contains("sd")) || (file3.getAbsolutePath().toString().toLowerCase().contains("download") && file3.getAbsolutePath().toString().toLowerCase().contains("storage"))) {
 																            firstExtSdCard = file3;
 																            break;
@@ -407,7 +403,6 @@ public class affich_srt extends ListActivity{
 						        	if(files2!=null){
 							        	 for (File file2 : files2) {
 										    	if( file2.isDirectory()){
-											        Log.d("file2",file2.getAbsolutePath().toString());
 											       if ((file2.getAbsolutePath().toString().toLowerCase().contains("bluetooth") && file2.getAbsolutePath().toString().toLowerCase().contains("sd")) || (file2.getAbsolutePath().toString().toLowerCase().contains("bluetooth") && file2.getAbsolutePath().toString().toLowerCase().contains("storage"))) {
 											            firstExtSdCard = file2;
 											            break;
@@ -416,7 +411,6 @@ public class affich_srt extends ListActivity{
 											        	if(files3!=null){
 												        	 for (File file3 : files3) {
 															    	if( file3.isDirectory()){
-																       Log.d("file3",file3.getAbsolutePath().toString());
 																       if ((file3.getAbsolutePath().toString().toLowerCase().contains("bluetooth") && file3.getAbsolutePath().toString().toLowerCase().contains("sd")) || (file3.getAbsolutePath().toString().toLowerCase().contains("bluetooth") && file3.getAbsolutePath().toString().toLowerCase().contains("storage"))) {
 																            firstExtSdCard = file3;
 																            break;
@@ -432,6 +426,25 @@ public class affich_srt extends ListActivity{
 					    	}
 					    }
 					    return firstExtSdCard;
-					}	
+					}
+					
+					public String getSrtPath(String pos){
+						
+						String Dir = yourDir.getAbsolutePath()+"/"+pos;
+		                File f = new File(Dir);
+		                if(!f.exists()){
+		                	Dir = DownloadDir.getAbsolutePath()+"/"+pos;
+		                	f = new File(Dir);
+		                	if(!f.exists()){
+		                		Dir = BlueToothDir.getAbsolutePath()+"/"+pos;
+			                	f = new File(Dir);
+		                	}
+		                	
+		                }
+		                Log.d("PATHHHHHHH",Dir);
+		                Dir=Dir.replace("/"+pos, "");
+		                Log.d("PATHHH",Dir);
+		                return Dir;
+					}
 					
 }
