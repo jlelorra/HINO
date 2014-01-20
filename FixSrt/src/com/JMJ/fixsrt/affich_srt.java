@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -99,7 +100,7 @@ public class affich_srt extends ListActivity{
 		    {
 		            yourDir = new File("/mnt/ext-sd", "");
 		    }*/
-		    for (File f : yourDir.listFiles()) 
+		    /*for (File f : yourDir.listFiles()) 
 		    {
 		       if (f.isFile())
 		       {	
@@ -108,9 +109,10 @@ public class affich_srt extends ListActivity{
 		    	   }
 		       }
 	
-		   }
+		   }*/
+	    	getListeRecursiv(yourDir,String.valueOf(yourDir), nameList);
 		    DownloadDir = CommonTools.getDownloadSDCardDirectory(); 
-			if(DownloadDir!=null){
+			/*if(DownloadDir!=null){
 				    for (File f : DownloadDir.listFiles()) 
 				    {
 				       if (f.isFile())
@@ -121,9 +123,10 @@ public class affich_srt extends ListActivity{
 				       }
 			
 				   }
-			}
+			}*/
+	    	getListeRecursiv(DownloadDir,String.valueOf(DownloadDir), nameList);
 		   BlueToothDir = CommonTools.getBlueToothSDCardDirectory(); 
-		   if(BlueToothDir!=null){
+		   /*if(BlueToothDir!=null){
 			    for (File f : BlueToothDir.listFiles()) 
 			    {
 			       if (f.isFile())
@@ -134,7 +137,8 @@ public class affich_srt extends ListActivity{
 			       }
 		
 			   }
-		   }
+		   }*/
+	    	getListeRecursiv(BlueToothDir,String.valueOf(BlueToothDir), nameList);
 	    	arr = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,nameList);
 			setListAdapter(arr);
 		    ActionBar actionBar = getActionBar();
@@ -321,6 +325,31 @@ public class affich_srt extends ListActivity{
 		                }
 		                Dir=Dir.replace("/"+pos, "");
 		                return Dir;
+					}
+					
+					public void getListeRecursiv(File path,String prefix,ArrayList<String>nameList ){
+						
+						Log.d("PATH",String.valueOf(path));
+						Log.d("PREFIX",prefix);
+						if(path !=null && path.exists() && path.isDirectory()){
+						    for (File f : path.listFiles()) 
+						    {
+						       if (f.isFile())
+						       {	
+						    	   if(f.getName().endsWith(".srt")||f.getName().endsWith(".ass")){
+						    		   prefix=path.getAbsolutePath().replace(prefix, "");
+						    		   nameList.add(prefix+"/"+f.getName());
+						    		   Log.d("ADD",String.valueOf(prefix+"/"+f.getName()));
+						    	   }
+						       }else if(f.isDirectory()){
+						    		   Log.d("CONTENU",f.getName());
+						    		   prefix=path.getAbsolutePath().replace(prefix, "");
+						    		   Log.d("PREFIXXXXX",prefix);
+						    		   getListeRecursiv(f,prefix,nameList);
+
+						       }
+						   }
+						}
 					}
 					
 }
