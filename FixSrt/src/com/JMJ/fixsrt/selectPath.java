@@ -4,12 +4,15 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.List;
+
+import com.JMJ.commonTools.CommonTools;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -181,10 +184,6 @@ public class selectPath extends Activity {
 		    	if(Uri.endsWith("/media")){
 		    		Uri=Uri.replace("/video/media", "");
 		    		Uri=Uri.replace("content://media", "");
-		    		Uri=Uri.replace(".mp4", "");
-		    		Uri=Uri.replace(".wmv", "");
-		    		Uri=Uri.replace(".m4a", "");
-		    		Uri=Uri.replace(".mkv", "");
 		    	}
 		    	if(uriSrt.endsWith("/file")){
 		    		uriSrt=uriSrt.replace("/file", "");
@@ -194,6 +193,11 @@ public class selectPath extends Activity {
 		    		uriSrt=convertAssToSrt(uriSrt);
 		    	}
 		    	FileInputStream input = new FileInputStream(uriSrt);
+		    	if(!path.trim().equals(getMp4Path(Uri)) && getMp4Path(Uri)!=null )path = getMp4Path(Uri);
+	    		Uri=Uri.replace(".mp4", "");
+	    		Uri=Uri.replace(".wmv", "");
+	    		Uri=Uri.replace(".m4a", "");
+	    		Uri=Uri.replace(".mkv", "");
 		    	FileOutputStream output = new FileOutputStream(path+Uri+".2.srt");
 		    	DataInputStream in = new DataInputStream(input);
 		    	DataOutputStream out = new DataOutputStream(output);
@@ -764,4 +768,24 @@ public class selectPath extends Activity {
 		    	return newSrt;
 
 		    }
+		    
+			public String getMp4Path(String pos){
+				
+			    File yourDir = CommonTools.getExternalSDCardDirectory();
+			    File DownloadDir = CommonTools.getDownloadSDCardDirectory(); 
+			    File BlueToothDir = CommonTools.getBlueToothSDCardDirectory();
+				String Dir = yourDir.getAbsolutePath()+"/"+pos;
+                File f = new File(Dir);
+                if(!f.exists()){
+                	Dir = DownloadDir.getAbsolutePath()+"/"+pos;
+                	f = new File(Dir);
+                	if(!f.exists()){
+                		Dir = BlueToothDir.getAbsolutePath()+"/"+pos;
+	                	f = new File(Dir);
+                	}
+                	
+                }
+                Dir=Dir.replace("/"+pos, "");
+                return Dir;
+			}
 }
