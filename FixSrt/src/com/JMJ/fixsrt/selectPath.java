@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.JMJ.commonTools.CommonTools;
@@ -33,6 +34,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -188,12 +190,18 @@ public class selectPath extends Activity {
 		    	if(uriSrt.endsWith("/file")){
 		    		uriSrt=uriSrt.replace("/file", "");
 		    		uriSrt=uriSrt.replace("content://media", path);
+		    		String[] tmp = uriSrt.split("/");
+	    			path="";
+		    		for(int i =0;i<(tmp.length-1);i++){
+		    			path+=tmp[i]+"/";
+		    		}
 		    	}
 		    	if(uriSrt.endsWith(".ass")){
 		    		uriSrt=convertAssToSrt(uriSrt);
 		    	}
 		    	FileInputStream input = new FileInputStream(uriSrt);
 		    	if(!path.trim().equals(getMp4Path(Uri)) && getMp4Path(Uri)!=null )path = getMp4Path(Uri);
+		    	Log.d("PA",path);
 	    		Uri=Uri.replace(".mp4", "");
 	    		Uri=Uri.replace(".wmv", "");
 	    		Uri=Uri.replace(".m4a", "");
@@ -769,23 +777,49 @@ public class selectPath extends Activity {
 
 		    }
 		    
-			public String getMp4Path(String pos){
+			public static String getMp4Path(String pos){
 				
 			    File yourDir = CommonTools.getExternalSDCardDirectory();
 			    File DownloadDir = CommonTools.getDownloadSDCardDirectory(); 
 			    File BlueToothDir = CommonTools.getBlueToothSDCardDirectory();
-				String Dir = yourDir.getAbsolutePath()+"/"+pos;
-                File f = new File(Dir);
-                if(!f.exists()){
-                	Dir = DownloadDir.getAbsolutePath()+"/"+pos;
-                	f = new File(Dir);
-                	if(!f.exists()){
-                		Dir = BlueToothDir.getAbsolutePath()+"/"+pos;
+				String Dir = getPathRecursiv(yourDir,pos);
+				if(Dir != null){
+		            //Log.d("Dir1",getPathRecursiv(yourDir,pos));
+	                File f = new File(Dir);
+	                Dir=Dir.replace(pos, "");
+	                if(!f.exists()){
+	                	Log.d("download","download");
+	                	Dir = getPathRecursiv(DownloadDir,pos);
 	                	f = new File(Dir);
-                	}
-                	
-                }
-                Dir=Dir.replace("/"+pos, "");
-                return Dir;
+		                Dir=Dir.replace(pos, "");
+	                	if(!f.exists()){
+	                		Log.d("bluetooth","bluetooth");
+	                		Dir =  getPathRecursiv(BlueToothDir,pos);
+	    	                Dir=Dir.replace(pos, "");
+	                		return Dir;
+	                	}else{return Dir;}
+	                }else{return Dir;}
+				}
+	            return null;
+			}
+			
+			public static String getPathRecursiv(File path,String name ){
+				
+				    for (File f : path.listFiles()) 
+				    {
+				       if (f.isFile())
+				       {	
+				    	   String test = name.replace("/", "");
+				    	   if(f.getName().equals(test)){
+				    		   name = f.getAbsolutePath();
+				    		   Log.d("file",name);
+				    		   return name;
+				    	   }
+				       }else if(f.isDirectory()){
+				            Log.d("Dir",f.getAbsolutePath());
+				            getPathRecursiv(f,name);
+				       }
+				   }
+				    return null;
 			}
 }

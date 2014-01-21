@@ -2,6 +2,8 @@ package com.JMJ.fixsrt;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -13,7 +15,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,6 +25,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+
 import com.JMJ.commonTools.*;
 
 @SuppressLint("DefaultLocale")
@@ -46,7 +48,7 @@ public class affich_srt extends ListActivity{
     File BlueToothDir;
     Uri Uri;
 	
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+ 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@SuppressLint({ "NewApi", "DefaultLocale" })
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);   
@@ -100,46 +102,13 @@ public class affich_srt extends ListActivity{
 		    {
 		            yourDir = new File("/mnt/ext-sd", "");
 		    }*/
-		    /*for (File f : yourDir.listFiles()) 
-		    {
-		       if (f.isFile())
-		       {	
-		    	   if(f.getName().endsWith(".srt")||f.getName().endsWith(".ass")){
-		    		   nameList.add(f.getName());
-		    	   }
-		       }
-	
-		   }*/
 	    	getListeRecursiv(yourDir,String.valueOf(yourDir), nameList);
 		    DownloadDir = CommonTools.getDownloadSDCardDirectory(); 
-			/*if(DownloadDir!=null){
-				    for (File f : DownloadDir.listFiles()) 
-				    {
-				       if (f.isFile())
-				       {	
-				    	   if(f.getName().endsWith(".srt")||f.getName().endsWith(".ass")){
-				    		   nameList.add(f.getName());
-				    	   }
-				       }
-			
-				   }
-			}*/
 	    	getListeRecursiv(DownloadDir,String.valueOf(DownloadDir), nameList);
 		   BlueToothDir = CommonTools.getBlueToothSDCardDirectory(); 
-		   /*if(BlueToothDir!=null){
-			    for (File f : BlueToothDir.listFiles()) 
-			    {
-			       if (f.isFile())
-			       {	
-			    	   if(f.getName().endsWith(".srt")||f.getName().endsWith(".ass")){
-			    		   nameList.add(f.getName());
-			    	   }
-			       }
-		
-			   }
-		   }*/
 	    	getListeRecursiv(BlueToothDir,String.valueOf(BlueToothDir), nameList);
-	    	arr = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,nameList);
+	    	Collections.sort((List<String>) nameList);
+	    	arr = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, nameList);
 			setListAdapter(arr);
 		    ActionBar actionBar = getActionBar();
 		    actionBar.setDisplayHomeAsUpEnabled(true);
@@ -329,22 +298,16 @@ public class affich_srt extends ListActivity{
 					
 					public void getListeRecursiv(File path,String prefix,ArrayList<String>nameList ){
 						
-						Log.d("PATH",String.valueOf(path));
-						Log.d("PREFIX",prefix);
 						if(path !=null && path.exists() && path.isDirectory()){
 						    for (File f : path.listFiles()) 
 						    {
 						       if (f.isFile())
 						       {	
 						    	   if(f.getName().endsWith(".srt")||f.getName().endsWith(".ass")){
-						    		   prefix=path.getAbsolutePath().replace(prefix, "");
-						    		   nameList.add(prefix+"/"+f.getName());
-						    		   Log.d("ADD",String.valueOf(prefix+"/"+f.getName()));
+						    		   String str_path=f.getAbsolutePath().replace(prefix+"/", "");
+						    		   nameList.add(str_path);
 						    	   }
 						       }else if(f.isDirectory()){
-						    		   Log.d("CONTENU",f.getName());
-						    		   prefix=path.getAbsolutePath().replace(prefix, "");
-						    		   Log.d("PREFIXXXXX",prefix);
 						    		   getListeRecursiv(f,prefix,nameList);
 
 						       }
