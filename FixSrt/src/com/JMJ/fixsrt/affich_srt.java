@@ -298,7 +298,7 @@ public class affich_srt extends ListActivity{
 					
 					public void getListeRecursiv(File path,String prefix,ArrayList<String>nameList ){
 						
-						if(path !=null && path.exists() && path.isDirectory()){
+						//if(path !=null && path.exists() && path.isDirectory()){
 						    for (File f : path.listFiles()) 
 						    {
 						       if (f.isFile())
@@ -307,12 +307,12 @@ public class affich_srt extends ListActivity{
 						    		   String str_path=f.getAbsolutePath().replace(prefix+"/", "");
 						    		   nameList.add(str_path);
 						    	   }
-						       }else if(f.isDirectory()){
+						       }else if(f.isDirectory() && f.canExecute() && f.canRead()){
 						    		   getListeRecursiv(f,prefix,nameList);
 
 						       }
 						   }
-						}
+						//}
 					}
 					
 }
