@@ -1,6 +1,13 @@
 package com.JMJ.fixsrt;
 
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import com.JMJ.commonTools.CommonTools;
+
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
@@ -11,6 +18,7 @@ import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,12 +42,13 @@ public class affich_video extends ListActivity{
 	String name; 
     ArrayAdapter<String> arr;
     Uri Uri;
+    File yourDir;
     Intent MainIntent;
 	
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@SuppressLint("NewApi")
 	public void onCreate(Bundle savedInstanceState) {
-    	MainIntent= getIntent();
+    	/*MainIntent= getIntent();
 	    super.onCreate(savedInstanceState);
 	    ContentResolver cr = getContentResolver();
 	    cursor = cr.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, null, null, null, null);
@@ -78,7 +87,71 @@ public class affich_video extends ListActivity{
 		        	i.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
 	                startActivity(i);
 	            }
-	        });
+	        });*/
+		
+		 super.onCreate(savedInstanceState);   
+	    	MainIntent= getIntent();
+		    ArrayList<String>nameList = new ArrayList<String>();
+		    yourDir = CommonTools.getExternalSDCardDirectory(); 
+		    	nameList.add("..");
+	    		getListeRecursiv(yourDir,String.valueOf(yourDir), nameList);
+		    	Collections.sort((List<String>) nameList);
+		    	arr = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, nameList);
+				setListAdapter(arr);
+			    ActionBar actionBar = getActionBar();
+			    actionBar.setDisplayHomeAsUpEnabled(true);
+				ListView list = this.getListView();   
+			    registerForContextMenu(list);
+				list.setOnItemClickListener(new OnItemClickListener() {
+						
+			           @Override
+			            public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
+			
+			                // TODO Auto-generated method stub
+			                Intent i = new Intent(getApplicationContext(),selectPath.class);
+			                name =  arr.getItem(position);
+			                if(!name.equals("..")){
+				                File Test = new File(yourDir+"/"+name);
+			                	Log.d("TEST",Test.getAbsolutePath());
+				                if(Test.isFile()){
+				                	Log.d("IS FILE","OK");
+					                Uri = MediaStore.Video.Media.getContentUri(arr.getItem(position));
+					                i.putExtra("NAME", name);
+					                i.putExtra("URI", String.valueOf(Uri));
+					                i.putExtra("PATHMP4", Test.getAbsolutePath().replace(name, ""));
+					                i.putExtra("URISRT", MainIntent.getStringExtra("URISRT"));
+					                i.putExtra("PATHSRT", MainIntent.getStringExtra("PATHSRT"));
+					                i.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
+					                i.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
+						        	i.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+					                startActivity(i);
+				                }
+				                else if(Test.isDirectory()){
+				                	Log.d("IS DIRECTORY","OK");
+					             	Intent intent = new Intent(getApplicationContext(),affich_child_video.class);
+					             	intent.putExtra("NAMESRT", name);
+					             	intent.putExtra("URISRT", String.valueOf(Uri));
+					             	intent.putExtra("URI", MainIntent.getStringExtra("URI"));
+					             	intent.putExtra("PATHSRT",Test.getAbsolutePath());
+					             	intent.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
+					             	intent.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
+					             	intent.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+					                startActivity(intent);
+				                }
+					           }else{
+				                	Log.d("IS PARENT","OK");
+					             	Intent intent = new Intent(getApplicationContext(),affich_child_video.class);
+					             	intent.putExtra("NAMESRT", name);
+					             	intent.putExtra("URISRT", String.valueOf(Uri));
+					             	intent.putExtra("URI", MainIntent.getStringExtra("URI"));
+					             	intent.putExtra("PATHSRT",yourDir.getParentFile().getAbsolutePath());
+					             	intent.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
+					             	intent.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
+					             	intent.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+					                startActivity(intent);
+					           }
+				            }
+			        });
 	}
     
 	 @Override
@@ -189,4 +262,25 @@ public class affich_video extends ListActivity{
 		    }	
 		    return super.onContextItemSelected(item);
 		  }
+		  
+		  
+			public void getListeRecursiv(File path,String prefix,ArrayList<String>nameList ){
+				
+				if(path !=null && path.exists() && path.isDirectory()){
+				    for (File f : path.listFiles()) 
+				    {
+				       if (f.isFile())
+				       {	
+				    	   if(f.getName().endsWith(".mp4")||f.getName().endsWith(".mkv") || f.getName().endsWith(".wmv")|| f.getName().endsWith(".m4a")){
+				    		   //String str_path=f.getAbsolutePath().replace(prefix+"/", "");
+				    		   nameList.add(f.getName());
+				    	   }
+				       }else if(f.isDirectory()){
+				    		   //getListeRecursiv(f,prefix,nameList);
+				    	   		nameList.add(f.getName());
+
+				       }
+				   }
+				}
+			}
 }

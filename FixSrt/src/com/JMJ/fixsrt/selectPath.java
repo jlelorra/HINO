@@ -33,6 +33,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -181,10 +182,9 @@ public class selectPath extends Activity {
 		String line;
 		if(Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())){
 		    try {
-		    	if(Uri.endsWith("/media")){
-		    		Uri=Uri.replace("/video/media", "");
-		    		Uri=Uri.replace("content://media", "");
-		    	}
+	    		Uri=Uri.replace("/video/media", "");
+		    	Uri=Uri.replace("content://media", "");
+		    	Uri=Uri.replace("/file", "");
 		    	if(uriSrt.endsWith("/file")){
 		    		uriSrt=uriSrt.replace("/file", "");
 		    		uriSrt=uriSrt.replace("content://media", path);
@@ -193,12 +193,19 @@ public class selectPath extends Activity {
 		    		for(int i =0;i<(tmp.length-1);i++){
 		    			path+=tmp[i]+"/";
 		    		}
+		    		path=path.substring(0,(path.length()-1));
+		    		Log.d("Before Path",path);
 		    	}
 		    	if(uriSrt.endsWith(".ass")){
 		    		uriSrt=convertAssToSrt(uriSrt);
 		    	}
 		    	FileInputStream input = new FileInputStream(uriSrt);
-		    	if(!path.trim().equals(getMp4Path(Uri)) && getMp4Path(Uri)!=null )path = getMp4Path(Uri);
+		    	if(i1.getStringExtra("PATHMP4")!=null ){
+			    	Log.d("Change Path","OK");
+		    		path=i1.getStringExtra("PATHMP4");
+		    		path=path.substring(0,(path.length()-1));
+		    	}
+		    	Log.d("After Path",path);
 	    		Uri=Uri.replace(".mp4", "");
 	    		Uri=Uri.replace(".wmv", "");
 	    		Uri=Uri.replace(".m4a", "");
@@ -458,6 +465,7 @@ public class selectPath extends Activity {
 			            	intent.putExtra("SWITCH",toggle.isChecked());
 			            	intent.putExtra("VIEW",View);
 			             	intent.putExtra("PATHSRT",i1.getStringExtra("PATHSRT"));
+			             	intent.putExtra("PATHMP4",i1.getStringExtra("PATHMP4"));
 			            	startActivity(intent);
 	          	          	return true;
 	          	          	
@@ -467,6 +475,7 @@ public class selectPath extends Activity {
 			            	intent2.putExtra("DELAY",picker.getValue());
 			            	intent2.putExtra("SWITCH",toggle.isChecked());
 			            	intent2.putExtra("VIEW",View);
+			            	intent2.putExtra("PATHMP4",i1.getStringExtra("PATHMP4"));
 							startActivity(intent2);
 					        return true;
 	
@@ -550,6 +559,7 @@ public class selectPath extends Activity {
 		            	intent.putExtra("SWITCH",toggle.isChecked());
 		            	intent.putExtra("VIEW",View);
 		             	intent.putExtra("PATHSRT",i1.getStringExtra("PATHSRT"));
+		             	intent.putExtra("PATHMP4",i1.getStringExtra("PATHMP4"));
 		            	startActivity(intent);
 	      	          	return true;
 		     	 	
@@ -559,6 +569,7 @@ public class selectPath extends Activity {
 		            	intent2.putExtra("DELAY",picker.getValue());
 		            	intent2.putExtra("SWITCH",toggle.isChecked());
 		            	intent2.putExtra("VIEW",View);
+		            	intent2.putExtra("PATHMP4",i1.getStringExtra("PATHMP4"));
 						startActivity(intent2);
 				        return true;
 
@@ -674,6 +685,7 @@ public class selectPath extends Activity {
 		             	intent.putExtra("SWITCH",toggle.isChecked());
 		             	intent.putExtra("VIEW",View);
 		             	intent.putExtra("PATHSRT",i1.getStringExtra("PATHSRT"));
+		             	intent.putExtra("PATHMP4",i1.getStringExtra("PATHMP4"));
 		 				startActivity(intent);
 		     		}
 		             
@@ -687,6 +699,7 @@ public class selectPath extends Activity {
 		             	intent.putExtra("DELAY",picker.getValue());
 		             	intent.putExtra("SWITCH",toggle.isChecked());
 		             	intent.putExtra("VIEW",View);
+		             	intent.putExtra("PATHMP4",i1.getStringExtra("PATHMP4"));
 		 				startActivity(intent);
 		     			}
 		             

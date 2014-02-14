@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -54,7 +55,14 @@ public class affich_srt extends ListActivity{
 	    super.onCreate(savedInstanceState);   
     	MainIntent= getIntent();
 	    ArrayList<String>nameList = new ArrayList<String>();
-	    yourDir = CommonTools.getExternalSDCardDirectory(); //new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "");
+	    /*if(!MainIntent.getStringExtra("PATHSRT").trim().equalsIgnoreCase("")){ 
+	    	yourDir = new File(MainIntent.getStringExtra("PATHSRT"));
+		    File[] files = yourDir.listFiles();
+		    for (File file : files) {
+		    	Log.d("FILE TO STRING",file.toString());
+		    	nameList.add(file.toString());
+		    }
+	    }else*/ yourDir = CommonTools.getExternalSDCardDirectory(); //new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "");
 	    /*if(android.os.Build.DEVICE.toLowerCase().contains("samsung") 
 		    || android.os.Build.MANUFACTURER.toLowerCase().contains("samsung") 
 		    || android.os.Build.PRODUCT.toLowerCase().contains("samsung") 
@@ -101,12 +109,13 @@ public class affich_srt extends ListActivity{
 			||android.os.Build.BRAND.toLowerCase().contains("clust")) 
 		    {
 		            yourDir = new File("/mnt/ext-sd", "");
-		    }*/
-	    	getListeRecursiv(yourDir,String.valueOf(yourDir), nameList);
-		    DownloadDir = CommonTools.getDownloadSDCardDirectory(); 
+		    }
+		    /*DownloadDir = CommonTools.getDownloadSDCardDirectory(); 
 	    	getListeRecursiv(DownloadDir,String.valueOf(DownloadDir), nameList);
 		   BlueToothDir = CommonTools.getBlueToothSDCardDirectory(); 
-	    	getListeRecursiv(BlueToothDir,String.valueOf(BlueToothDir), nameList);
+	    	getListeRecursiv(BlueToothDir,String.valueOf(BlueToothDir), nameList);*/
+	    	nameList.add("..");
+    		getListeRecursiv(yourDir,String.valueOf(yourDir), nameList);
 	    	Collections.sort((List<String>) nameList);
 	    	arr = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, nameList);
 			setListAdapter(arr);
@@ -122,17 +131,50 @@ public class affich_srt extends ListActivity{
 		                // TODO Auto-generated method stub
 		                Intent i = new Intent(getApplicationContext(),selectPath.class);
 		                name =  arr.getItem(position);
-		                Uri = MediaStore.Files.getContentUri(arr.getItem(position));
-		                path = getSrtPath(arr.getItem(position));
-		                i.putExtra("NAMESRT", name);
-		                i.putExtra("URISRT", String.valueOf(Uri));
-		                i.putExtra("URI", MainIntent.getStringExtra("URI"));
-		                i.putExtra("PATHSRT",path);
-		                i.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
-		                i.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
-		                i.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
-		                startActivity(i);
-		            }
+		                if(!name.equals("..")){
+			                File Test = new File(yourDir+"/"+name);
+		                	Log.d("TEST",Test.getAbsolutePath());
+			                if(Test.isFile()){
+			                	Log.d("IS FILE","OK");
+				                Uri = MediaStore.Files.getContentUri(arr.getItem(position));
+				                path = getSrtPath(arr.getItem(position));
+				                i.putExtra("NAMESRT", name);
+				                i.putExtra("URISRT", String.valueOf(Uri));
+				                i.putExtra("URI", MainIntent.getStringExtra("URI"));
+				                i.putExtra("PATHSRT",path);
+				                i.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
+				                i.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
+				                i.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+				                i.putExtra("PATHMP4",MainIntent.getStringExtra("PATHMP4"));
+				                startActivity(i);
+			                }
+			                else if(Test.isDirectory()){
+			                	Log.d("IS DIRECTORY","OK");
+				             	Intent intent = new Intent(getApplicationContext(),affich_child.class);
+				             	intent.putExtra("NAMESRT", name);
+				             	intent.putExtra("URISRT", String.valueOf(Uri));
+				             	intent.putExtra("URI", MainIntent.getStringExtra("URI"));
+				             	intent.putExtra("PATHSRT",Test.getAbsolutePath());
+				             	intent.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
+				             	intent.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
+				             	intent.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+				             	intent.putExtra("PATHMP4",MainIntent.getStringExtra("PATHMP4"));
+				                startActivity(intent);
+			                }
+				           }else{
+			                	Log.d("IS PARENT","OK");
+				             	Intent intent = new Intent(getApplicationContext(),affich_child.class);
+				             	intent.putExtra("NAMESRT", name);
+				             	intent.putExtra("URISRT", String.valueOf(Uri));
+				             	intent.putExtra("URI", MainIntent.getStringExtra("URI"));
+				             	intent.putExtra("PATHSRT",yourDir.getParentFile().getAbsolutePath());
+				             	intent.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
+				             	intent.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
+				             	intent.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+				             	intent.putExtra("PATHMP4",MainIntent.getStringExtra("PATHMP4"));
+				                startActivity(intent);
+				           }
+			            }
 		        });
     }
 
@@ -161,6 +203,7 @@ public class affich_srt extends ListActivity{
 					            	intent.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
 					            	intent.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
 					            	intent.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+					            	intent.putExtra("PATHMP4",MainIntent.getStringExtra("PATHMP4"));
 					            	startActivity(intent);
 			          	          	return true;
 			          	          	
@@ -171,6 +214,7 @@ public class affich_srt extends ListActivity{
 					            	intent2.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
 					            	intent2.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
 					            	intent2.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+					            	intent2.putExtra("PATHMP4",MainIntent.getStringExtra("PATHMP4"));
 									startActivity(intent2);
 							        return true;
 			
@@ -181,6 +225,7 @@ public class affich_srt extends ListActivity{
 						        	intent3.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
 						        	intent3.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
 						        	intent3.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+						        	intent3.putExtra("PATHMP4",MainIntent.getStringExtra("PATHMP4"));
 									startActivity(intent3);
 							        return true;
 			        case R.id.about:
@@ -220,6 +265,7 @@ public class affich_srt extends ListActivity{
 					        	intent3.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
 					        	intent3.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
 				            	intent3.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+				            	intent3.putExtra("PATHMP4",MainIntent.getStringExtra("PATHMP4"));
 								startActivity(intent3);
 						        return true;
 					     	 	
@@ -230,6 +276,7 @@ public class affich_srt extends ListActivity{
 				            	intent.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
 				            	intent.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
 				            	intent.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+				            	intent.putExtra("PATHMP4",MainIntent.getStringExtra("PATHMP4"));
 				            	startActivity(intent);
 			      	          	return true;
 				     	 	
@@ -240,6 +287,7 @@ public class affich_srt extends ListActivity{
 				            	intent2.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
 				            	intent2.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
 				            	intent2.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+				            	intent2.putExtra("PATHMP4",MainIntent.getStringExtra("PATHMP4"));
 				            	startActivity(intent2);
 						        return true;
 						        
@@ -247,13 +295,17 @@ public class affich_srt extends ListActivity{
 								AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
 								int position=item.getItemId();
 				                path = getSrtPath(arr.getItem(info.position));
-				            	Intent intent5 = new Intent(getApplicationContext(),affich_srt_txt.class);
-				            	intent5.putExtra("PATHSRT", path);
-				            	intent5.putExtra("URISRT",   arr.getItem(info.position));
-				            	intent5.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
-				            	intent5.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
-				            	intent5.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
-				            	startActivity(intent5);
+								File file2 = new File( path +"/"+arr.getItem(info.position));
+								if(file2.isFile() && (file2.getName().endsWith(".srt")||file2.getName().endsWith(".ass"))){
+					            	Intent intent5 = new Intent(getApplicationContext(),affich_srt_txt.class);
+					            	intent5.putExtra("PATHSRT", path);
+					            	intent5.putExtra("URISRT",   arr.getItem(info.position));
+					            	intent5.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
+					            	intent5.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
+					            	intent5.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+					            	intent5.putExtra("PATHMP4",MainIntent.getStringExtra("PATHMP4"));
+					            	startActivity(intent5);
+								}
 					        return true;
 					        
 					    case DELETESRT:
@@ -261,8 +313,10 @@ public class affich_srt extends ListActivity{
 								position=item.getItemId();
 								path = getSrtPath(arr.getItem(info.position));
 								File file = new File( path +"/"+arr.getItem(info.position));
-								boolean deleted = file.delete();
-								if(deleted)	onResume();
+								if(file.isFile() && (file.getName().endsWith(".srt")||file.getName().endsWith(".ass"))){
+									boolean deleted = file.delete();
+									if(deleted)	onResume();
+								}
 					        return true;
 						    
 
@@ -298,21 +352,22 @@ public class affich_srt extends ListActivity{
 					
 					public void getListeRecursiv(File path,String prefix,ArrayList<String>nameList ){
 						
-						//if(path !=null && path.exists() && path.isDirectory()){
+						if(path !=null && path.exists() && path.isDirectory()){
 						    for (File f : path.listFiles()) 
 						    {
 						       if (f.isFile())
 						       {	
 						    	   if(f.getName().endsWith(".srt")||f.getName().endsWith(".ass")){
-						    		   String str_path=f.getAbsolutePath().replace(prefix+"/", "");
-						    		   nameList.add(str_path);
+						    		   //String str_path=f.getAbsolutePath().replace(prefix+"/", "");
+						    		   nameList.add(f.getName());
 						    	   }
-						       }else if(f.isDirectory() && f.canExecute() && f.canRead()){
-						    		   getListeRecursiv(f,prefix,nameList);
+						       }else if(f.isDirectory()){
+						    		   //getListeRecursiv(f,prefix,nameList);
+						    	   		nameList.add(f.getName());
 
 						       }
 						   }
-						//}
+						}
 					}
 					
 }
