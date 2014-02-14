@@ -231,7 +231,7 @@ public class affich_child extends ListActivity{
 								int position=item.getItemId();
 				                path = getSrtPath(arr.getItem(info.position));
 								File file2 = new File( path +"/"+arr.getItem(info.position));
-								if(file2.isFile() && (file2.getName().endsWith(".srt")||file2.getName().endsWith(".ass"))){
+								if(file2.isFile() && (file2.getName().toLowerCase().endsWith(".srt")||file2.getName().toLowerCase().endsWith(".ass"))){
 					            	Intent intent5 = new Intent(getApplicationContext(),affich_srt_txt.class);
 					            	intent5.putExtra("PATHSRT", path);
 					            	intent5.putExtra("URISRT",   arr.getItem(info.position));
@@ -248,7 +248,7 @@ public class affich_child extends ListActivity{
 								position=item.getItemId();
 								path = getSrtPath(arr.getItem(info.position));
 								File file = new File( path +"/"+arr.getItem(info.position));
-								if(file.isFile() && (file.getName().endsWith(".srt")||file.getName().endsWith(".ass"))){
+								if(file.isFile() && (file.getName().toLowerCase().endsWith(".srt")||file.getName().toLowerCase().endsWith(".ass"))){
 									boolean deleted = file.delete();
 									if(deleted)	onResume();
 								}
@@ -292,7 +292,7 @@ public class affich_child extends ListActivity{
 						    {
 						       if (f.isFile())
 						       {	
-						    	   if(f.getName().endsWith(".srt")||f.getName().endsWith(".ass")){
+						    	   if(f.getName().toLowerCase().endsWith(".srt")||f.getName().toLowerCase().endsWith(".ass")){
 						    		   //String str_path=f.getAbsolutePath().replace(prefix+"/", "");
 						    		   nameList.add(f.getName());
 						    	   }

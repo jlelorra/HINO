@@ -271,7 +271,7 @@ public class affich_video extends ListActivity{
 				    {
 				       if (f.isFile())
 				       {	
-				    	   if(f.getName().endsWith(".mp4")||f.getName().endsWith(".mkv") || f.getName().endsWith(".wmv")|| f.getName().endsWith(".m4a")){
+				    	   if(f.getName().toLowerCase().endsWith(".mp4")||f.getName().toLowerCase().endsWith(".mkv") || f.getName().toLowerCase().endsWith(".wmv")|| f.getName().toLowerCase().endsWith(".m4a")){
 				    		   //String str_path=f.getAbsolutePath().replace(prefix+"/", "");
 				    		   nameList.add(f.getName());
 				    	   }
