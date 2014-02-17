@@ -55,65 +55,7 @@ public class affich_srt extends ListActivity{
 	    super.onCreate(savedInstanceState);   
     	MainIntent= getIntent();
 	    ArrayList<String>nameList = new ArrayList<String>();
-	    /*if(!MainIntent.getStringExtra("PATHSRT").trim().equalsIgnoreCase("")){ 
-	    	yourDir = new File(MainIntent.getStringExtra("PATHSRT"));
-		    File[] files = yourDir.listFiles();
-		    for (File file : files) {
-		    	Log.d("FILE TO STRING",file.toString());
-		    	nameList.add(file.toString());
-		    }
-	    }else*/ yourDir = CommonTools.getExternalSDCardDirectory(); //new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "");
-	    /*if(android.os.Build.DEVICE.toLowerCase().contains("samsung") 
-		    || android.os.Build.MANUFACTURER.toLowerCase().contains("samsung") 
-		    || android.os.Build.PRODUCT.toLowerCase().contains("samsung") 
-		    ||android.os.Build.BRAND.toLowerCase().contains("samsung")
-		    ||android.os.Build.DEVICE.toLowerCase().contains("galaxy") 
-		    || android.os.Build.MANUFACTURER.toLowerCase().contains("galaxy") 
-		    || android.os.Build.PRODUCT.toLowerCase().contains("galaxy") 
-		    ||android.os.Build.BRAND.toLowerCase().contains("galaxy")) 
-	    {
-	            yourDir = new File("/storage/extSdCard/", "");
-	    }
-	    if(android.os.Build.DEVICE.toLowerCase().contains("tablet s") 
-			|| android.os.Build.MANUFACTURER.toLowerCase().contains("tablet s") 
-			|| android.os.Build.PRODUCT.toLowerCase().contains("tablet s") 
-			||android.os.Build.BRAND.toLowerCase().contains("tablet s")
-			||android.os.Build.DEVICE.toLowerCase().contains("sony") 
-			|| android.os.Build.MANUFACTURER.toLowerCase().contains("sony") 
-			|| android.os.Build.PRODUCT.toLowerCase().contains("sony") 
-			||android.os.Build.BRAND.toLowerCase().contains("sony")) 
-		    {
-		            yourDir = new File("/mnt/sdcard2/", "");
-		    }
-	    if(android.os.Build.DEVICE.toLowerCase().contains("wiko") 
-			|| android.os.Build.MANUFACTURER.toLowerCase().contains("wiko") 
-			|| android.os.Build.PRODUCT.toLowerCase().contains("wiko") 
-			||android.os.Build.BRAND.toLowerCase().contains("wiko")
-			|| android.os.Build.DEVICE.toLowerCase().contains("htc") 
-			|| android.os.Build.MANUFACTURER.toLowerCase().contains("htc") 
-			|| android.os.Build.PRODUCT.toLowerCase().contains("htc") 
-			||android.os.Build.BRAND.toLowerCase().contains("htc")) 
-		    {
-		            yourDir = new File("/mnt/sdcard/", "");
-		    }
-	    if(android.os.Build.DEVICE.toLowerCase().contains("lg") 
-			|| android.os.Build.MANUFACTURER.toLowerCase().contains("lg") 
-			|| android.os.Build.PRODUCT.toLowerCase().contains("lg") 
-			||android.os.Build.BRAND.toLowerCase().contains("lg")) 
-		    {
-		            yourDir = new File("/mnt/sdcard/external_sd", "");
-		    }
-	    if(android.os.Build.DEVICE.toLowerCase().contains("clust") 
-			|| android.os.Build.MANUFACTURER.toLowerCase().contains("clust") 
-			|| android.os.Build.PRODUCT.toLowerCase().contains("clust") 
-			||android.os.Build.BRAND.toLowerCase().contains("clust")) 
-		    {
-		            yourDir = new File("/mnt/ext-sd", "");
-		    }
-		    /*DownloadDir = CommonTools.getDownloadSDCardDirectory(); 
-	    	getListeRecursiv(DownloadDir,String.valueOf(DownloadDir), nameList);
-		   BlueToothDir = CommonTools.getBlueToothSDCardDirectory(); 
-	    	getListeRecursiv(BlueToothDir,String.valueOf(BlueToothDir), nameList);*/
+	    yourDir = CommonTools.getExternalSDCardDirectory(); 
 	    	nameList.add("..");
     		getListeRecursiv(yourDir,String.valueOf(yourDir), nameList);
 	    	Collections.sort((List<String>) nameList);
@@ -121,6 +63,7 @@ public class affich_srt extends ListActivity{
 			setListAdapter(arr);
 		    ActionBar actionBar = getActionBar();
 		    actionBar.setDisplayHomeAsUpEnabled(true);
+		    actionBar.setSubtitle(yourDir.getAbsolutePath());
 			ListView list = this.getListView();   
 		    registerForContextMenu(list);
 			list.setOnItemClickListener(new OnItemClickListener() {

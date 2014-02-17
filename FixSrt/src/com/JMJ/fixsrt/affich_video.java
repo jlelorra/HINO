@@ -4,6 +4,7 @@ package com.JMJ.fixsrt;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import com.JMJ.commonTools.CommonTools;
@@ -29,6 +30,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.SimpleAdapter;
 import android.net.Uri;
 
 public class affich_video extends ListActivity{
@@ -41,65 +43,32 @@ public class affich_video extends ListActivity{
 	int nameIdx;
 	String name; 
     ArrayAdapter<String> arr;
+    SimpleAdapter adapter;
     Uri Uri;
     File yourDir;
     Intent MainIntent;
+    ArrayList <HashMap<String,String>>nameList = new ArrayList <HashMap<String,String>>();
+
 	
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@SuppressLint("NewApi")
 	public void onCreate(Bundle savedInstanceState) {
-    	/*MainIntent= getIntent();
-	    super.onCreate(savedInstanceState);
-	    ContentResolver cr = getContentResolver();
-	    cursor = cr.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, null, null, null, null);
-	    nameIdx = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME);
-	    Integer idx = cursor.getCount();
-	    String str[]= new String[idx];
-	    if (cursor.moveToFirst()){
-	        int x = 0;
-		    do{
-			   	 name = cursor.getString(nameIdx);
-			     str[x]= name;
-			     x++;
-			 } while(cursor.moveToNext());
-	    }
-		arr = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,str);
-		setListAdapter(arr);
-	    ActionBar actionBar = getActionBar();
-	    actionBar.setDisplayHomeAsUpEnabled(true);
-		ListView list = this.getListView();   
-	    registerForContextMenu(list);
-		list.setOnItemClickListener(new OnItemClickListener() {
-				
-	           @Override
-	            public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
-
-	                Intent i = new Intent(getApplicationContext(),selectPath.class);
-	                name =  arr.getItem(position);
-	                //ContentResolver cr = getContentResolver();
-	                Uri = MediaStore.Video.Media.getContentUri(arr.getItem(position));
-	                i.putExtra("NAME", name);
-	                i.putExtra("URI", String.valueOf(Uri));
-	                i.putExtra("URISRT", MainIntent.getStringExtra("URISRT"));
-	                i.putExtra("PATHSRT", MainIntent.getStringExtra("PATHSRT"));
-	                i.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
-	                i.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
-		        	i.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
-	                startActivity(i);
-	            }
-	        });*/
-		
+	
 		 super.onCreate(savedInstanceState);   
 	    	MainIntent= getIntent();
-		    ArrayList<String>nameList = new ArrayList<String>();
-		    yourDir = CommonTools.getExternalSDCardDirectory(); 
-		    	nameList.add("..");
-	    		getListeRecursiv(yourDir,String.valueOf(yourDir), nameList);
-		    	Collections.sort((List<String>) nameList);
-		    	arr = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, nameList);
-				setListAdapter(arr);
+			HashMap<String,String>element = new HashMap<String,String>();
+		    yourDir = CommonTools.getExternalSDCardDirectory();
+		    	element.put("Title", "..");
+		    	element.put("SubTitle", "Parent Directory");
+		    	nameList.add(element);
+	    		getListeRecursiv(yourDir,String.valueOf(yourDir), element);
+		    	//Collections.sort((List<String>) element.values());
+		    	//arr = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_2, nameList);
+		    	adapter= new SimpleAdapter(this,nameList,android.R.layout.simple_list_item_2,new String[]{ "Title", "SubTitle" },new int[] { android.R.id.text1, android.R.id.text2 });
+				setListAdapter(adapter);
 			    ActionBar actionBar = getActionBar();
 			    actionBar.setDisplayHomeAsUpEnabled(true);
+			    actionBar.setSubtitle(yourDir.getAbsolutePath());
 				ListView list = this.getListView();   
 			    registerForContextMenu(list);
 				list.setOnItemClickListener(new OnItemClickListener() {
@@ -109,13 +78,14 @@ public class affich_video extends ListActivity{
 			
 			                // TODO Auto-generated method stub
 			                Intent i = new Intent(getApplicationContext(),selectPath.class);
-			                name =  arr.getItem(position);
+			                HashMap<String, String> Hm_name = nameList.get(position);
+			                name = Hm_name.get("Title") ; //=  adapter.getItem(position);
 			                if(!name.equals("..")){
 				                File Test = new File(yourDir+"/"+name);
 			                	Log.d("TEST",Test.getAbsolutePath());
 				                if(Test.isFile()){
 				                	Log.d("IS FILE","OK");
-					                Uri = MediaStore.Video.Media.getContentUri(arr.getItem(position));
+					                Uri = MediaStore.Video.Media.getContentUri(name);
 					                i.putExtra("NAME", name);
 					                i.putExtra("URI", String.valueOf(Uri));
 					                i.putExtra("PATHMP4", Test.getAbsolutePath().replace(name, ""));
@@ -264,20 +234,26 @@ public class affich_video extends ListActivity{
 		  }
 		  
 		  
-			public void getListeRecursiv(File path,String prefix,ArrayList<String>nameList ){
+			@SuppressLint("DefaultLocale")
+			public void getListeRecursiv(File path,String prefix,HashMap<String,String>el ){
 				
 				if(path !=null && path.exists() && path.isDirectory()){
 				    for (File f : path.listFiles()) 
-				    {
+				    {	
+				    	el = new HashMap<String,String>();
 				       if (f.isFile())
 				       {	
 				    	   if(f.getName().toLowerCase().endsWith(".mp4")||f.getName().toLowerCase().endsWith(".mkv") || f.getName().toLowerCase().endsWith(".wmv")|| f.getName().toLowerCase().endsWith(".m4a")){
 				    		   //String str_path=f.getAbsolutePath().replace(prefix+"/", "");
-				    		   nameList.add(f.getName());
+						    	el.put("Title", f.getName());
+						    	el.put("SubTitle", "Video File");
+				    		   nameList.add(el);
 				    	   }
 				       }else if(f.isDirectory()){
 				    		   //getListeRecursiv(f,prefix,nameList);
-				    	   		nameList.add(f.getName());
+					    	el.put("Title", f.getName());
+					    	el.put("SubTitle", "Directory");
+			    	   		nameList.add(el);
 
 				       }
 				   }

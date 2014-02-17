@@ -58,6 +58,7 @@ public class affich_child_video extends ListActivity{
 		setListAdapter(arr);
 	    ActionBar actionBar = getActionBar();
 	    actionBar.setDisplayHomeAsUpEnabled(true);
+	    actionBar.setSubtitle(yourDir.getAbsolutePath());
 		ListView list = this.getListView();   
 	    registerForContextMenu(list);
 		list.setOnItemClickListener(new OnItemClickListener() {
