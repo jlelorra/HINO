@@ -487,6 +487,13 @@ public class selectPath extends Activity {
 	        case R.id.about:
 		        	Intent intent5 = new Intent(getApplicationContext(),about.class);
 		        	intent5.putExtra("VIEW",View);
+		        	intent5.putExtra("NAMESRT",  i1.getStringExtra("NAMESRT"));
+		        	intent5.putExtra("URISRT",  i1.getStringExtra("URISRT"));
+		        	intent5.putExtra("URI", i1.getStringExtra("URI"));
+		        	intent5.putExtra("PATHSRT",i1.getStringExtra("PATHSRT"));
+		        	intent5.putExtra("DELAY",picker.getValue());
+		        	intent5.putExtra("SWITCH",toggle.isChecked());
+		        	intent5.putExtra("PATHMP4",i1.getStringExtra("PATHMP4"));
 					startActivity(intent5);
 			        return true;
 

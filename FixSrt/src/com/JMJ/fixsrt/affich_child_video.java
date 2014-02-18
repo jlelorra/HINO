@@ -165,6 +165,13 @@ public class affich_child_video extends ListActivity{
 			        case R.id.about:
 			        	Intent intent5 = new Intent(getApplicationContext(),about.class);
 			        	intent5.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+			        	intent5.putExtra("NAMESRT",  MainIntent.getStringExtra("NAMESRT"));
+			        	intent5.putExtra("URISRT",  MainIntent.getStringExtra("URISRT"));
+			        	intent5.putExtra("URI", MainIntent.getStringExtra("URI"));
+			        	intent5.putExtra("PATHSRT",MainIntent.getStringExtra("PATHSRT"));
+			        	intent5.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
+			        	intent5.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
+			        	intent5.putExtra("PATHMP4",MainIntent.getStringExtra("PATHMP4"));
 						startActivity(intent5);
 				        return true;
 
