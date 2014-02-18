@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.JMJ.fixsrt"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="19" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="com.JMJ.fixsrt.selectPath"
+            android:label="@string/app_name"
+            android:configChanges="orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.JMJ.fixsrt.affich_video"
+            android:label="@string/app_name"
+            android:parentActivityName=".selectPath"
+            android:configChanges="orientation|screenSize">
+            <meta-data 
+            	android:name="android.support.PARENT_ACTIVITY"
+            	android:value="com.example.CDTheque.selectPath"/>
+        </activity>
+        <activity
+            android:name="com.JMJ.fixsrt.affich_srt"
+            android:label="@string/app_name"
+            android:parentActivityName=".selectPath"
+            android:configChanges="orientation|screenSize">
+             <meta-data 
+            	android:name="android.support.PARENT_ACTIVITY"
+            	android:value="com.example.CDTheque.selectPath"/>
+        </activity>
+        <activity
+            android:name="com.JMJ.fixsrt.affich_srt_txt"
+            android:label="@string/app_name"
+            android:parentActivityName=".affich_srt"
+            android:configChanges="orientation|screenSize">
+             <meta-data 
+            	android:name="android.support.PARENT_ACTIVITY"
+            	android:value="com.example.CDTheque.affich_srt"/>
+        </activity>
+         <activity
+            android:name="com.JMJ.fixsrt.about"
+            android:label="@string/app_name"
+            android:parentActivityName=".selectPath"
+            android:configChanges="orientation|screenSize">
+             <meta-data 
+            	android:name="android.support.PARENT_ACTIVITY"
+            	android:value="com.example.CDTheque.selectPath"/>
+        </activity>
+        <activity
+            android:name="com.JMJ.fixsrt.affich_child"
+            android:label="@string/app_name"
+            android:parentActivityName=".selectPath"
+            android:configChanges="orientation|screenSize">
+             <meta-data 
+            	android:name="android.support.PARENT_ACTIVITY"
+            	android:value="com.example.CDTheque.selectPath"/>
+        </activity>
+        <activity
+            android:name="com.JMJ.fixsrt.affich_child_video"
+            android:label="@string/app_name"
+            android:parentActivityName=".selectPath"
+            android:configChanges="orientation|screenSize">
+             <meta-data 
+            	android:name="android.support.PARENT_ACTIVITY"
+            	android:value="com.example.CDTheque.selectPath"/>
+        </activity>
+    </application>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+</manifest>

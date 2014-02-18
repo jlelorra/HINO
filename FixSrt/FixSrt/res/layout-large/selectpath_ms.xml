@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/selectPathLayout" >
+     
+  
+    <TextView
+        android:id="@+id/lbl_Chooseavideo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:ems="10"
+        android:text="Please select a video :" 
+        android:textSize="40dp"        />
+
+    <TextView
+        android:id="@+id/pathvideo"
+        android:layout_width="150dp"
+        android:layout_height="70dp"
+        android:layout_alignLeft="@+id/lbl_Chooseavideo"
+        android:layout_alignRight="@+id/lbl_Chooseavideo"
+        android:layout_below="@+id/lbl_Chooseavideo"
+        android:ems="10"
+        android:textSize="20dp" />
+        
+     <Button
+        android:id="@+id/btn_video"
+        android:layout_width="185dp"
+        android:layout_height="130dp"
+        android:layout_toRightOf="@+id/lbl_Chooseavideo"
+        android:layout_alignBottom="@+id/lbl_Chooseavideo"
+        android:layout_alignTop="@+id/lbl_Chooseavideo"        
+        android:text="Browse"
+        android:ems="10" />
+     
+
+     <TextView
+         android:id="@+id/lbl_Choosesrt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+         android:layout_below="@+id/pathvideo"
+         android:ems="10"
+         android:text="Please select a srt file :" 
+         android:textSize="40dp"/>
+
+    <TextView
+        android:id="@+id/pathsrt"
+        android:layout_width="150dp"
+        android:layout_height="70dp"
+        android:layout_alignLeft="@+id/lbl_Choosesrt"
+        android:layout_alignRight="@+id/lbl_Choosesrt"
+        android:layout_below="@+id/lbl_Choosesrt"
+        android:ems="10"
+        android:textSize="20dp" />
+        
+     <Button
+        android:id="@+id/btn_srt"
+        android:layout_width="185dp"
+        android:layout_height="130dp"
+        android:layout_toRightOf="@+id/lbl_Choosesrt"
+        android:layout_alignBottom="@+id/lbl_Choosesrt"        
+        android:layout_alignTop="@+id/lbl_Choosesrt" 
+        android:text="Browse"
+        android:ems="10" />
+
+      <TextView
+          android:id="@+id/lbl_setdelay"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignLeft="@+id/pathvideo"
+          android:layout_below="@+id/pathsrt"
+          android:ems="10"
+          android:text="Please set the delay :"
+          android:textSize="40dp" />
+
+     <TextView
+         android:id="@+id/lbl_second"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignBottom="@+id/switch1"
+         android:layout_toRightOf="@+id/timePicker1"
+         android:layout_marginBottom="3dp"
+         android:layout_marginLeft="2dp"
+         android:ems="10"
+         android:text="(s)" 
+         android:textSize="20dp"         />
+     
+          <TextView
+         android:id="@+id/lbl_millisecond"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignBottom="@+id/switch1"
+         android:layout_toRightOf="@+id/timePicker4"
+         android:layout_marginBottom="3dp"
+         android:layout_marginLeft="5dp"
+         android:ems="10"
+         android:text="(ms)" 
+		android:textSize="20dp"         />
+     
+      <Button
+        android:id="@+id/btn_test"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentLeft="true"
+        android:text="GO TO VLC"
+        android:ems="10" />
+
+      <NumberPicker
+          android:id="@+id/timePicker3"
+          android:layout_width="75dp"
+          android:layout_height="150dp"
+          android:layout_alignTop="@+id/timePicker2"
+          android:layout_marginRight="2dp"
+          android:layout_toRightOf="@+id/timePicker2" />
+
+      <NumberPicker
+          android:id="@+id/timePicker4"
+          android:layout_width="75dp"
+          android:layout_height="150dp"
+          android:layout_alignTop="@+id/timePicker3"
+          android:layout_toRightOf="@+id/timePicker3" />
+
+      <NumberPicker
+          android:id="@+id/timePicker2"
+          android:layout_width="75dp"
+          android:layout_height="150dp"
+          android:layout_alignLeft="@+id/lbl_second"
+          android:layout_alignTop="@+id/timePicker1"
+          android:layout_marginRight="2dp"          
+          android:layout_marginLeft="20dp" />
+
+      <NumberPicker
+          android:id="@+id/timePicker1"
+          android:layout_width="75dp"
+          android:layout_height="150dp"
+          android:layout_below="@+id/pathsrt"
+          android:layout_toLeftOf="@+id/btn_srt" />
+
+      <Switch
+          android:id="@+id/switch1"
+          android:layout_width="90dp"
+          android:layout_height="wrap_content"
+          android:layout_below="@+id/lbl_setdelay"
+          android:layout_marginRight="28dp"
+          android:layout_toLeftOf="@+id/timePicker1"
+          android:textOff="+"
+          android:textOn="-" />
+       
+</RelativeLayout>
+

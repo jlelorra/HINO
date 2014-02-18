@@ -1,0 +1,29 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+   
+    <item
+        android:id="@+id/video"
+        android:titleCondensed="video" 
+        android:menuCategory="system" 
+        android:title="Video"></item>
+
+        
+      <item
+        android:id="@+id/srt"
+        android:titleCondensed="srt" 
+        android:menuCategory="system" 
+        android:title="Srt"></item>
+      
+      <item
+        android:id="@+id/path"
+        android:titleCondensed="path" 
+        android:menuCategory="system" 
+        android:title="Path"></item>
+      
+       <item
+        android:id="@+id/about"
+        android:titleCondensed="About" 
+        android:menuCategory="system" 
+        android:title="About"></item>
+
+</menu>
