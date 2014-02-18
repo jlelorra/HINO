@@ -33,7 +33,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -194,18 +193,15 @@ public class selectPath extends Activity {
 		    			path+=tmp[i]+"/";
 		    		}
 		    		path=path.substring(0,(path.length()-1));
-		    		Log.d("Before Path",path);
 		    	}
 		    	if(uriSrt.endsWith(".ass")){
 		    		uriSrt=convertAssToSrt(uriSrt);
 		    	}
 		    	FileInputStream input = new FileInputStream(uriSrt);
 		    	if(i1.getStringExtra("PATHMP4")!=null ){
-			    	Log.d("Change Path","OK");
 		    		path=i1.getStringExtra("PATHMP4");
 		    		path=path.substring(0,(path.length()-1));
 		    	}
-		    	Log.d("After Path",path);
 	    		Uri=Uri.replace(".mp4", "");
 	    		Uri=Uri.replace(".wmv", "");
 	    		Uri=Uri.replace(".m4a", "");
@@ -786,43 +782,4 @@ public class selectPath extends Activity {
 		    	return newSrt;
 
 		    }
-		    
-			String DirdeOuf;
-			
-			public String getMp4Path(String pos){
-				
-			    File yourDir = CommonTools.getExternalSDCardDirectory();
-			    File DownloadDir = CommonTools.getDownloadSDCardDirectory(); 
-			    File BlueToothDir = CommonTools.getBlueToothSDCardDirectory();
-
-			    getPathRecursiv(yourDir,pos);
-				if(DirdeOuf != null){
-	                File f = new File(DirdeOuf);
-	                if(!f.exists()){
-	                	getPathRecursiv(DownloadDir,pos);
-	                	f = new File(DirdeOuf);
-	                	if(!f.exists()){
-	                		getPathRecursiv(BlueToothDir,pos);
-	                	}
-	                }
-				}
-        		DirdeOuf=DirdeOuf.replace(pos, "");
-				return DirdeOuf;
-			}
-			
-			public void getPathRecursiv(File path,String name ){
-				
-				if(path.exists() && path.listFiles().length>0){
-				for (File f : path.listFiles()){
-				       if (f.isFile()){
-				    	   String test = name.replace("/", "");
-				    	   if(f.getName().equals(test)){
-				    		   DirdeOuf = f.getAbsolutePath();
-				    	   }
-				       }else if(f.isDirectory() && f.canExecute() && f.canRead()){
-				            getPathRecursiv(f,name);
-				       }
-				   }
-				}
-			}
 }

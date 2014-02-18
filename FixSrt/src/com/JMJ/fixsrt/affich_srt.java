@@ -3,7 +3,9 @@ package com.JMJ.fixsrt;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.Comparator;
+import java.util.HashMap;
+import com.JMJ.commonTools.CommonTools;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -15,7 +17,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,11 +24,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.AdapterView.OnItemClickListener;
-
-import com.JMJ.commonTools.*;
 
 @SuppressLint("DefaultLocale")
 public class affich_srt extends ListActivity{
@@ -37,62 +36,61 @@ public class affich_srt extends ListActivity{
 	private static final int SRT = 2;
 	private static final int CONTENTSRT = 3;
 	private static final int DELETESRT = 4;
-	ListView liste = null;
-	Cursor cursor;
-	int nameIdx;
 	String name; 
-	private static ArrayAdapter<String> arr;
     Intent MainIntent;
     File yourDir;
     String path;
-    File DownloadDir;
-    File BlueToothDir;
+    SimpleAdapter adapter;
     Uri Uri;
+    ArrayList <HashMap<String,String>>nameList = new  ArrayList <HashMap<String,String>>();
 	
  	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@SuppressLint({ "NewApi", "DefaultLocale" })
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);   
     	MainIntent= getIntent();
-	    ArrayList<String>nameList = new ArrayList<String>();
-	    yourDir = CommonTools.getExternalSDCardDirectory(); 
-	    	nameList.add("..");
-    		getListeRecursiv(yourDir,String.valueOf(yourDir), nameList);
-	    	Collections.sort((List<String>) nameList);
-	    	arr = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, nameList);
-			setListAdapter(arr);
-		    ActionBar actionBar = getActionBar();
-		    actionBar.setDisplayHomeAsUpEnabled(true);
-		    actionBar.setSubtitle(yourDir.getAbsolutePath());
-			ListView list = this.getListView();   
-		    registerForContextMenu(list);
-			list.setOnItemClickListener(new OnItemClickListener() {
+    	HashMap<String,String>element = new HashMap<String,String>();
+    	yourDir = CommonTools.getExternalSDCardDirectory(); 
+    	element.put("Title", "..");
+    	element.put("SubTitle", "Parent Directory");
+    	nameList.add(element);
+		getListeRecursiv(yourDir,String.valueOf(yourDir), element);
+    	Collections.sort(nameList, new Comparator<HashMap<String,String>>(){
+    	    public int compare(HashMap<String,String> s1, HashMap<String,String> s2) {
+    	        return s1.get("Title").compareToIgnoreCase(s2.get("Title"));
+    	    }
+    	});
+		adapter= new SimpleAdapter(this,nameList,android.R.layout.simple_list_item_2,new String[]{ "Title", "SubTitle" },new int[] { android.R.id.text1, android.R.id.text2 });
+		setListAdapter(adapter);
+	    ActionBar actionBar = getActionBar();
+	    actionBar.setDisplayHomeAsUpEnabled(true);
+	    actionBar.setSubtitle(yourDir.getAbsolutePath());
+		ListView list = this.getListView();   
+	    registerForContextMenu(list);
+		list.setOnItemClickListener(new OnItemClickListener() {
 					
 		           @Override
 		            public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
 		
 		                // TODO Auto-generated method stub
 		                Intent i = new Intent(getApplicationContext(),selectPath.class);
-		                name =  arr.getItem(position);
+		                HashMap<String, String> Hm_name = nameList.get(position);
+		                name = Hm_name.get("Title") ; //=  adapter.getItem(position);
 		                if(!name.equals("..")){
 			                File Test = new File(yourDir+"/"+name);
-		                	Log.d("TEST",Test.getAbsolutePath());
 			                if(Test.isFile()){
-			                	Log.d("IS FILE","OK");
-				                Uri = MediaStore.Files.getContentUri(arr.getItem(position));
-				                path = getSrtPath(arr.getItem(position));
+				                Uri = MediaStore.Files.getContentUri(name);
 				                i.putExtra("NAMESRT", name);
 				                i.putExtra("URISRT", String.valueOf(Uri));
 				                i.putExtra("URI", MainIntent.getStringExtra("URI"));
-				                i.putExtra("PATHSRT",path);
+				                i.putExtra("PATHSRT",yourDir.getAbsolutePath());
 				                i.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
 				                i.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
 				                i.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
 				                i.putExtra("PATHMP4",MainIntent.getStringExtra("PATHMP4"));
 				                startActivity(i);
 			                }
-			                else if(Test.isDirectory()){
-			                	Log.d("IS DIRECTORY","OK");
+			                else if(Test.isDirectory() && Test.canRead()){
 				             	Intent intent = new Intent(getApplicationContext(),affich_child.class);
 				             	intent.putExtra("NAMESRT", name);
 				             	intent.putExtra("URISRT", String.valueOf(Uri));
@@ -105,7 +103,6 @@ public class affich_srt extends ListActivity{
 				                startActivity(intent);
 			                }
 				           }else{
-			                	Log.d("IS PARENT","OK");
 				             	Intent intent = new Intent(getApplicationContext(),affich_child.class);
 				             	intent.putExtra("NAMESRT", name);
 				             	intent.putExtra("URISRT", String.valueOf(Uri));
@@ -183,7 +180,7 @@ public class affich_srt extends ListActivity{
 				public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuinfo) {
 					
 					  super.onCreateContextMenu(menu, v, menuinfo);
-					  menu.add(Menu.NONE, PATH, Menu.NONE, "Language");
+					  menu.add(Menu.NONE, PATH, Menu.NONE, "Main");
 					  menu.add(Menu.NONE, VIDEO, Menu.NONE, "Video");
 					  menu.add(Menu.NONE, SRT, Menu.NONE, "Srt");
 					  menu.add(Menu.NONE, CONTENTSRT, Menu.NONE, "Display Srt Content");
@@ -237,12 +234,15 @@ public class affich_srt extends ListActivity{
 					    case CONTENTSRT:
 								AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
 								int position=item.getItemId();
-				                path = getSrtPath(arr.getItem(info.position));
-								File file2 = new File( path +"/"+arr.getItem(info.position));
+				                path = yourDir.getAbsolutePath();
+				                HashMap<String, String> Hm_name = nameList.get(info.position);
+				                name = Hm_name.get("Title") ; //=  adapter.getItem(position);
+								File file2 = new File( path +"/"+name);
 								if(file2.isFile() && (file2.getName().toLowerCase().endsWith(".srt")||file2.getName().toLowerCase().endsWith(".ass"))){
 					            	Intent intent5 = new Intent(getApplicationContext(),affich_srt_txt.class);
 					            	intent5.putExtra("PATHSRT", path);
-					            	intent5.putExtra("URISRT",   arr.getItem(info.position));
+					            	intent5.putExtra("URISRT",   name);
+					            	intent5.putExtra("URI", MainIntent.getStringExtra("URI"));
 					            	intent5.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
 					            	intent5.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
 					            	intent5.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
@@ -254,8 +254,10 @@ public class affich_srt extends ListActivity{
 					    case DELETESRT:
 								info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
 								position=item.getItemId();
-								path = getSrtPath(arr.getItem(info.position));
-								File file = new File( path +"/"+arr.getItem(info.position));
+								Hm_name = nameList.get(info.position);
+				                name = Hm_name.get("Title") ;
+				                path = yourDir.getAbsolutePath();
+								File file = new File( path +"/"+name);
 								if(file.isFile() && (file.getName().toLowerCase().endsWith(".srt")||file.getName().toLowerCase().endsWith(".ass"))){
 									boolean deleted = file.delete();
 									if(deleted)	onResume();
@@ -271,42 +273,31 @@ public class affich_srt extends ListActivity{
 					@Override
 					protected void onResume(){
 						super.onResume();
+						nameList.clear();
 						this.onCreate(null);
 					}
 					
-					
-					
-					public String getSrtPath(String pos){
-						
-						String Dir = yourDir.getAbsolutePath()+"/"+pos;
-		                File f = new File(Dir);
-		                if(!f.exists()){
-		                	Dir = DownloadDir.getAbsolutePath()+"/"+pos;
-		                	f = new File(Dir);
-		                	if(!f.exists()){
-		                		Dir = BlueToothDir.getAbsolutePath()+"/"+pos;
-			                	f = new File(Dir);
-		                	}
-		                	
-		                }
-		                Dir=Dir.replace("/"+pos, "");
-		                return Dir;
-					}
-					
-					public void getListeRecursiv(File path,String prefix,ArrayList<String>nameList ){
+				
+					@SuppressLint("DefaultLocale")
+					public void getListeRecursiv(File path,String prefix,HashMap<String,String>el ){
 						
 						if(path !=null && path.exists() && path.isDirectory()){
 						    for (File f : path.listFiles()) 
-						    {
+						    {	
+						    	el = new HashMap<String,String>();
 						       if (f.isFile())
 						       {	
 						    	   if(f.getName().toLowerCase().endsWith(".srt")||f.getName().toLowerCase().endsWith(".ass")){
 						    		   //String str_path=f.getAbsolutePath().replace(prefix+"/", "");
-						    		   nameList.add(f.getName());
+								    	el.put("Title", f.getName());
+								    	el.put("SubTitle", "SubTitle File");
+						    		   nameList.add(el);
 						    	   }
-						       }else if(f.isDirectory()){
+						       }else if(f.isDirectory() && f.canRead()){
 						    		   //getListeRecursiv(f,prefix,nameList);
-						    	   		nameList.add(f.getName());
+							    	el.put("Title", f.getName());
+							    	el.put("SubTitle", "Directory");
+					    	   		nameList.add(el);
 
 						       }
 						   }

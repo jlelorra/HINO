@@ -34,7 +34,6 @@ public class MainActivity extends Activity {
 
 	    player = (VideoView)findViewById(R.id.videoView1);
 	    Uri uri = Uri.parse(Environment.getExternalStorageDirectory().getPath() +"/American.Horror.Story.S03E09.HDTV.x264-ASAP.mp4");
-	    Log.d("URI CONTENT",Environment.getExternalStorageDirectory().getPath() +"/American.Horror.Story.S03E09.HDTV.x264-ASAP.mp4");
 
 	    @SuppressWarnings("deprecation")
 		Date dt = new Date();
