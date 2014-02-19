@@ -13,7 +13,6 @@ import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.ListActivity;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -136,46 +135,52 @@ public class affich_video extends ListActivity{
 	        {
        	
 	         case R.id.video:
-			            	Intent intent = new Intent(getApplicationContext(),affich_video.class);
-			            	intent.putExtra("URI", String.valueOf(Uri));
+			            	Intent intent = new Intent(getApplicationContext(),affich_child_video.class);
+			            	intent.putExtra("URI", MainIntent.getStringExtra("URI"));
 			            	intent.putExtra("URISRT", MainIntent.getStringExtra("URISRT"));
 			            	intent.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
 			            	intent.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
 			            	intent.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+			            	intent.putExtra("PATHMP4",yourDir.getAbsolutePath());
+			            	intent.putExtra("PATHSRT",MainIntent.getStringExtra("PATHSRT"));
 			            	startActivity(intent);
 	          	          	return true;
 	          	          	
 	        case R.id.srt:
-			            	Intent intent2 = new Intent(getApplicationContext(),affich_srt.class);
-			            	intent2.putExtra("URI", String.valueOf(Uri));
+			            	Intent intent2 = new Intent(getApplicationContext(),affich_child.class);
+			            	intent2.putExtra("URI", MainIntent.getStringExtra("URI"));
 			            	intent2.putExtra("URISRT", MainIntent.getStringExtra("URISRT"));
 			            	intent2.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
 			            	intent2.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
 			            	intent2.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+			            	intent2.putExtra("PATHMP4",MainIntent.getStringExtra("PATHMP4"));
+			            	intent2.putExtra("PATHSRT",yourDir.getAbsolutePath());
 							startActivity(intent2);
 					        return true;
 	
 	        case R.id.path:
 				        	Intent intent3 = new Intent(getApplicationContext(),selectPath.class);
-				        	intent3.putExtra("URI", String.valueOf(Uri));
+				        	intent3.putExtra("URI", MainIntent.getStringExtra("URI"));
 				        	intent3.putExtra("URISRT", MainIntent.getStringExtra("URISRT"));
 				        	intent3.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
 				        	intent3.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
 			            	intent3.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+			            	intent3.putExtra("PATHMP4",MainIntent.getStringExtra("PATHMP4"));
+			            	intent3.putExtra("PATHSRT",MainIntent.getStringExtra("PATHSRT"));
 							startActivity(intent3);
 					        return true;
 					        
 	        case R.id.about:
-	        	Intent intent5 = new Intent(getApplicationContext(),about.class);
-	        	intent5.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
-	        	intent5.putExtra("NAMESRT",  MainIntent.getStringExtra("NAMESRT"));
-	        	intent5.putExtra("URISRT",  MainIntent.getStringExtra("URISRT"));
-	        	intent5.putExtra("URI", String.valueOf(Uri));
-	        	intent5.putExtra("PATHSRT",MainIntent.getStringExtra("PATHSRT"));
-	        	intent5.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
-	        	intent5.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
-	        	intent5.putExtra("PATHMP4",MainIntent.getStringExtra("PATHMP4"));
-				startActivity(intent5);
+				        	Intent intent5 = new Intent(getApplicationContext(),about.class);
+				        	intent5.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+				        	intent5.putExtra("NAMESRT",  MainIntent.getStringExtra("NAMESRT"));
+				        	intent5.putExtra("URISRT",  MainIntent.getStringExtra("URISRT"));
+				        	intent5.putExtra("URI", MainIntent.getStringExtra("URI"));
+				        	intent5.putExtra("PATHSRT",MainIntent.getStringExtra("PATHSRT"));
+				        	intent5.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
+				        	intent5.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
+				        	intent5.putExtra("PATHMP4",MainIntent.getStringExtra("PATHMP4"));
+							startActivity(intent5);
 		        return true;
 
 	        }
@@ -203,31 +208,37 @@ public class affich_video extends ListActivity{
 			    		
 			    case PATH:
 			        	Intent intent3 = new Intent(getApplicationContext(),selectPath.class);
-			        	intent3.putExtra("URI", String.valueOf(Uri));
+			        	intent3.putExtra("URI", MainIntent.getStringExtra("URI"));
 			        	intent3.putExtra("URISRT", MainIntent.getStringExtra("URISRT"));
 			        	intent3.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
 			        	intent3.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
 		            	intent3.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+		            	intent3.putExtra("PATHMP4",MainIntent.getStringExtra("PATHMP4"));
+		            	intent3.putExtra("PATHSRT",MainIntent.getStringExtra("PATHSRT"));
 						startActivity(intent3);
 				        return true;
 			     	 	
 			    case VIDEO:
-		            	Intent intent = new Intent(getApplicationContext(),affich_video.class);
-		            	intent.putExtra("URI", String.valueOf(Uri));
+		            	Intent intent = new Intent(getApplicationContext(),affich_child_video.class);
+		            	intent.putExtra("URI", MainIntent.getStringExtra("URI"));
 		            	intent.putExtra("URISRT", MainIntent.getStringExtra("URISRT"));
 		            	intent.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
 		            	intent.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
 		            	intent.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+		            	intent.putExtra("PATHMP4",yourDir.getAbsolutePath());
+		            	intent.putExtra("PATHSRT",MainIntent.getStringExtra("PATHSRT"));
 		            	startActivity(intent);
 	      	          	return true;
 		     	 	
 			    case SRT:
-		            	Intent intent2 = new Intent(getApplicationContext(),affich_srt.class);
-		            	intent2.putExtra("URI", String.valueOf(Uri));
+		            	Intent intent2 = new Intent(getApplicationContext(),affich_child.class);
+		            	intent2.putExtra("URI", MainIntent.getStringExtra("URI"));
 		            	intent2.putExtra("URISRT", MainIntent.getStringExtra("URISRT"));
 		            	intent2.putExtra("DELAY",MainIntent.getIntExtra("DELAY",0));
 		            	intent2.putExtra("SWITCH",MainIntent.getBooleanExtra("SWITCH",false));
 		            	intent2.putExtra("VIEW",MainIntent.getStringExtra("VIEW"));
+		            	intent2.putExtra("PATHMP4",MainIntent.getStringExtra("PATHMP4"));
+		            	intent2.putExtra("PATHSRT",yourDir.getAbsolutePath());
 		            	startActivity(intent2);
 				        return true;
 

@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -12,12 +11,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.List;
 
-import com.JMJ.commonTools.CommonTools;
-
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -158,11 +156,16 @@ public class selectPath extends Activity {
 
 	private void showInMarket(String packageName)
 	{
-	    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + packageName));
-	    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-	    //intent.setDataAndType(Uri.parse(i1.getStringExtra("URI")), "video/*");
-	    //intent.setDataAndType(Uri.parse(i1.getStringExtra("URISRT")), "file/*");
-	    startActivity(intent);
+		try{
+		    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + packageName));
+		    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		    //intent.setDataAndType(Uri.parse(i1.getStringExtra("URI")), "video/*");
+		    //intent.setDataAndType(Uri.parse(i1.getStringExtra("URISRT")), "file/*");
+		    startActivity(intent);
+		}catch(ActivityNotFoundException e){
+			Toast.makeText(getApplicationContext(), "No package found", Toast.LENGTH_LONG).show();
+			return;
+		}
 	}
 	
 	public boolean doesPackageExist(String targetPackage) {
@@ -455,47 +458,61 @@ public class selectPath extends Activity {
 				        	return true;
 			        	
 	         case R.id.video:
-			            	Intent intent = new Intent(getApplicationContext(),affich_video.class);
+			            	Intent intent;
+			             	if(i1.getStringExtra("PATHMP4")==null) intent = new Intent(getApplicationContext(),affich_video.class);
+			             	else  intent = new Intent(getApplicationContext(),affich_child_video.class);
+			            	intent.putExtra("URI", i1.getStringExtra("URI"));
 			            	intent.putExtra("URISRT",i1.getStringExtra("URISRT"));
 			            	intent.putExtra("DELAY",picker.getValue());
 			            	intent.putExtra("SWITCH",toggle.isChecked());
 			            	intent.putExtra("VIEW",View);
 			             	intent.putExtra("PATHSRT",i1.getStringExtra("PATHSRT"));
 			             	intent.putExtra("PATHMP4",i1.getStringExtra("PATHMP4"));
+			             	intent.putExtra("NAMESRT",  i1.getStringExtra("NAMESRT"));
+			             	intent.putExtra("URISRT",  i1.getStringExtra("URISRT"));
 			            	startActivity(intent);
 	          	          	return true;
 	          	          	
 	        case R.id.srt:
-			            	Intent intent2 = new Intent(getApplicationContext(),affich_srt.class);
+				            Intent intent2;
+				            if(i1.getStringExtra("PATHSRT")==null) intent2 = new Intent(getApplicationContext(),affich_srt.class);
+				            else  intent2 = new Intent(getApplicationContext(),affich_child.class);
 			            	intent2.putExtra("URI", i1.getStringExtra("URI"));
 			            	intent2.putExtra("DELAY",picker.getValue());
 			            	intent2.putExtra("SWITCH",toggle.isChecked());
 			            	intent2.putExtra("VIEW",View);
 			            	intent2.putExtra("PATHMP4",i1.getStringExtra("PATHMP4"));
+			            	intent2.putExtra("NAMESRT",  i1.getStringExtra("NAMESRT"));
+			            	intent2.putExtra("URISRT",  i1.getStringExtra("URISRT"));
+			            	intent2.putExtra("PATHSRT",i1.getStringExtra("PATHSRT"));
 							startActivity(intent2);
 					        return true;
 	
 	        case R.id.path:
 				        	Intent intent3 = new Intent(getApplicationContext(),selectPath.class);
 				        	intent3.putExtra("URI", i1.getStringExtra("URI"));
+				        	intent3.putExtra("PATHMP4",i1.getStringExtra("PATHMP4"));
 				        	intent3.putExtra("DELAY",picker.getValue());
 				        	intent3.putExtra("SWITCH",toggle.isChecked());
 				        	intent3.putExtra("VIEW",View);
+				        	intent3.putExtra("NAMESRT",  i1.getStringExtra("NAMESRT"));
+				        	intent3.putExtra("URISRT",  i1.getStringExtra("URISRT"));
+				        	intent3.putExtra("PATHSRT",i1.getStringExtra("PATHSRT"));
 							startActivity(intent3);
 					        return true;
 					        
 	        case R.id.about:
-		        	Intent intent5 = new Intent(getApplicationContext(),about.class);
-		        	intent5.putExtra("VIEW",View);
-		        	intent5.putExtra("NAMESRT",  i1.getStringExtra("NAMESRT"));
-		        	intent5.putExtra("URISRT",  i1.getStringExtra("URISRT"));
-		        	intent5.putExtra("URI", i1.getStringExtra("URI"));
-		        	intent5.putExtra("PATHSRT",i1.getStringExtra("PATHSRT"));
-		        	intent5.putExtra("DELAY",picker.getValue());
-		        	intent5.putExtra("SWITCH",toggle.isChecked());
-		        	intent5.putExtra("PATHMP4",i1.getStringExtra("PATHMP4"));
-					startActivity(intent5);
-			        return true;
+				        	Intent intent5 = new Intent(getApplicationContext(),about.class);
+				        	intent5.putExtra("VIEW",View);
+				        	intent5.putExtra("NAMESRT",  i1.getStringExtra("NAMESRT"));
+				        	intent5.putExtra("URISRT",  i1.getStringExtra("URISRT"));
+				        	intent5.putExtra("URI", i1.getStringExtra("URI"));
+				        	intent5.putExtra("PATHSRT",i1.getStringExtra("PATHSRT"));
+				        	intent5.putExtra("DELAY",picker.getValue());
+				        	intent5.putExtra("SWITCH",toggle.isChecked());
+				        	intent5.putExtra("PATHMP4",i1.getStringExtra("PATHMP4"));
+							startActivity(intent5);
+					        return true;
 
 	        }
 	        return super.onOptionsItemSelected(item);
@@ -556,8 +573,12 @@ public class selectPath extends Activity {
 			        	return true;
 			     	 	
 			    case VIDEO:
-		            	Intent intent = new Intent(getApplicationContext(),affich_video.class);
+		            	Intent intent;
+		             	if(i1.getStringExtra("PATHMP4")==null) intent = new Intent(getApplicationContext(),affich_video.class);
+		             	else  intent = new Intent(getApplicationContext(),affich_child_video.class);
+		            	intent.putExtra("URI", i1.getStringExtra("URI"));
 		            	intent.putExtra("URISRT",i1.getStringExtra("URISRT"));
+		            	intent.putExtra("NAMESRT",  i1.getStringExtra("NAMESRT"));
 		            	intent.putExtra("DELAY",picker.getValue());
 		            	intent.putExtra("SWITCH",toggle.isChecked());
 		            	intent.putExtra("VIEW",View);
@@ -567,11 +588,16 @@ public class selectPath extends Activity {
 	      	          	return true;
 		     	 	
 			    case SRT:
-		            	Intent intent2 = new Intent(getApplicationContext(),affich_srt.class);
+			            Intent intent2;
+			            if(i1.getStringExtra("PATHSRT")==null) intent2 = new Intent(getApplicationContext(),affich_srt.class);
+			            else  intent2 = new Intent(getApplicationContext(),affich_child.class);
 		            	intent2.putExtra("URI", i1.getStringExtra("URI"));
+		            	intent2.putExtra("URISRT",i1.getStringExtra("URISRT"));
+		            	intent2.putExtra("NAMESRT",  i1.getStringExtra("NAMESRT"));
 		            	intent2.putExtra("DELAY",picker.getValue());
 		            	intent2.putExtra("SWITCH",toggle.isChecked());
 		            	intent2.putExtra("VIEW",View);
+		            	intent2.putExtra("PATHSRT",i1.getStringExtra("PATHSRT"));
 		            	intent2.putExtra("PATHMP4",i1.getStringExtra("PATHMP4"));
 						startActivity(intent2);
 				        return true;
@@ -612,7 +638,7 @@ public class selectPath extends Activity {
 		    
 		    
 		    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-			@SuppressLint("NewApi")
+			@SuppressLint({ "NewApi", "DefaultLocale" })
 			public void populate(){
 		    	 RelativeLayout rl = (RelativeLayout)findViewById(R.id.selectPathLayout);
 		 	    rl.setBackgroundColor(Color.BLACK);
@@ -682,8 +708,11 @@ public class selectPath extends Activity {
 		             @SuppressLint("NewApi")
 					@Override
 		             public void onClick(View v) {
-		             	Intent intent = new Intent(getApplicationContext(),affich_video.class);
+		            	Intent intent;
+		             	if(i1.getStringExtra("PATHMP4")==null) intent = new Intent(getApplicationContext(),affich_video.class);
+		             	else  intent = new Intent(getApplicationContext(),affich_child_video.class);
 		             	intent.putExtra("URISRT",i1.getStringExtra("URISRT"));
+		             	intent.putExtra("URI", i1.getStringExtra("URI"));
 		             	intent.putExtra("DELAY",picker.getValue());
 		             	intent.putExtra("SWITCH",toggle.isChecked());
 		             	intent.putExtra("VIEW",View);
@@ -697,20 +726,27 @@ public class selectPath extends Activity {
 		             @SuppressLint("NewApi")
 					@Override
 		             public void onClick(View v) {
-		             	Intent intent = new Intent(getApplicationContext(),affich_srt.class);
+			            Intent intent;
+			            if(i1.getStringExtra("PATHSRT")==null) intent = new Intent(getApplicationContext(),affich_srt.class);
+			            else  intent = new Intent(getApplicationContext(),affich_child.class);
 		             	intent.putExtra("URI", i1.getStringExtra("URI"));
+		             	intent.putExtra("URISRT",i1.getStringExtra("URISRT"));
 		             	intent.putExtra("DELAY",picker.getValue());
 		             	intent.putExtra("SWITCH",toggle.isChecked());
 		             	intent.putExtra("VIEW",View);
 		             	intent.putExtra("PATHMP4",i1.getStringExtra("PATHMP4"));
+		             	intent.putExtra("PATHSRT",i1.getStringExtra("PATHSRT"));
 		 				startActivity(intent);
 		     			}
 		             
 		 		});
 		 		Test.setOnClickListener(new View.OnClickListener(){
 		 			
-		 			public void onClick(View v) {
-		 				if(!String.valueOf(pathvideo.getText()).trim().equals("")&&!String.valueOf(pathSrt.getText()).trim().equals("")){
+		 			@SuppressLint("DefaultLocale")
+					public void onClick(View v) {
+		 				if(!String.valueOf(pathvideo.getText()).trim().equals("")&&!String.valueOf(pathSrt.getText()).trim().equals("")
+		 					&&!String.valueOf(pathvideo.getText()).trim().toLowerCase().equals("null")
+		 					&&!String.valueOf(pathSrt.getText()).trim().toLowerCase().equals("null")){
 		 					if(View.equals("selectpath_ms")||View.equals("selectpath_ms_fr")){
 			 					modif_srt(String.valueOf(pathvideo.getText()),
 			 							String.valueOf(pathSrt.getText()),
@@ -728,12 +764,31 @@ public class selectPath extends Activity {
 		 						Intent LaunchIntent = new Intent("android.intent.action.MAIN");
 		 						startApplication("org.videolan.vlc.betav7neon");
 		 					}else{
-		 						if(!View.equals("selectpath")&&!View.equals("selectpath_ms"))Toast.makeText(getApplicationContext(), "Veuillez Installer VLC", Toast.LENGTH_LONG).show();
-		 						else Toast.makeText(getApplicationContext(), "Please install VLCBeta For android", Toast.LENGTH_LONG).show();
-		 						showInMarket("org.videolan.vlc.betav7neon");
+		 						if(!View.equals("selectpath")&&!View.equals("selectpath_ms"))Toast.makeText(getApplicationContext(), "Nouveau sous titre cr��", Toast.LENGTH_LONG).show();
+		 						else Toast.makeText(getApplicationContext(), "Created new subtitle", Toast.LENGTH_LONG).show();
+		 						AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+		 						builder.setTitle("Install VLC Media Player ?");
+		 						builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+
+		 						    public void onClick(DialogInterface dialog, int which) {
+		 						    	showInMarket("org.videolan.vlc.betav7neon");
+		 						        dialog.dismiss();
+		 						    }
+
+		 						});
+		 						builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+		 						    @Override
+		 						    public void onClick(DialogInterface dialog, int which) {
+		 						        // I do not need any action here you might
+		 						        dialog.dismiss();
+		 						    }
+		 						});
+		 						AlertDialog alert = builder.create();
+		 						alert.show();
 		 					}
 		 				}else{
-		 					if(!View.equals("selectpath")&&!View.equals("selectpath_ms"))Toast.makeText(getApplicationContext(), "Pas de video ou de sous titres selectionner", Toast.LENGTH_LONG).show();
+		 					if(!View.equals("selectpath")&&!View.equals("selectpath_ms"))Toast.makeText(getApplicationContext(), "Pas de video ou de sous titres selectionne(es)", Toast.LENGTH_LONG).show();
 		 					else Toast.makeText(getApplicationContext(), "No Video or Subtitle selected", Toast.LENGTH_LONG).show();}
 		 			}
 
